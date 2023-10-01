@@ -1,9 +1,16 @@
 #ifndef BCB_FIRMWARE_2024_TEMPMONITORING_H
 #define BCB_FIRMWARE_2024_TEMPMONITORING_H
 
+#include "../BcbParameters.h"
+
+typedef struct SegmentData {
+    float thermistorData[18];
+} SegmentData;
+
 typedef struct TempMonitoringInput {
-    float temp1; // temp sensor 1
-    float temp2; // temp sensor 2
+    // Battery has 5 segments, 18 thermistors per segment
+    SegmentData segmentData[5];
+    float temp;
 } TempMonitoringInput;
 
 typedef struct TempMonitoringOutput {
@@ -14,8 +21,8 @@ typedef struct TempMonitoringOutput {
 
 class TempMonitoring {
 public:
-    void evaluate(TempMonitoringInput* input, TempMonitoringOutput* output);
-
+    void setParameters(BcbParameters* params) {};
+    void evaluate(BcbParameters* params, TempMonitoringInput* input, TempMonitoringOutput* output);
 };
 
 

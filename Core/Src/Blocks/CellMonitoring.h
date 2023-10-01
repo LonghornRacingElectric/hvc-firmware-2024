@@ -6,11 +6,9 @@
 #define BCB_FIRMWARE_2024_CELLMONITORING_H
 
 
-
 class CellMonitoring {
 
 };
-
 
 
 #endif //BCB_FIRMWARE_2024_CELLMONITORING_H

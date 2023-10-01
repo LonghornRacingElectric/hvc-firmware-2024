@@ -55,7 +55,12 @@ add_definitions(-DDEBUG -DUSE_HAL_DRIVER -DSTM32H7A3xxQ)
 
 file(GLOB_RECURSE SOURCES "Core/*.*" "Libs/LonghornLibrary/*.*" "Drivers/*.*")
 
-set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32H7A3ZITXQ_FLASH.ld)
+set(LINKER_SCRIPT ${CMAKE_SOURCE_DIR}/STM32H7A3ZITXQ_FLASH.ld
+        Core/Src/Blocks/TempMonitoring.cpp
+        Core/Src/Blocks/TempMonitoring.h
+        Core/Src/BcbParameters.h
+        Core/Src/Blocks/CellMonitoring.cpp
+        Core/Src/Blocks/CellMonitoring.h)
 
 add_link_options(-Wl,-gc-sections,--print-memory-usage,-Map=${PROJECT_BINARY_DIR}/${PROJECT_NAME}.map)
 add_link_options(-mcpu=cortex-m7 -mthumb -mthumb-interwork)
