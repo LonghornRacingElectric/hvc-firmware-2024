@@ -104,6 +104,15 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+
+        // Update state machine
+        // check SPI inbox
+        /* send info over CAN
+         *  VCU (imd, faults)
+         *  IMD/AMS LED status */
+        // receive CAN (config info)
+        //send cell voltages/current data (1 Hz)
+
         bool userButton = HAL_GPIO_ReadPin(B1_GPIO_Port, B1_Pin);
 
         HAL_GPIO_WritePin(GPIOB, LD1_Pin, userButton ? GPIO_PIN_SET : GPIO_PIN_RESET);
