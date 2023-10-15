@@ -13,10 +13,14 @@ void TempMonitoring::evaluate(BcbParameters* params, TempMonitoringInput* input,
     // Check if temperature is in the safe range.
     output->safeTemp = true;
 
-
-    if(input->temp < params->tempMin || input->temp > params->tempMax)
+    for(SegmentData segment : input->segmentData)
     {
-        output->safeTemp = false;
+        for(float temp : segment.thermistorData) {
+            if(temp < params->tempMin || temp > params->tempMax)
+            {
+                output->safeTemp = false;
+            }
+        }
     }
 
     // Check that there are no missing measurements.
