@@ -15,7 +15,7 @@ static float maxTemp;
 // Functions
 void cellsPeriodic();
 
-static void sendTempPackets(); // 12 packets, 1 byte per temp (int)
-static void sendVoltagePackets(); // 35 packets, 2 bytes per voltage (int)
+static void sendTempPacket(); // 12 packets, 1 byte per temp (int)
+static void sendVoltagePacket(); // 35 packets, 2 bytes per voltage (int)
 
 #endif //HVC_FIRMWARE_2024_CELLS_H
