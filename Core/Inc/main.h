@@ -57,12 +57,12 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
-#define Prox_to_MCU_Pin GPIO_PIN_14
-#define Prox_to_MCU_GPIO_Port GPIOC
-#define Ctrl_from_MCU_Pin GPIO_PIN_15
+#define Ctrl_from_MCU_Pin GPIO_PIN_14
 #define Ctrl_from_MCU_GPIO_Port GPIOC
-#define Ctrl_to_MCU_Pin GPIO_PIN_0
-#define Ctrl_to_MCU_GPIO_Port GPIOC
+#define Prox_to_MCU_Pin GPIO_PIN_15
+#define Prox_to_MCU_GPIO_Port GPIOC
+#define Calib_Button_Pin GPIO_PIN_0
+#define Calib_Button_GPIO_Port GPIOC
 #define A_HV_to_MCU_Pin GPIO_PIN_1
 #define A_HV_to_MCU_GPIO_Port GPIOC
 #define A_HV_lowCurr_to_MCU_Pin GPIO_PIN_2
@@ -83,8 +83,8 @@ void Error_Handler(void);
 #define Close_HV__Signal_GPIO_Port GPIOC
 #define Close_HV__SignalC5_Pin GPIO_PIN_5
 #define Close_HV__SignalC5_GPIO_Port GPIOC
-#define Calib_Button_Pin GPIO_PIN_0
-#define Calib_Button_GPIO_Port GPIOB
+#define Ctrl_to_MCU_Pin GPIO_PIN_0
+#define Ctrl_to_MCU_GPIO_Port GPIOB
 #define SDO_IMU_Pin GPIO_PIN_1
 #define SDO_IMU_GPIO_Port GPIOB
 #define SDI_IMU_Pin GPIO_PIN_2
