@@ -10,9 +10,3 @@ bool isPackVoltageWithinBounds();
 float getPackVoltage();
 
 #endif //HVC_FIRMWARE_2024_VSENSE_H
-
-// Variables
-uint32_t voltage;
-
-
-// Functions
