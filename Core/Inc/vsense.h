@@ -6,3 +6,9 @@
 #define HVC_FIRMWARE_2024_VSENSE_H
 
 #endif //HVC_FIRMWARE_2024_VSENSE_H
+
+// Variables
+uint32_t voltage;
+
+
+// Functions

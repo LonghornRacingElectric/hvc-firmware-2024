@@ -17,5 +17,5 @@ void cellsPeriodic();
 
 static void sendTempPacket(); // 12 packets, 1 byte per temp (int)
 static void sendVoltagePacket(); // 35 packets, 2 bytes per voltage (int)
-
+bool areCellVoltagesWithinBounds();
 #endif //HVC_FIRMWARE_2024_CELLS_H
