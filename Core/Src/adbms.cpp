@@ -12,6 +12,44 @@
 #include <iostream>
 #include <cstdint>
 #include "ADBMS.h"
+#include "spi.h"
+
+// Interrupt callbacks
+static LTC6813_Error_t bms_error = LTC6813_ERROR;
+void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi) {
+    bms_error = LTC6813_OK;
+}
+
+void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi) {
+    bms_error = LTC6813_SPI_ERROR;
+}
+
+extern SPI_HandleTypeDef hspi1; // BMS SPI
+
+LTC6813_Error_t ltc6813_cmd_write(LTC6813_Command_t command, uint8_t *data, uint8_t len) {
+    LTC6813_Command_t cmd_buf = command; // PEC15 requires pointer to command
+    uint16_t cmd_crc = pec15((char *) cmd_buf, 2);
+    uint16_t data_crc = pec15((char *) data, len);
+    HAL_SPI_Transmit_IT(&hspi1, (uint8_t *) &cmd_buf, 2);
+    if(bms_error != LTC6813_OK) {
+        return bms_error;
+    }
+    HAL_SPI_Transmit_IT(&hspi1, (uint8_t *) &cmd_crc, 2);
+    if(bms_error != LTC6813_OK) {
+        return bms_error;
+    }
+    // TODO: Handle shifting (comm with multiple BMS ICs)
+    HAL_SPI_Transmit_IT(&hspi1, data, len);
+    if(bms_error != LTC6813_OK) {
+        return bms_error;
+    }
+    HAL_SPI_Transmit_IT(&hspi1, (uint8_t *) &data_crc, 2);
+    if(bms_error != LTC6813_OK) {
+        return bms_error;
+    }
+
+    return bms_error;
+}
 
 /************************************************
  * ADI-given PEC15 Code
