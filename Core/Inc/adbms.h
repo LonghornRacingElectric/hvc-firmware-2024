@@ -24,6 +24,12 @@
 #define CH_6 CELL_SELECTION_6_12_18 // Cell Channels
 
 typedef enum {
+    LTC6813_OK,
+    LTC6813_SPI_ERROR,
+    LTC6813_ERROR //Todo: More specific
+} LTC6813_Error_t;
+
+typedef enum {
     ADC_MODE_SLOW = 0x0, // 422Hz
     ADC_MODE_FAST = 0x1, // 27kHz
     ADC_MODE_NORMAL = 0x2, // 7kHz
@@ -59,6 +65,14 @@ typedef enum {
     GPIO_5 = 0x5,
     GPIO_2ND_REFERENCE = 0x6
 } LTC6813_ADC_GPIO_Selection_t;
+
+typedef enum {
+    STATUS_GROUP_ALL = 0x0,
+    STATUS_GROUP_SC = 0x1,
+    STATUS_GROUP_ITMP = 0x2,
+    STATUS_GROUP_VA = 0x3,
+    STATUS_GROUP_VD = 0x4
+} LTC6813_Status_Group_Selection_t;
 
 // From UBC team's public Github code
 typedef enum {
@@ -107,37 +121,37 @@ typedef enum {
     CMD_ADOL    = 0x0201 | (MD << 7) | (DCP << 4),
 
     // Start GPIOs ADC Conversion and Poll Status
-    CMD_ADAX_ALL      =  0x0460 | (MD << 7) | CHG_ALL,
-    CMD_ADAX_GPIO1_6  =  0x0460 | (MD << 7) | CHG_GPIO1_6,
-    CMD_ADAX_GPIO2_7  =  0x0460 | (MD << 7) | CHG_GPIO2_7,
-    CMD_ADAX_GPIO3_8  =  0x0460 | (MD << 7) | CHG_GPIO3_8,
-    CMD_ADAX_GPIO4_9  =  0x0460 | (MD << 7) | CHG_GPIO4_9,
-    CMD_ADAX_GPIO5    =  0x0460 | (MD << 7) | CHG_GPIO5,
-    CMD_ADAX_VREF2    =  0x0460 | (MD << 7) | CHG_VREF2,
+    CMD_ADAX_ALL      =  0x0460 | (MD << 7) | GPIO_1_5_6_10,
+    CMD_ADAX_GPIO1_6  =  0x0460 | (MD << 7) | GPIO_1_6,
+    CMD_ADAX_GPIO2_7  =  0x0460 | (MD << 7) | GPIO_2_7,
+    CMD_ADAX_GPIO3_8  =  0x0460 | (MD << 7) | GPIO_3_8,
+    CMD_ADAX_GPIO4_9  =  0x0460 | (MD << 7) | GPIO_4_9,
+    CMD_ADAX_GPIO5    =  0x0460 | (MD << 7) | GPIO_5,
+    CMD_ADAX_VREF2    =  0x0460 | (MD << 7) | GPIO_2ND_REFERENCE,
     // Start GPIOs ADC Conversion With Digital Redundancy and Poll Status
-    CMD_ADAXD_ALL     =  0x0400 | (MD << 7) | CHG_ALL,
-    CMD_ADAXD_GPIO1_6 =  0x0400 | (MD << 7) | CHG_GPIO1_6,
-    CMD_ADAXD_GPIO2_7 =  0x0400 | (MD << 7) | CHG_GPIO2_7,
-    CMD_ADAXD_GPIO3_8 =  0x0400 | (MD << 7) | CHG_GPIO3_8,
-    CMD_ADAXD_GPIO4_9 =  0x0400 | (MD << 7) | CHG_GPIO4_9,
-    CMD_ADAXD_GPIO5   =  0x0400 | (MD << 7) | CHG_GPIO5,
-    CMD_ADAXD_VREF2   =  0x0400 | (MD << 7) | CHG_VREF2,
+    CMD_ADAXD_ALL     =  0x0400 | (MD << 7) | GPIO_1_5_6_10,
+    CMD_ADAXD_GPIO1_6 =  0x0400 | (MD << 7) | GPIO_1_6,
+    CMD_ADAXD_GPIO2_7 =  0x0400 | (MD << 7) | GPIO_2_7,
+    CMD_ADAXD_GPIO3_8 =  0x0400 | (MD << 7) | GPIO_3_8,
+    CMD_ADAXD_GPIO4_9 =  0x0400 | (MD << 7) | GPIO_4_9,
+    CMD_ADAXD_GPIO5   =  0x0400 | (MD << 7) | GPIO_5,
+    CMD_ADAXD_VREF2   =  0x0400 | (MD << 7) | GPIO_2ND_REFERENCE,
 
     // Start Self Test GPIOs Conversion and Poll Status
     //CMD_AXST = 0x0407 | (MD << 7) | (ST << 5),
 
     // Start Status Group ADC Conversion and Poll Status
-    CMD_ADSTAT_ALL  = 0x0468 | (MD << 7) | CHST_ALL,
-    CMD_ADSTAT_SC   = 0x0468 | (MD << 7) | CHST_SC,
-    CMD_ADSTAT_ITMP = 0x0468 | (MD << 7) | CHST_ITMP,
-    CMD_ADSTAT_VA   = 0x0468 | (MD << 7) | CHST_VA,
-    CMD_ADSTAT_VD   = 0x0468 | (MD << 7) | CHST_VD,
+    CMD_ADSTAT_ALL  = 0x0468 | (MD << 7) | STATUS_GROUP_ALL,
+    CMD_ADSTAT_SC   = 0x0468 | (MD << 7) | STATUS_GROUP_SC,
+    CMD_ADSTAT_ITMP = 0x0468 | (MD << 7) | STATUS_GROUP_ITMP,
+    CMD_ADSTAT_VA   = 0x0468 | (MD << 7) | STATUS_GROUP_VA,
+    CMD_ADSTAT_VD   = 0x0468 | (MD << 7) | STATUS_GROUP_VD,
     // Start Status Group ADC Conversion With Digital Redundancy and Poll Status
-    CMD_ADSTATD_ALL = 0x0408 | (MD << 7) | CHST_ALL,
-    CMD_ADSTATD_SC  = 0x0408 | (MD << 7) | CHST_SC,
-    CMD_ADSTATD_ITMP= 0x0408 | (MD << 7) | CHST_ITMP,
-    CMD_ADSTATD_VA  = 0x0408 | (MD << 7) | CHST_VA,
-    CMD_ADSTATD_VD  = 0x0408 | (MD << 7) | CHST_VD,
+    CMD_ADSTATD_ALL = 0x0408 | (MD << 7) | STATUS_GROUP_ALL,
+    CMD_ADSTATD_SC  = 0x0408 | (MD << 7) | STATUS_GROUP_SC,
+    CMD_ADSTATD_ITMP= 0x0408 | (MD << 7) | STATUS_GROUP_ITMP,
+    CMD_ADSTATD_VA  = 0x0408 | (MD << 7) | STATUS_GROUP_VA,
+    CMD_ADSTATD_VD  = 0x0408 | (MD << 7) | STATUS_GROUP_VD,
 
     // Start Self Test Status Group Conversion and Poll Status
     //CMD_STATST  = 0x040F | (MD << 7) | (ST << 5),
@@ -157,7 +171,7 @@ typedef enum {
     CMD_STCOMM  = 0x0723,       // Start I2C /SPI Communication
     CMD_MUTE    = 0x0028,       // Mute discharge
     CMD_UNMUTE  = 0x0029        // Unmute discharge
-} BTM_command_t;
+} LTC6813_Command_t;
 
 // Pre-generated PEC15 table by running code given in ADI datsheet
 const uint16_t pec15Table[256] = {0x0, 0xc599, 0xceab, 0xb32, 0xd8cf, 0x1d56, 0x1664,
@@ -186,6 +200,16 @@ const uint16_t pec15Table[256] = {0x0, 0xc599, 0xceab, 0xb32, 0xd8cf, 0x1d56, 0x
 /**********************************************************
  * Function declarations
 ***********************************************************/
+
+/**
+ * @brief Write command to LTC6813
+ *
+ * @param command
+ * @param data
+ * @param len
+ * @return LTC6813_Error_t
+ */
+LTC6813_Error_t ltc6813_cmd_write(LTC6813_Command_t command, uint8_t *data, uint8_t len);
 
 /**
  * @brief Generate pec15 CRC for LTC6813
