@@ -8,7 +8,12 @@
 static float minTemp = 0.0f;
 static float maxTemp = 60.0f;
 
-void updateParameters();
+void updateParameters(float newMinTemp, float newMaxTemp);
 bool isTempWithinBounds();
+
+/**
+ * check temps, update fan setpoints
+ */
+void thermalPeriodic();
 
 #endif //HVC_FIRMWARE_2024_COOLING_H
