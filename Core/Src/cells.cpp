@@ -59,6 +59,30 @@ static void sendTempPacket() {
     idTracker = idTracker + 7;
 }
 
+/** sends 35 can packets with 8 bytes of voltage data each, 2 byte per voltage
+ *  only sends 1 can packet when called, resets when it reaches 35
+ */
 static void sendVoltagePacket() {
+    // keeps track of which canID we should be sending can packet over, resets after 35th packet
+    static uint32_t idTracker = HVC_VCU_CELL_VOLTAGES_START;
+    if(idTracker == HVC_VCU_CELL_VOLTAGES_START + 280) {
+        idTracker = HVC_VCU_CELL_VOLTAGES_START;
+    }
 
+    // convert voltageData from float in mV to uint8_t that uses 2 bytes per voltage
+    static uint8_t voltages[8];
+    static int offset = (int)(idTracker - HVC_VCU_CELL_VOLTAGES_START) / 2;
+
+    for(int i = offset ; i < (offset + 4) ; i++) {
+        auto value = (uint16_t) voltageData[i];
+        auto byte1 = static_cast<uint8_t>((value & 0xFF00) >> 8);
+        auto byte2 = static_cast<uint8_t>(value & 0x00FF);
+
+        voltages[i] = byte1;
+        voltages[i+1] = byte2;
+    }
+
+    // sends data over can and increments canID
+    can_send(idTracker, 8, voltages);
+    idTracker = idTracker + 8;
 }
