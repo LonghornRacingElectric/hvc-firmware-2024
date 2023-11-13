@@ -5,4 +5,8 @@
 #ifndef HVC_FIRMWARE_2024_CONTACTORS_H
 #define HVC_FIRMWARE_2024_CONTACTORS_H
 
+void setPrechargeContactor(bool on);
+void setDriveContactor(bool on);
+void setDischargeDisable(bool disable);
+
 #endif //HVC_FIRMWARE_2024_CONTACTORS_H
