@@ -74,7 +74,7 @@ static void sendVoltagePacket() {
     static int offset = (int)(idTracker - HVC_VCU_CELL_VOLTAGES_START) / 2;
 
     for(int i = offset ; i < (offset + 4) ; i++) {
-        auto value = (uint16_t) voltageData[i];
+        auto value = (uint16_t) (voltageData[i] / 0.001f);
         auto byte1 = static_cast<uint8_t>((value & 0xFF00) >> 8);
         auto byte2 = static_cast<uint8_t>(value & 0x00FF);
 
