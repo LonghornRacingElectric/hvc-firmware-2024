@@ -79,7 +79,7 @@ static void sendVoltagePacket() {
         auto byte2 = static_cast<uint8_t>(value & 0x00FF);
 
         voltages[i] = byte1;
-        voltages[i+1] = byte2;
+        voltages[i*2+1] = byte2;
     }
 
     // sends data over can and increments canID
