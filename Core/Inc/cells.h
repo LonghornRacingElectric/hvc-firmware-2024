@@ -14,7 +14,9 @@ static float maxTemp;
 
 // Functions
 void cellsPeriodic();
-
+float getSoC();
+float getMaxTemp();
+float getMinTemp();
 static void sendTempPacket(); // 12 packets, 1 byte per temp (int)
 static void sendVoltagePacket(); // 35 packets, 2 bytes per voltage (int)
 bool areCellVoltagesWithinBounds();

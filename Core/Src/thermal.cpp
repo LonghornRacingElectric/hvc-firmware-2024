@@ -5,11 +5,11 @@
 #include "thermal.h"
 
 void updateParameters(float newMinTemp, float newMaxTemp) {
-    minTemp = newMinTemp;
-    maxTemp = newMaxTemp;
+    minAllowedTemp = newMinTemp;
+    maxAllowedTemp = newMaxTemp;
 }
 
 bool isTempWithinBounds() {
     float temp = 15.0f;
-    return temp >= minTemp && temp <= maxTemp;
+    return temp >= minAllowedTemp && temp <= maxAllowedTemp;
 }

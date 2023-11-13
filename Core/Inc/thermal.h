@@ -5,8 +5,8 @@
 #ifndef HVC_FIRMWARE_2024_COOLING_H
 #define HVC_FIRMWARE_2024_COOLING_H
 
-static float minTemp = 0.0f;
-static float maxTemp = 60.0f;
+static float minAllowedTemp = 0.0f;
+static float maxAllowedTemp = 60.0f;
 
 void updateParameters(float newMinTemp, float newMaxTemp);
 bool isTempWithinBounds();
