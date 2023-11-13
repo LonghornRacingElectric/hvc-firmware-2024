@@ -27,11 +27,36 @@ void cellsPeriodic() {
     }
 
     // Send Temp and Voltage Packets (periodically)
-
+    static int i = 0;
+    if(++i == 50) {
+        sendTempPacket();
+    }
+    else if (i >= 100) {
+        sendVoltagePacket();
+        i = 0;
+    }
 }
 
+/** sends 13 can packets with 7 bytes of temp data each, 1 byte per temp
+ *  only sends 1 can packet when called, resets when it reaches 13
+ */
 static void sendTempPacket() {
+    // keeps track of which canID we should be sending can packet over, resets after 13th packet
+    static uint32_t idTracker = HVC_VCU_CELL_TEMPS_START;
+    if(idTracker == HVC_VCU_CELL_TEMPS_START + 91) {
+        idTracker = HVC_VCU_CELL_TEMPS_START;
+    }
 
+    // converts tempData from float to uint8_t of the specific can packet
+    static uint8_t rounded_temps[7];
+    static int offset = (int)(idTracker - HVC_VCU_CELL_TEMPS_START);
+    for(int i = offset ; i < (offset + 7) ; i++) {
+        rounded_temps[i-offset] = (uint8_t)tempData[i];
+    }
+
+    // sends data over can and increments canID
+    can_send(idTracker, 7, rounded_temps);
+    idTracker = idTracker + 7;
 }
 
 static void sendVoltagePacket() {
