@@ -9,7 +9,8 @@
  * find min max temps after low pass filter
  **/
 void cellsPeriodic() {
-    // Create SPI inbox request
+    // Create SPI receive request
+
 
     // Process Temperature Data
     for(int i = 0 ; i < 91 ; i++) {
