@@ -87,3 +87,15 @@ static void sendVoltagePacket() {
     can_send(idTracker, 8, voltages);
     idTracker = idTracker + 8;
 }
+
+float getSoC() {
+
+}
+
+float getMaxTemp() {
+    return maxTemp;
+}
+
+float getMinTemp() {
+    return minTemp;
+}

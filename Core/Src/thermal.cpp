@@ -3,6 +3,7 @@
 //
 
 #include "thermal.h"
+#include "cells.h"
 
 void updateParameters(float newMinTemp, float newMaxTemp) {
     minAllowedTemp = newMinTemp;
@@ -10,6 +11,5 @@ void updateParameters(float newMinTemp, float newMaxTemp) {
 }
 
 bool isTempWithinBounds() {
-    float temp = 15.0f;
-    return temp >= minAllowedTemp && temp <= maxAllowedTemp;
+    return getMinTemp() >= minAllowedTemp && getMaxTemp() <= maxAllowedTemp;
 }
