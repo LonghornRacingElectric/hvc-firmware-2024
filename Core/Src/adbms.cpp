@@ -9,7 +9,6 @@
  *
  */
 
-#include <iostream>
 #include <cstdint>
 #include "ADBMS.h"
 #include "spi.h"
