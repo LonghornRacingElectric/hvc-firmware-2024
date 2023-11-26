@@ -10,8 +10,8 @@ void setPrechargeContactor(bool on) {
 }
 
 void setDriveContactor(bool on) {
-    HAL_GPIO_WritePin(Close_HV__Signal_GPIO_Port, Close_HV__Signal_Pin, (GPIO_PinState) on);
-    HAL_GPIO_WritePin(Close_HV__SignalC5_GPIO_Port, Close_HV__SignalC5_Pin, (GPIO_PinState) on);
+    HAL_GPIO_WritePin(Close_HV_P_Signal_GPIO_Port, Close_HV_P_Signal_Pin, (GPIO_PinState) on);
+    HAL_GPIO_WritePin(Close_HV_N_Signal_GPIO_Port, Close_HV_N_Signal_Pin, (GPIO_PinState) on);
 }
 
 void setDischargeDisable(bool disable) {

@@ -52,7 +52,7 @@ void MX_GPIO_Init(void)
   __HAL_RCC_GPIOD_CLK_ENABLE();
 
   /*Configure GPIO pin Output Level */
-  HAL_GPIO_WritePin(GPIOC, Prox_to_MCU_Pin|Close_HV__Signal_Pin|Close_HV__SignalC5_Pin|CAN_Term_Charge_Pin
+  HAL_GPIO_WritePin(GPIOC, Prox_to_MCU_Pin|Close_HV_P_Signal_Pin|Close_HV_N_Signal_Pin|CAN_Term_Charge_Pin
                           |AMS_Error_Pin|PWM_to_Fan_Pin|IMU_CS_Pin|EEPROM_CS_Pin
                           |TEMP_CS_Pin, GPIO_PIN_RESET);
 
@@ -71,7 +71,7 @@ void MX_GPIO_Init(void)
   /*Configure GPIO pins : PCPin PCPin PCPin PCPin
                            PCPin PCPin PCPin PCPin
                            PCPin */
-  GPIO_InitStruct.Pin = Prox_to_MCU_Pin|Close_HV__Signal_Pin|Close_HV__SignalC5_Pin|CAN_Term_Charge_Pin
+  GPIO_InitStruct.Pin = Prox_to_MCU_Pin|Close_HV_P_Signal_Pin|Close_HV_N_Signal_Pin|CAN_Term_Charge_Pin
                           |AMS_Error_Pin|PWM_to_Fan_Pin|IMU_CS_Pin|EEPROM_CS_Pin
                           |TEMP_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
