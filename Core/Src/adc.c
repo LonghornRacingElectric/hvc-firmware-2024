@@ -85,7 +85,16 @@ void MX_ADC1_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN ADC1_Init 2 */
+  HAL_ADC_Start_DMA(&hadc1, (uint32_t*) &adcData, 5);
 
+  if (HAL_ADCEx_Calibration_Start(&hadc1, ADC_CALIB_OFFSET,ADC_SINGLE_ENDED) != HAL_OK)
+  {
+      Error_Handler();
+  }
+  if (HAL_ADCEx_MultiModeStart_DMA(&hadc1, (uint32_t*) &adcData, 5) != HAL_OK)
+  {
+      Error_Handler();
+  }
   /* USER CODE END ADC1_Init 2 */
 
 }

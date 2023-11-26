@@ -3,3 +3,7 @@
 //
 
 #include "../Inc/vsense.h"
+
+float getPackVoltage() {
+
+}
