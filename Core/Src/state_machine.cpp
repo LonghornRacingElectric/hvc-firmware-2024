@@ -4,6 +4,6 @@
 
 #include "state_machine.h"
 
-int updateStateMachine(bool hvOk, bool chargerPresent) {
+int updateStateMachine(bool shutdownClosed, bool hvOk, bool chargerPresent) {
     return STATE_NOT_ENERGIZED;
 }

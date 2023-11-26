@@ -114,16 +114,18 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
+        bool imdOk = isImdOk();
+        bool shutdownClosed = isShutdownClosed();
+        bool chargerPresent = !isVehicleCanActive(); // are we in the vehicle or connected to the charging box?
+
         bool hvOk = isTempWithinBounds();
         hvOk = hvOk && isPackVoltageWithinBounds();
         hvOk = hvOk && isPackCurrentWithinBounds();
         hvOk = hvOk && areCellVoltagesWithinBounds();
+        hvOk = hvOk && imdOk;
         // TODO see if more checks are needed
-        bool imdOk = isImdOk();
-        bool shutdownClosed = isShutdownClosed();
-        bool chargerPresent = isChargerPresent();
 
-        int state = updateStateMachine(hvOk, chargerPresent);
+        int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent);
 
         cellsPeriodic();
         thermalPeriodic();
