@@ -79,10 +79,10 @@ void Error_Handler(void);
 #define SPI_MISO_GPIO_Port GPIOA
 #define Contactor_PGood_Signal_Pin GPIO_PIN_7
 #define Contactor_PGood_Signal_GPIO_Port GPIOA
-#define Close_HV__Signal_Pin GPIO_PIN_4
-#define Close_HV__Signal_GPIO_Port GPIOC
-#define Close_HV__SignalC5_Pin GPIO_PIN_5
-#define Close_HV__SignalC5_GPIO_Port GPIOC
+#define Close_HV_P_Signal_Pin GPIO_PIN_4
+#define Close_HV_P_Signal_GPIO_Port GPIOC
+#define Close_HV_N_Signal_Pin GPIO_PIN_5
+#define Close_HV_N_Signal_GPIO_Port GPIOC
 #define Ctrl_to_MCU_Pin GPIO_PIN_0
 #define Ctrl_to_MCU_GPIO_Port GPIOB
 #define SDO_IMU_Pin GPIO_PIN_1

@@ -25,7 +25,15 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "imd.h"
+#include "thermal.h"
+#include "state_machine.h"
+#include "vcu.h"
+#include "charging.h"
+#include "indicators.h"
+#include "vsense.h"
+#include "isense.h"
+#include "cells.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -97,17 +105,32 @@ int main(void)
   MX_FDCAN2_Init();
   MX_SPI1_Init();
   /* USER CODE BEGIN 2 */
-
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-  while (1)
-  {
+    while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-  }
+
+        bool hvOk = isTempWithinBounds();
+        hvOk = hvOk && isPackVoltageWithinBounds();
+        hvOk = hvOk && isPackCurrentWithinBounds();
+        hvOk = hvOk && areCellVoltagesWithinBounds();
+        // TODO see if more checks are needed
+        bool imdOk = isImdOk();
+        bool shutdownClosed = isShutdownClosed();
+        bool chargerPresent = isChargerPresent();
+
+        int state = updateStateMachine(hvOk, chargerPresent);
+
+        cellsPeriodic();
+        thermalPeriodic();
+        vcuPeriodic();
+        chargingPeriodic();
+        setIndicatorLights(!hvOk, !imdOk);
+    }
   /* USER CODE END 3 */
 }
 
@@ -210,11 +233,10 @@ void PeriphCommonClock_Config(void)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-  /* User can add his own implementation to report the HAL error return state */
-  __disable_irq();
-  while (1)
-  {
-  }
+    /* User can add his own implementation to report the HAL error return state */
+    __disable_irq();
+    while (1) {
+    }
   /* USER CODE END Error_Handler_Debug */
 }
 

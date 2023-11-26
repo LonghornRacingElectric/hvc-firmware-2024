@@ -164,5 +164,7 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
 }
 
 /* USER CODE BEGIN 1 */
-
+int isShutdownClosed() {
+    return 0; // TODO implement
+}
 /* USER CODE END 1 */
