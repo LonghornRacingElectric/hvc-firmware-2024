@@ -232,4 +232,24 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
 int isShutdownClosed() {
     return 0; // TODO implement
 }
+
+float getContactorPGoodSignal() {
+    return (float) adcData[0]; // TODO implement
+}
+
+float getCtrltoMCU() {
+    return (float) adcData[1]; // TODO implement
+}
+
+float getA_HV_to_MCU() {
+    return (float) adcData[2]; // TODO implement
+}
+
+float getA_HV_lowCurr_to_MCU() {
+    return (float) adcData[3]; // TODO implement
+}
+
+float getA_HV_highCurr_to_MCU() {
+    return (float) adcData[4]; // TODO implement
+}
 /* USER CODE END 1 */
