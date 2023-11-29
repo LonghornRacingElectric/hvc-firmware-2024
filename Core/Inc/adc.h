@@ -35,13 +35,18 @@ extern "C" {
 extern ADC_HandleTypeDef hadc1;
 
 /* USER CODE BEGIN Private defines */
-
+static uint16_t adcData[5];
 /* USER CODE END Private defines */
 
 void MX_ADC1_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 int isShutdownClosed();
+float getContactorPGoodSignal();
+float getCtrltoMCU();
+float getA_HV_to_MCU();
+float getA_HV_lowCurr_to_MCU();
+float getA_HV_highCurr_to_MCU();
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
