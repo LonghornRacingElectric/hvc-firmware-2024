@@ -11,8 +11,10 @@
 
 #include <iostream>
 #include <cstdint>
-#include "ADBMS.h"
+#include "adbms.h"
 #include "spi.h"
+
+static uint16_t pec15 (char *data , int len);
 
 // Interrupt callbacks
 static LTC6813_Error_t bms_error = LTC6813_ERROR;
@@ -30,25 +32,57 @@ LTC6813_Error_t ltc6813_cmd_write(LTC6813_Command_t command, uint8_t *data, uint
     LTC6813_Command_t cmd_buf = command; // PEC15 requires pointer to command
     uint16_t cmd_crc = pec15((char *) cmd_buf, 2);
     uint16_t data_crc = pec15((char *) data, len);
-    HAL_SPI_Transmit_IT(&hspi1, (uint8_t *) &cmd_buf, 2);
-    if(bms_error != LTC6813_OK) {
-        return bms_error;
+
+    // Send command
+    if(HAL_SPI_Transmit(&hspi1, (uint8_t *) &cmd_buf, 2, LTC_SPI_TIMEOUT) != HAL_OK) {
+        return LTC6813_SPI_ERROR;
     }
-    HAL_SPI_Transmit_IT(&hspi1, (uint8_t *) &cmd_crc, 2);
-    if(bms_error != LTC6813_OK) {
-        return bms_error;
-    }
-    // TODO: Handle shifting (comm with multiple BMS ICs)
-    HAL_SPI_Transmit_IT(&hspi1, data, len);
-    if(bms_error != LTC6813_OK) {
-        return bms_error;
-    }
-    HAL_SPI_Transmit_IT(&hspi1, (uint8_t *) &data_crc, 2);
-    if(bms_error != LTC6813_OK) {
-        return bms_error;
+    if(HAL_SPI_Transmit(&hspi1, (uint8_t *) &cmd_crc, 2, LTC_SPI_TIMEOUT) != HAL_OK) {
+        return LTC6813_SPI_ERROR;
     }
 
-    return bms_error;
+    // TODO: Handle shifting (comm with multiple BMS ICs)
+    if(HAL_SPI_Transmit(&hspi1, data, len, LTC_SPI_TIMEOUT) != HAL_OK) {
+        return LTC6813_SPI_ERROR;
+    }
+    if(HAL_SPI_Transmit(&hspi1, (uint8_t *) &data_crc, 2, LTC_SPI_TIMEOUT) != HAL_OK) {
+        return LTC6813_SPI_ERROR;
+    }
+
+    return LTC6813_OK;
+}
+
+// data_buf must be >= data size (5 bytes per ADC IC?)
+LTC6813_Error_t ltc6813_cmd_read(LTC6813_Command_t command, uint8_t *data_buf) {
+    LTC6813_Command_t cmd_buf = command; // PEC15 requires pointer to command
+    LTC6813_Error_t output_status = LTC6813_OK;
+    uint16_t received_data_crc;
+    uint16_t cmd_crc = pec15((char *) cmd_buf, 2);
+
+    // Send command
+    if(HAL_SPI_Transmit(&hspi1, (uint8_t *) &cmd_buf, 2, LTC_SPI_TIMEOUT) != HAL_OK) {
+        return LTC6813_SPI_ERROR;
+    }
+    if(HAL_SPI_Transmit(&hspi1, (uint8_t *) &cmd_crc, 2, LTC_SPI_TIMEOUT) != HAL_OK) {
+        return LTC6813_SPI_ERROR;
+    }
+
+    // Get result from daisy chain, check CRC
+    for(int i = 0; i < NUM_BMS_ICS; i++) {
+        if(HAL_SPI_Receive(&hspi1, data_buf+(i*5), 5, LTC_SPI_TIMEOUT) != HAL_OK) {
+            return LTC6813_SPI_ERROR;
+        }
+        if(HAL_SPI_Receive(&hspi1, (uint8_t *)(&received_data_crc), 2, LTC_SPI_TIMEOUT) != HAL_OK) { // PEC15
+            return LTC6813_SPI_ERROR;
+        }
+        uint16_t data_crc = pec15((char *)data_buf, 5);
+        if(data_crc != received_data_crc) {
+            output_status = LTC6813_INVALID_DATA;
+        }
+    }
+
+    return output_status;
+
 }
 
 /************************************************
@@ -66,7 +100,14 @@ USE OF SAME, INCLUDING ANY LOSS OF USE OR DATA OR PROFITS, WHETHER IN AN ACTION 
 OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
 ***************************************/
 
-uint16_t pec15 (char *data , int len) {
+/**
+ * @brief Generate pec15 CRC for LTC6813
+ *
+ * @param data
+ * @param len
+ * @return uint16_t
+ */
+static uint16_t pec15 (char *data , int len) {
     uint16_t remainder, address;
     remainder = 16; // PEC seed
     for (int i = 0; i < len; i++) {

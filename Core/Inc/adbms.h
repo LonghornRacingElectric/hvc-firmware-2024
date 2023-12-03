@@ -10,6 +10,9 @@
 #ifndef ADBMS_H
 #define ADBMS_H
 
+#define LTC_SPI_TIMEOUT 1000 // Timeout
+#define NUM_BMS_ICS 1 // Number of BMS ICs in series
+
 // Not used here - just for reference
 #define CRC15_POLY 0x4599;
 
@@ -26,6 +29,7 @@
 typedef enum {
     LTC6813_OK,
     LTC6813_SPI_ERROR,
+    LTC6813_INVALID_DATA, // CRC mismatch
     LTC6813_ERROR //Todo: More specific
 } LTC6813_Error_t;
 
@@ -210,14 +214,5 @@ const uint16_t pec15Table[256] = {0x0, 0xc599, 0xceab, 0xb32, 0xd8cf, 0x1d56, 0x
  * @return LTC6813_Error_t
  */
 LTC6813_Error_t ltc6813_cmd_write(LTC6813_Command_t command, uint8_t *data, uint8_t len);
-
-/**
- * @brief Generate pec15 CRC for LTC6813
- *
- * @param data
- * @param len
- * @return uint16_t
- */
-uint16_t pec15 (char *data , int len);
 
 #endif
