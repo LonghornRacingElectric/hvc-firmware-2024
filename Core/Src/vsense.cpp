@@ -3,7 +3,8 @@
 //
 
 #include "../Inc/vsense.h"
-
+#include "adc.h"
 float getPackVoltage() {
-
+    //insert calculations needed
+    float VSenseVoltage = getA_HV_to_MCU();
 }
