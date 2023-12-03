@@ -6,30 +6,27 @@
 #include "isense.h"
 #include "adc.h"
 
-
-
+//checks if current is within max to open shutdown in case if curr too high
 bool isPackCurrentWithinBounds() {
     float lowCurr = getA_HV_lowCurr_to_MCU(); // set value
     float highCurr = getA_HV_highCurr_to_MCU();
+    float maxCurrSetting; //TODO: Add this in when we figure val out
 
-    if (lowCurr < -20 && lowCurr > 20) {
-        return false;
-    }
-    if (highCurr < -500 && highCurr > 500) {
+    if (getPackCurrent() > maxCurrSetting) {
         return false;
     }
     return true;
 }
 
-
-//Returns the current rating measured directly
+//Returns the current rating measured directly (mostly HighCurrVal)
 //±20 A for channel 1
 //±500 A for channel 2
 float getPackCurrent() {
-    float lowCurr = getA_HV_lowCurr_to_MCU(); // set value
+    float lowCurr = getA_HV_lowCurr_to_MCU();
     float highCurr = getA_HV_highCurr_to_MCU();
 
-    // return the actual value of the current
-    return lowCurr; // if (we want
+    if (highCurr <= lowCurr) {
+        return lowCurr;
+    } else return highCurr;
 }
 
