@@ -5,7 +5,6 @@
 
 #include "isense.h"
 #include "adc.h"
-
 //checks if current is within max to open shutdown in case if curr too high
 bool isPackCurrentWithinBounds() {
     float lowCurr = getA_HV_lowCurr_to_MCU(); // set value
@@ -25,8 +24,8 @@ float getPackCurrent() {
     float lowCurr = getA_HV_lowCurr_to_MCU();
     float highCurr = getA_HV_highCurr_to_MCU();
 
-    if (highCurr <= lowCurr) {
-        return lowCurr;
-    } else return highCurr;
+    if (highCurr >= 20) { // most used cuz HV outputs higher than 20A around 130A
+        return highCurr;
+    } else return lowCurr;
 }
 
