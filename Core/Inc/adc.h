@@ -36,7 +36,7 @@ extern ADC_HandleTypeDef hadc1;
 
 /* USER CODE BEGIN Private defines */
 static uint16_t adcDataDMA[5];
-int adcConversionComplete= 0;
+//int adcConversionComplete= 0;
 /* USER CODE END Private defines */
 
 void MX_ADC1_Init(void);

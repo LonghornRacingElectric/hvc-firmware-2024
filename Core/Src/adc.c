@@ -229,10 +229,6 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
 }
 
 /* USER CODE BEGIN 1 */
-void HAL_ADC_ConvCpltCallback(ADC_HandleTypeDef* hadc1)
-{
-    adcConversionComplete = 1;
-}
 
 int isShutdownClosed() {
     return 0; // TODO implement
