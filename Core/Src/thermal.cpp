@@ -13,5 +13,5 @@ bool isTempWithinBounds() {
 }
 
 void thermalPeriodic() {
-    setFanRpm();
+    // TODO implement
 }

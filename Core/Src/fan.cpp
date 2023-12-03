@@ -20,9 +20,10 @@ void setFanRpm(float rpm, float deltaTime) {
     time = time + deltaTime;
 
     if(prevTach > currTach) {
-        trueRpm = (1/time) * 60;
+        trueRpm = (1.0f/time) * 60.0f;
         time = 0;
-        pwmDutyCycle += (rpm > trueRpm && pwmDutyCycle >= 0.0f && pwmDutyCycle <= 1.0f) ? 0.01f : -0.01f;
+        pwmDutyCycle += (rpm > trueRpm) ? 0.01f : -0.01f;
+
     }
     prevTach = currTach;
 
