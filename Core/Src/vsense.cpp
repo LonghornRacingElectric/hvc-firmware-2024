@@ -7,4 +7,5 @@
 float getPackVoltage() {
     //insert calculations needed
     float VSenseVoltage = getA_HV_to_MCU();
+    return VSenseVoltage;
 }
