@@ -119,22 +119,22 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-        bool hvOk = isTempWithinBounds();
-        hvOk = hvOk && isPackVoltageWithinBounds();
-        hvOk = hvOk && isPackCurrentWithinBounds();
-        hvOk = hvOk && areCellVoltagesWithinBounds();
-        // TODO see if more checks are needed
-        bool imdOk = isImdOk();
-        bool shutdownClosed = isShutdownClosed();
-        bool chargerPresent = isChargerPresent();
-
-        int state = updateStateMachine(hvOk, chargerPresent);
-
-        cellsPeriodic();
-        thermalPeriodic();
-        vcuPeriodic();
-        chargingPeriodic();
-        setIndicatorLights(!hvOk, !imdOk);
+//        bool hvOk = isTempWithinBounds();
+//        hvOk = hvOk && isPackVoltageWithinBounds();
+//        hvOk = hvOk && isPackCurrentWithinBounds();
+//        hvOk = hvOk && areCellVoltagesWithinBounds();
+//        // TODO see if more checks are needed
+//        bool imdOk = isImdOk();
+//        bool shutdownClosed = isShutdownClosed();
+//        bool chargerPresent = isChargerPresent();
+//
+//        int state = updateStateMachine(hvOk, chargerPresent);
+//
+//        cellsPeriodic();
+//        thermalPeriodic();
+//        vcuPeriodic();
+//        chargingPeriodic();
+//        setIndicatorLights(!hvOk, !imdOk);
     }
   /* USER CODE END 3 */
 }
