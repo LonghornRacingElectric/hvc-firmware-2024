@@ -3,7 +3,7 @@
 //
 
 #include "cells.h"
-#include "can.h"
+#include "angel_can.h"
 
 /** creating spi request, store data, choose when to send temp & voltage packets
  * find min max temps after low pass filter

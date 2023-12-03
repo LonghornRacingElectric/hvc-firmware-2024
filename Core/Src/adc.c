@@ -238,23 +238,23 @@ int isShutdownClosed() {
     return 0; // TODO implement
 }
 
-float getContactorPGoodSignal() {
+float getShutdownCircuit() {
     return ((float) adcDataDMA[0]) / 65535.0f * 3.3f;
 }
 
-float getCtrltoMCU() {
+float getControlPilot() {
     return (float) adcDataDMA[1] / 65535.0f * 3.3f / 3.13043478f * 24.0f;
 }
 
-float getA_HV_to_MCU() {
+float getVSense() {
     return (float) adcDataDMA[2] / 65535.0f * 3.3f; // TODO implement
 }
 
-float getA_HV_lowCurr_to_MCU() {
+float getISenseLow() {
     return (float) adcDataDMA[3] / 65535.0f * 5.0f;
 }
 
-float getA_HV_highCurr_to_MCU() {
+float getISenseHigh() {
     return (float) adcDataDMA[4] / 65535.0f * 5.0f;
 }
 /* USER CODE END 1 */

@@ -43,11 +43,11 @@ void MX_ADC1_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 int isShutdownClosed();
-float getContactorPGoodSignal();
-float getCtrltoMCU();
-float getA_HV_to_MCU();
-float getA_HV_lowCurr_to_MCU();
-float getA_HV_highCurr_to_MCU();
+float getShutdownCircuit();
+float getControlPilot();
+float getVSense();
+float getISenseLow();
+float getISenseHigh();
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
