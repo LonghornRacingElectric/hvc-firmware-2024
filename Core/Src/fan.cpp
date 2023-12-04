@@ -25,19 +25,21 @@ void setFanRpm(float rpm, float deltaTime) {
 
     if(prevTach > currTach) {
         pulseTimes[index] = time;
-        index++;
-        if(index == 10) index = 0;
         time = 0;
-
-        for(float t : pulseTimes) {
-            if(t != 0) numPulses += 1;
-            timeTotal += t;
-        }
-        trueRpm = numPulses / timeTotal * 60.0f;
-        pwmDutyCycle += (rpm > trueRpm) ? 0.01f : -0.01f;
+        index++;
+        index %= 10;
 
         numPulses = 0;
         timeTotal = 0;
+        for(float t : pulseTimes) {
+            if(t > 0.0f) numPulses += 1;
+            timeTotal += t;
+        }
+        trueRpm = numPulses / timeTotal * 60.0f;
+
+        pwmDutyCycle += (rpm > trueRpm) ? 0.01f : -0.01f;
+        if(pwmDutyCycle > 1.0f) pwmDutyCycle = 1.0f;
+        if(pwmDutyCycle < 0.0f) pwmDutyCycle = 0.0f;
     }
     prevTach = currTach;
 
