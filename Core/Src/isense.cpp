@@ -3,3 +3,13 @@
 //
 
 #include "isense.h"
+
+bool isPackCurrentWithinBounds() {
+    return false;
+    // TODO implement
+}
+
+float getPackCurrent() {
+    return 0;
+    // TODO implement
+}

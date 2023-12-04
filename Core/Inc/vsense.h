@@ -5,6 +5,6 @@
 #ifndef HVC_FIRMWARE_2024_VSENSE_H
 #define HVC_FIRMWARE_2024_VSENSE_H
 
-float getPackVoltage();
+float getTractiveVoltage();
 
 #endif //HVC_FIRMWARE_2024_VSENSE_H

@@ -4,7 +4,7 @@
 
 #include "indicators.h"
 #include "stm32h7xx_hal.h"
-#include "can.h"
+#include "angel_can.h"
 
 void setIndicatorLights(bool amsIndicator, bool imdIndicator)
 {

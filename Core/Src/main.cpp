@@ -19,8 +19,10 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 #include "adc.h"
+#include "dma.h"
 #include "fdcan.h"
 #include "spi.h"
+#include "tim.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -100,10 +102,13 @@ int main(void)
 
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
-  MX_ADC1_Init();
+  MX_DMA_Init();
   MX_FDCAN1_Init();
   MX_FDCAN2_Init();
+  MX_ADC1_Init();
   MX_SPI1_Init();
+  MX_TIM2_Init();
+  MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   /* USER CODE END 2 */
 
@@ -114,16 +119,14 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-        bool imdOk = isImdOk();
-        bool shutdownClosed = isShutdownClosed();
-        bool chargerPresent = !isVehicleCanActive(); // are we in the vehicle or connected to the charging box?
-
         bool hvOk = isTempWithinBounds();
         hvOk = hvOk && isPackVoltageWithinBounds();
         hvOk = hvOk && isPackCurrentWithinBounds();
         hvOk = hvOk && areCellVoltagesWithinBounds();
-        hvOk = hvOk && imdOk;
         // TODO see if more checks are needed
+        bool imdOk = isImdOk();
+        bool shutdownClosed = isShutdownClosed();
+        bool chargerPresent = false; // isChargerPresent(); // TODO from CAN
 
         int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent);
 

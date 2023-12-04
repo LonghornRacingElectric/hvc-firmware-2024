@@ -53,8 +53,7 @@ void MX_GPIO_Init(void)
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOC, Prox_to_MCU_Pin|Close_HV_P_Signal_Pin|Close_HV_N_Signal_Pin|CAN_Term_Charge_Pin
-                          |AMS_Error_Pin|PWM_to_Fan_Pin|IMU_CS_Pin|EEPROM_CS_Pin
-                          |TEMP_CS_Pin, GPIO_PIN_RESET);
+                          |AMS_Error_Pin|IMU_CS_Pin|EEPROM_CS_Pin|TEMP_CS_Pin, GPIO_PIN_RESET);
 
   /*Configure GPIO pin Output Level */
   HAL_GPIO_WritePin(GPIOA, Discharge_Disable_Pin|CAN_Term_Pin, GPIO_PIN_RESET);
@@ -69,11 +68,9 @@ void MX_GPIO_Init(void)
   HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
 
   /*Configure GPIO pins : PCPin PCPin PCPin PCPin
-                           PCPin PCPin PCPin PCPin
-                           PCPin */
+                           PCPin PCPin PCPin PCPin */
   GPIO_InitStruct.Pin = Prox_to_MCU_Pin|Close_HV_P_Signal_Pin|Close_HV_N_Signal_Pin|CAN_Term_Charge_Pin
-                          |AMS_Error_Pin|PWM_to_Fan_Pin|IMU_CS_Pin|EEPROM_CS_Pin
-                          |TEMP_CS_Pin;
+                          |AMS_Error_Pin|IMU_CS_Pin|EEPROM_CS_Pin|TEMP_CS_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
