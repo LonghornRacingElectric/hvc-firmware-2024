@@ -8,7 +8,7 @@
 #include "clock.h"
 
 static CanRx parameterMailbox;
-static uint8_t packData[7];
+static uint8_t packData[6];
 static uint8_t imuAccel[6];
 static uint8_t imuGyro[6];
 
@@ -22,9 +22,9 @@ void vcuInit() {
  * */
 void vcuPeriodic() {
     can_writeBytes(packData, 0, 2, (uint16_t) (getPackVoltage() / 0.001f));
-    can_writeBytes(packData, 2, 4, (uint16_t) (getPackCurrent() / 0.001f));
-    can_writeBytes(packData, 4, 6, (uint16_t) (getSoC() / 0.001f));
-    can_writeBytes(packData, 6, 7, (uint8_t) getMaxTemp());
+    can_writeBytes(packData, 2, 4, (uint16_t) (getPackCurrent() / 0.1f));
+    can_writeBytes(packData, 4, 5, (uint16_t) getSoC());
+    can_writeBytes(packData, 5, 6, (uint8_t) getMaxTemp());
 
     can_writeBytes(imuAccel, 0, 2, (uint16_t) (imu_getAccel()));
     can_writeBytes(imuAccel, 2, 4, (uint16_t) (imu_getAccel()));
@@ -35,8 +35,15 @@ void vcuPeriodic() {
     can_writeBytes(imuGyro, 4, 6, (uint16_t) (imu_getGyro()));
 
     if(clock_getDeltaTime() == .01f) {
-        can_send(HVC_VCU_PACK_STATUS, 7, packData);
+        can_send(HVC_VCU_PACK_STATUS, 6, packData);
         can_send(HVC_VCU_IMU_ACCEL, 6, imuAccel);
         can_send(HVC_VCU_IMU_GYRO, 6, imuGyro);
     }
 }
+
+/**
+ *
+ */
+ void receiveParams() {
+
+ }
