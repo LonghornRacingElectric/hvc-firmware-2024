@@ -34,7 +34,10 @@ void vcuPeriodic() {
     can_writeBytes(imuGyro, 2, 4, (uint16_t) (imu_getGyro()));
     can_writeBytes(imuGyro, 4, 6, (uint16_t) (imu_getGyro()));
 
-    if(clock_getDeltaTime() == .01f) {
+    static float timer = 0.0f;
+    timer += clock_getDeltaTime();
+    if(timer >= 0.01f) {
+        timer = 0.0f;
         can_send(HVC_VCU_PACK_STATUS, 6, packData);
         can_send(HVC_VCU_IMU_ACCEL, 6, imuAccel);
         can_send(HVC_VCU_IMU_GYRO, 6, imuGyro);

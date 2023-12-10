@@ -32,8 +32,8 @@ void cellsPeriodic() {
         sendVoltagePacket();
     }
     else if (time >= 0.0769f) {
-        sendTempPacket();
         time = 0.0f;
+        sendTempPacket();
     }
 }
 
