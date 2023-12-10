@@ -9,4 +9,9 @@ void vcuInit();
  */
 void vcuPeriodic();
 
+/**
+ * receive adjustable param updates from vcu
+ */
+void receiveParams();
+
 #endif //HVC_FIRMWARE_2024_VCU_H
