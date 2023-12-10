@@ -5,13 +5,15 @@
 #include "indicators.h"
 #include "stm32h7xx_hal.h"
 #include "angel_can.h"
+#include "clock.h"
 
 void setIndicatorLights(bool amsIndicator, bool imdIndicator)
 {
-    // Runs code every 100 cycles
-    static int i = 0;
-    if(++i < 100) return;
-    i = 0;
+    // 1 Hz timer
+    static float timer = 0.0f;
+    timer += clock_getDeltaTime();
+    if(timer >= 1.0f) return;
+    timer = 0.0f;
 
     uint8_t data[2] = {amsIndicator, imdIndicator};
     can_send(HVC_VCU_AMS_IMD, 2, data);
