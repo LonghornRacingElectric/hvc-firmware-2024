@@ -6,6 +6,7 @@
 #include "cells.h"
 #include "imu.h"
 #include "clock.h"
+#include "thermal.h"
 
 static CanRx parameterMailbox;
 static uint8_t packData[6];
@@ -45,8 +46,10 @@ void vcuPeriodic() {
 }
 
 /**
- *
+ * Gets can packet from VCU for parameter changes like temp
  */
  void receiveParams() {
-
+    auto minTempParam = (float) can_readBytes(parameterMailbox.data, 0, 1);
+    auto maxTempParam = (float) can_readBytes(parameterMailbox.data, 1, 2);
+    updateParameters(minTempParam, maxTempParam);
  }
