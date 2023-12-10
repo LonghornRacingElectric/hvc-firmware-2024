@@ -1,9 +1,7 @@
-//
-// Created by rolandwang on 11/12/2023.
-//
 
 #include "cells.h"
 #include "angel_can.h"
+#include "clock.h"
 
 /** creating spi request, store data, choose when to send temp & voltage packets
  * find min max temps after low pass filter
@@ -28,13 +26,14 @@ void cellsPeriodic() {
     }
 
     // Send Temp and Voltage Packets (periodically)
-    static int i = 0;
-    if(++i == 50) {
-        sendTempPacket();
-    }
-    else if (i >= 100) {
+    static float time = 0.0f;
+    time += clock_getDeltaTime();
+    if(time >= 0.0285f) {
         sendVoltagePacket();
-        i = 0;
+    }
+    else if (time >= 0.0769f) {
+        sendTempPacket();
+        time = 0.0f;
     }
 }
 
