@@ -27,13 +27,13 @@ void vcuPeriodic() {
     can_writeBytes(packData, 4, 5, (uint16_t) getSoC());
     can_writeBytes(packData, 5, 6, (uint8_t) getMaxTemp());
 
-    can_writeBytes(imuAccel, 0, 2, (uint16_t) (imu_getAccel()));
-    can_writeBytes(imuAccel, 2, 4, (uint16_t) (imu_getAccel()));
-    can_writeBytes(imuAccel, 4, 6, (uint16_t) (imu_getAccel()));
+    can_writeBytes(imuAccel, 0, 2, (uint16_t) accelData.x);
+    can_writeBytes(imuAccel, 2, 4, (uint16_t) accelData.y);
+    can_writeBytes(imuAccel, 4, 6, (uint16_t) accelData.z);
 
-    can_writeBytes(imuGyro, 0, 2, (uint16_t) (imu_getGyro()));
-    can_writeBytes(imuGyro, 2, 4, (uint16_t) (imu_getGyro()));
-    can_writeBytes(imuGyro, 4, 6, (uint16_t) (imu_getGyro()));
+    can_writeBytes(imuGyro, 0, 2, (uint16_t) gyroData.x);
+    can_writeBytes(imuGyro, 2, 4, (uint16_t) gyroData.y);
+    can_writeBytes(imuGyro, 4, 6, (uint16_t) gyroData.z);
 
     static float timer = 0.0f;
     timer += clock_getDeltaTime();
