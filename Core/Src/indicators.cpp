@@ -9,12 +9,12 @@
 
 void setIndicatorLights(bool amsIndicator, bool imdIndicator)
 {
-    // 1 Hz timer
+    // 10 Hz timer
     static float timer = 0.0f;
     timer += clock_getDeltaTime();
-    if(timer >= 1.0f) return;
-    timer = 0.0f;
-
-    uint8_t data[2] = {amsIndicator, imdIndicator};
-    can_send(HVC_VCU_AMS_IMD, 2, data);
+    if(timer >= 10.0f) {
+        timer = 0.0f;
+        uint8_t data[2] = {amsIndicator, imdIndicator};
+        can_send(HVC_VCU_AMS_IMD, 2, data);
+    }
 }
