@@ -22,34 +22,32 @@ void vcuInit() {
  *  Get imu accel and gyro data
  * */
 void vcuPeriodic() {
-    can_writeBytes(packData, 0, 2, (uint16_t) (getPackVoltage() / 0.001f));
-    can_writeBytes(packData, 2, 4, (uint16_t) (getPackCurrent() / 0.1f));
-    can_writeBytes(packData, 4, 5, (uint16_t) getSoC());
-    can_writeBytes(packData, 5, 6, (uint8_t) getMaxTemp());
-
-    can_writeBytes(imuAccel, 0, 2, (uint16_t) accelData.x);
-    can_writeBytes(imuAccel, 2, 4, (uint16_t) accelData.y);
-    can_writeBytes(imuAccel, 4, 6, (uint16_t) accelData.z);
-
-    can_writeBytes(imuGyro, 0, 2, (uint16_t) gyroData.x);
-    can_writeBytes(imuGyro, 2, 4, (uint16_t) gyroData.y);
-    can_writeBytes(imuGyro, 4, 6, (uint16_t) gyroData.z);
-
     static float timer = 0.0f;
     timer += clock_getDeltaTime();
     if(timer >= 0.01f) {
         timer = 0.0f;
+        can_writeBytes(packData, 0, 1, (uint16_t) (getPackVoltage() / 0.01f));
+        can_writeBytes(packData, 2, 3, (uint16_t) (getPackCurrent() / 0.1f));
+        can_writeBytes(packData, 4, 4, (uint16_t) getSoC());
+        can_writeBytes(packData, 5, 5, (uint8_t) getMaxTemp());
+
+        can_writeBytes(imuAccel, 0, 1, (uint16_t) accelData.x);
+        can_writeBytes(imuAccel, 2, 2, (uint16_t) accelData.y);
+        can_writeBytes(imuAccel, 4, 5, (uint16_t) accelData.z);
+
+        can_writeBytes(imuGyro, 0, 1, (uint16_t) gyroData.x);
+        can_writeBytes(imuGyro, 2, 3, (uint16_t) gyroData.y);
+        can_writeBytes(imuGyro, 4, 5, (uint16_t) gyroData.z);
+
         can_send(HVC_VCU_PACK_STATUS, 6, packData);
         can_send(HVC_VCU_IMU_ACCEL, 6, imuAccel);
         can_send(HVC_VCU_IMU_GYRO, 6, imuGyro);
     }
-}
 
-/**
- * Gets can packet from VCU for parameter changes like temp
- */
- void receiveParams() {
-    auto minTempParam = (float) can_readBytes(parameterMailbox.data, 0, 1);
-    auto maxTempParam = (float) can_readBytes(parameterMailbox.data, 1, 2);
-    updateParameters(minTempParam, maxTempParam);
- }
+    // Check VCU->HVC Params Mailbox
+    if(parameterMailbox.isRecent) {
+        auto minTempParam = (float) can_readBytes(parameterMailbox.data, 0, 0);
+        auto maxTempParam = (float) can_readBytes(parameterMailbox.data, 1, 1);
+        updateParameters(minTempParam, maxTempParam);
+    }
+}
