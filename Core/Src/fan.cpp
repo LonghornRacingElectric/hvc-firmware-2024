@@ -41,7 +41,12 @@ void setFanRpm(float rpm, float deltaTime) {
         if(t > 0.0f) numPulses += 1;
         timeTotal += t;
     }
-    if(timeTotal != 0.0f) trueRpm = numPulses / timeTotal * 60.0f;
+    if(timeTotal != 0.0f) {
+        trueRpm = numPulses / timeTotal * 60.0f;
+    }
+    else {
+        trueRpm = 0.0f;
+    }
 
     // Adjusts pwmDutyCycle based on requested rpm compared to true rpm
     pwmDutyCycle += (rpm > trueRpm) ? 0.01f : -0.01f;
