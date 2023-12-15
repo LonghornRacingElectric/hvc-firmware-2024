@@ -6,7 +6,7 @@
 /** creating spi request, store data, choose when to send temp & voltage packets
  * find min max temps after low pass filter
  **/
-void cellsPeriodic() {
+void cellsPeriodic(float deltaTime) {
     // Create SPI receive request
 
 
@@ -26,13 +26,16 @@ void cellsPeriodic() {
     }
 
     // Send Temp and Voltage Packets (periodically)
-    static float time = 0.0f;
-    time += clock_getDeltaTime();
-    if(time >= 0.0285f) {
+    static float time1 = 0.0f;
+    static float time2 = 0.0f;
+    time1 += deltaTime;
+    time2 += deltaTime;
+    if(time1 >= 0.0285f) {
+        time1 = 0.0f;
         sendVoltagePacket();
     }
-    else if (time >= 0.0769f) {
-        time = 0.0f;
+    else if (time2 >= 0.0769f) {
+        time2 = 0.0f;
         sendTempPacket();
     }
 }
