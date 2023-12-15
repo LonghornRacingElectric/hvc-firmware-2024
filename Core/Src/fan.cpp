@@ -9,6 +9,7 @@
 void setFanRpm(float rpm, float deltaTime) {
 
     static float time;
+    static float pwmTimer = 0.0f;
     static float trueRpm;
     static float pwmDutyCycle = 0.0f;
     static float pulseTimes[10];
@@ -20,7 +21,7 @@ void setFanRpm(float rpm, float deltaTime) {
 
 
     currTach = HAL_GPIO_ReadPin(Tach_from_Fan_GPIO_Port, Tach_from_Fan_Pin) == GPIO_PIN_SET;
-    time = time + deltaTime;
+    time += deltaTime;
 
     // Detects when tach falls from high to low, and stores pulse time
     if(prevTach > currTach) {
@@ -48,12 +49,19 @@ void setFanRpm(float rpm, float deltaTime) {
         trueRpm = 0.0f;
     }
 
-    // Adjusts pwmDutyCycle based on requested rpm compared to true rpm
-    pwmDutyCycle += (rpm > trueRpm) ? 0.01f : -0.01f;
-    if(pwmDutyCycle > 1.0f) pwmDutyCycle = 1.0f;
-    if(pwmDutyCycle < 0.0f) pwmDutyCycle = 0.0f;
 
-    // update fan based on requested rpm
-    TIM3->CCR4 = (uint8_t)(pwmDutyCycle * 255.0f);
+    // Adjusts pwmDutyCycle based on requested rpm compared to true rpm
+    pwmTimer += deltaTime;
+    if(pwmTimer >= 0.02f) {
+        pwmTimer = 0.0f;
+
+        pwmDutyCycle += (rpm > trueRpm) ? 0.01f : -0.01f;
+        if(pwmDutyCycle > 1.0f) pwmDutyCycle = 1.0f;
+        if(pwmDutyCycle < 0.0f) pwmDutyCycle = 0.0f;
+
+        // update fan based on requested rpm
+        TIM3->CCR4 = (uint8_t)(pwmDutyCycle * 255.0f);
+    }
+
 
 }
