@@ -126,7 +126,7 @@ void MX_ADC1_Init(void)
   {
       Error_Handler();
   }
-  if (HAL_ADCEx_MultiModeStart_DMA(&hadc1, (uint32_t*) &adcData, 5) != HAL_OK)
+  if (HAL_ADCEx_MultiModeStart_DMA(&hadc1, (uint32_t*) &adcDataDMA, 5) != HAL_OK)
   {
       Error_Handler();
   }
@@ -233,23 +233,23 @@ int isShutdownClosed() {
     return 0; // TODO implement
 }
 
-float getContactorPGoodSignal() {
-    return (float) adcData[0]; // TODO implement
+float getShutdownCircuit() {
+    return ((float) adcDataDMA[0]) / 65535.0f * 3.3f;
 }
 
-float getCtrltoMCU() {
-    return (float) adcData[1]; // TODO implement
+float getControlPilot() {
+    return (float) adcDataDMA[1] / 65535.0f * 3.3f / 3.13043478f * 24.0f;
 }
 
-float getA_HV_to_MCU() {
-    return (float) adcData[2]; // TODO implement
+float getVSense() {
+    return (float) adcDataDMA[2] / 65535.0f * 3.3f; // TODO implement
 }
 
-float getA_HV_lowCurr_to_MCU() {
-    return (float) adcData[3]; // TODO implement
+float getISenseLow() {
+    return (float) adcDataDMA[3] / (65535.0f * (3.17880f/3.3f)) * 4.8f;
 }
 
-float getA_HV_highCurr_to_MCU() {
-    return (float) adcData[4]; // TODO implement
+float getISenseHigh() {
+    return (float) adcDataDMA[4] / (65535.0f * (3.17880f/3.3f)) * 4.8f;
 }
 /* USER CODE END 1 */

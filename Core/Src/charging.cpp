@@ -3,3 +3,7 @@
 //
 
 #include "charging.h"
+
+void chargingPeriodic() {
+
+}

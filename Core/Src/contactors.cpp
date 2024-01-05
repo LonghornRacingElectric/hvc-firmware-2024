@@ -2,7 +2,7 @@
 // Created by rolandwang on 11/12/2023.
 //
 
-#include "../Inc/contactors.h"
+#include "contactors.h"
 #include "main.h"
 
 void setPrechargeContactor(bool on) {

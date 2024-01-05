@@ -2,10 +2,11 @@
 // Created by rolandwang on 11/12/2023.
 //
 
-#include "../Inc/vsense.h"
+#include "vsense.h"
 #include "adc.h"
-float getPackVoltage() {
+float getTractiveVoltage() {
     //insert calculations needed
-    float VSenseVoltage = getA_HV_to_MCU();
+    float VSenseVoltage = getVSense();
     return VSenseVoltage;
 }
+

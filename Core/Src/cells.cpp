@@ -3,7 +3,7 @@
 //
 
 #include "cells.h"
-#include "can.h"
+#include "angel_can.h"
 
 /** creating spi request, store data, choose when to send temp & voltage packets
  * find min max temps after low pass filter
@@ -36,6 +36,8 @@ void cellsPeriodic() {
         sendVoltagePacket();
         i = 0;
     }
+
+    // TODO receive data
 }
 
 /** sends 13 can packets with 7 bytes of temp data each, 1 byte per temp
@@ -88,8 +90,20 @@ static void sendVoltagePacket() {
     idTracker = idTracker + 8;
 }
 
-float getSoC() {
+bool areCellVoltagesWithinBounds() {
+    return false;
+}
 
+bool getPackVoltageFromCells() {
+    return false;
+}
+
+bool isPackVoltageWithinBounds() {
+    return false;
+}
+
+float getSoC() {
+    return 0.0f;
 }
 
 float getMaxTemp() {

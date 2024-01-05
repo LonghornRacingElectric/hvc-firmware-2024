@@ -2,7 +2,7 @@
 // Created by rolandwang on 11/12/2023.
 //
 
-#include "../Inc/imd.h"
+#include "imd.h"
 #include "main.h"
 
 bool isImdOk() {
