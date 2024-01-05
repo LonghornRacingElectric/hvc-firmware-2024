@@ -1,9 +1,7 @@
-//
-// Created by rolandwang on 11/12/2023.
-//
 
 #include "thermal.h"
 #include "cells.h"
+#include "fan.h"
 
 void updateParameters(float newMinTemp, float newMaxTemp) {
     minAllowedTemp = newMinTemp;
@@ -12,4 +10,8 @@ void updateParameters(float newMinTemp, float newMaxTemp) {
 
 bool isTempWithinBounds() {
     return getMinTemp() >= minAllowedTemp && getMaxTemp() <= maxAllowedTemp;
+}
+
+void thermalPeriodic() {
+    // TODO implement
 }

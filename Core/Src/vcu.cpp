@@ -3,7 +3,7 @@
 //
 
 #include "vcu.h"
-#include "can.h"
+#include "angel_can.h"
 
 static CanRx parameterMailbox;
 

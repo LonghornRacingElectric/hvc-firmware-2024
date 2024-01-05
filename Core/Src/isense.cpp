@@ -4,6 +4,7 @@
 //
 
 #include "isense.h"
+isense
 #include "adc.h"
 //checks if current is within max to open shutdown in case if curr too high
 bool isPackCurrentWithinBounds() {
@@ -28,4 +29,5 @@ float getPackCurrent() {
         return highCurr;
     } else return lowCurr;
 }
+
 

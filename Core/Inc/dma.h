@@ -1,9 +1,9 @@
 /* USER CODE BEGIN Header */
 /**
   ******************************************************************************
-  * @file    adc.h
+  * @file    dma.h
   * @brief   This file contains all the function prototypes for
-  *          the adc.c file
+  *          the dma.c file
   ******************************************************************************
   * @attention
   *
@@ -18,8 +18,8 @@
   */
 /* USER CODE END Header */
 /* Define to prevent recursive inclusion -------------------------------------*/
-#ifndef __ADC_H__
-#define __ADC_H__
+#ifndef __DMA_H__
+#define __DMA_H__
 
 #ifdef __cplusplus
 extern "C" {
@@ -28,35 +28,25 @@ extern "C" {
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 
+/* DMA memory to memory transfer handles -------------------------------------*/
+
 /* USER CODE BEGIN Includes */
 
 /* USER CODE END Includes */
 
-extern ADC_HandleTypeDef hadc1;
-
 /* USER CODE BEGIN Private defines */
 
-static uint16_t adcDataDMA[5];
-//int adcConversionComplete= 0;
-main
 /* USER CODE END Private defines */
 
-void MX_ADC1_Init(void);
+void MX_DMA_Init(void);
 
 /* USER CODE BEGIN Prototypes */
-int isShutdownClosed();
 
-float getShutdownCircuit();
-float getControlPilot();
-float getVSense();
-float getISenseLow();
-float getISenseHigh();
- main
 /* USER CODE END Prototypes */
 
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* __ADC_H__ */
+#endif /* __DMA_H__ */
 
