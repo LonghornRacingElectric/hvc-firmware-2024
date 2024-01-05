@@ -13,7 +13,7 @@ static float maxTemp;
 
 
 // Functions
-void cellsPeriodic();
+void cellsPeriodic(); //estimate SOC
 static float receiveSPIData();
 static void sendTempPacket(); // 12 packets, 1 byte per temp (int)
 static void sendVoltagePacket(); // 35 packets, 2 bytes per voltage (int)
