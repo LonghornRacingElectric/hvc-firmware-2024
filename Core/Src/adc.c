@@ -246,10 +246,10 @@ float getVSense() {
 }
 
 float getISenseLow() {
-    return (float) adcDataDMA[3] / (65535.0f * (3.17880f/3.3f)) * 4.8f;
+    return (float) adcDataDMA[3] / 65535.0f * 3.3f * 1.510f;
 }
 
 float getISenseHigh() {
-    return (float) adcDataDMA[4] / (65535.0f * (3.17880f/3.3f)) * 4.8f;
+    return (float) adcDataDMA[4] / 65535.0f * 3.3f * 1.510f;
 }
 /* USER CODE END 1 */

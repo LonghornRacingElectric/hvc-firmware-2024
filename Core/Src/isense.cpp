@@ -19,19 +19,23 @@ bool isPackCurrentWithinBounds() {
 float calculateHallCurrent(float hv_voltage_reading) {
     // current is measured by I = ((5/(supply voltage = Uc)) * Vout - (Voffset = 2.5)) * 1/(sensitivity = 6.67)
     //TODO check if we have a reading on supply voltage to enter in this formula
-    float hv_supply_voltage; // bottom 5 in the eq
-    return (float) ((5/5) * hv_voltage_reading - 2.5) * (1/(6.67))
+    float hv_supply; // bottom 5 in the eq
+    if (hv_voltage_reading  >= 50) {
+        return (float) ((5/5) * hv_voltage_reading - 2.5) * (1/(6.67));
+    } else {
+        return (float) ((5/5) * hv_voltage_reading - 2.5) * (1/(40));
+    }
 }
 
 //Returns the current rating measured directly (mostly HighCurrVal)
-//±20 A for channel 1
-//±500 A for channel 2
+//±50 A for channel 1
+//±300 A for channel 2
 float getPackCurrent() {
     // current is measured by I = ((5/(supply voltage = Uc)) * Vout - Voffset) * 1/(sensitivity = 6.67)
     float lowCurr = calculateHallCurrent(getISenseLow());
     float highCurr = calculateHallCurrent(getISenseHigh());
 
-    if (highCurr >= 20) { // most used cuz HV outputs higher than 20A around 130A
+    if (highCurr >= 50) { // most used cuz HV outputs higher than 50A around 300A
         return highCurr;
     } else return lowCurr;
 }
