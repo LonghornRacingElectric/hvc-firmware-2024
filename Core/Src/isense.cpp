@@ -14,15 +14,11 @@ bool isPackCurrentWithinBounds() {
     }
     return true;
 }
-float calculateHallCurrent(float hv_voltage_reading) {
+float calculateHallCurrent(float hv_voltage_reading, float sensitivity) {
     // current is measured by I = ((5/(supply voltage = Uc)) * Vout - (Voffset = 2.5)) * 1/(sensitivity = 6.67)
     //TODO check if we have a reading on supply voltage to enter in this formula
     float hv_supply; // bottom 5 in the eq
-    if (hv_voltage_reading  >= 50.0f) {
-        return (float) ((5.0f/5.0f) * hv_voltage_reading - 2.5f) * (1.0f/(6.67f));
-    } else {
-        return (float) ((5.0f/5.0f) * hv_voltage_reading - 2.5f) * (1.0f/(40.0f));
-    }
+    return (float) ((5.0f/5.0f) * hv_voltage_reading - 2.5f) * (1.0f/(sensitivity));
 }
 
 //Returns the current rating measured directly (mostly HighCurrVal)
@@ -30,10 +26,10 @@ float calculateHallCurrent(float hv_voltage_reading) {
 //±300 A for channel 2
 float getPackCurrent() {
     // current is measured by I = ((5/(supply voltage = Uc)) * Vout - Voffset) * 1/(sensitivity = 6.67)
-    float lowCurr = calculateHallCurrent(getISenseLow());
-    float highCurr = calculateHallCurrent(getISenseHigh());
+    float lowCurr = calculateHallCurrent(getISenseLow(), 40.0f);
+    float highCurr = calculateHallCurrent(getISenseHigh(), 6.67f);
 
-    if (highCurr >= 50.0f) { // most used cuz HV outputs higher than 50A around 300A
+    if (highCurr >= 50.0f || highCurr <= -50.0f) { // most used cuz HV outputs higher than 50A around 300A
         return highCurr;
     } else return lowCurr;
 }
