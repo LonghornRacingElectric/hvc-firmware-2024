@@ -1,14 +1,12 @@
 //
 // Created by rolandwang on 11/12/2023.
-// Developed by angelasrsh on 12/3/24.
+// Developed by angelasrsh on 1/8/24.
 //
 
 #include "isense.h"
 #include "adc.h"
 //checks if current is within max to open shutdown in case if curr too high
 bool isPackCurrentWithinBounds() {
-    float lowCurr = getISenseLow(); // low curr
-    float highCurr = getISenseHigh(); //high curr
     float maxCurrSetting; //TODO: Add this in when we do testing
 
     if (getPackCurrent() > maxCurrSetting) {
@@ -20,10 +18,10 @@ float calculateHallCurrent(float hv_voltage_reading) {
     // current is measured by I = ((5/(supply voltage = Uc)) * Vout - (Voffset = 2.5)) * 1/(sensitivity = 6.67)
     //TODO check if we have a reading on supply voltage to enter in this formula
     float hv_supply; // bottom 5 in the eq
-    if (hv_voltage_reading  >= 50) {
-        return (float) ((5/5) * hv_voltage_reading - 2.5) * (1/(6.67));
+    if (hv_voltage_reading  >= 50.0f) {
+        return (float) ((5.0f/5.0f) * hv_voltage_reading - 2.5f) * (1.0f/(6.67f));
     } else {
-        return (float) ((5/5) * hv_voltage_reading - 2.5) * (1/(40));
+        return (float) ((5.0f/5.0f) * hv_voltage_reading - 2.5f) * (1.0f/(40.0f));
     }
 }
 
@@ -35,7 +33,7 @@ float getPackCurrent() {
     float lowCurr = calculateHallCurrent(getISenseLow());
     float highCurr = calculateHallCurrent(getISenseHigh());
 
-    if (highCurr >= 50) { // most used cuz HV outputs higher than 50A around 300A
+    if (highCurr >= 50.0f) { // most used cuz HV outputs higher than 50A around 300A
         return highCurr;
     } else return lowCurr;
 }
