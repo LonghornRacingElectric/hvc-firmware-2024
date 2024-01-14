@@ -6,7 +6,7 @@
 #include "stm32h7xx_hal.h"
 #include "angel_can.h"
 #include "clock.h"
-
+/*
 void setIndicatorLights(bool amsIndicator, bool imdIndicator)
 {
     // 10 Hz timer
@@ -18,3 +18,4 @@ void setIndicatorLights(bool amsIndicator, bool imdIndicator)
         can_send(HVC_VCU_AMS_IMD, 2, data);
     }
 }
+*/

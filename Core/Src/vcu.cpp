@@ -21,9 +21,13 @@ void vcuInit() {
  *  Get pack current, voltage, SoC, max temp -> store in data array (2 bytes each)
  *  Get imu accel and gyro data
  * */
-void vcuPeriodic() {
+void vcuPeriodic(float deltaTime, bool amsIndicator, bool imdIndicator) {
     static float timer = 0.0f;
-    timer += clock_getDeltaTime();
+    static float timer2 = 0.0f; // Used for Indicator Lights
+
+    timer += deltaTime;
+    timer2 += deltaTime;
+
     if(timer >= 0.01f) {
         timer = 0.0f;
         can_writeBytes(packData, 0, 1, (uint16_t) (getPackVoltage() / 0.01f));
@@ -42,6 +46,12 @@ void vcuPeriodic() {
         can_send(HVC_VCU_PACK_STATUS, 6, packData);
         can_send(HVC_VCU_IMU_ACCEL, 6, imuAccel);
         can_send(HVC_VCU_IMU_GYRO, 6, imuGyro);
+    }
+
+    if(timer2 >= 0.1f) {
+            timer2 = 0.0f;
+            uint8_t data[2] = {amsIndicator, imdIndicator};
+            can_send(HVC_VCU_AMS_IMD, 2, data);
     }
 
     // Check VCU->HVC Params Mailbox
