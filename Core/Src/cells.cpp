@@ -1,16 +1,34 @@
 
 #include "cells.h"
 #include "angel_can.h"
-#include "clock.h"
+#include "adbms.h"
 
-/** creating spi request, store data, choose when to send temp & voltage packets
- * find min max temps after low pass filter
+static LTC6813_Command_t CMD_RDCVs[5] = {CMD_RDCVA,CMD_RDCVB,CMD_RDCVC,CMD_RDCVD,CMD_RDCVE};
+static CanOutbox cellVoltages[35];
+static CanOutbox cellTemps[13];
+
+void cellsInit() {
+    can_addOutboxes(HVC_VCU_CELL_VOLTAGES_START, HVC_VCU_CELL_VOLTAGES_END, 0.0285f, cellVoltages);
+    can_addOutboxes(HVC_VCU_CELL_TEMPS_START, HVC_VCU_CELL_TEMPS_END, 0.0769f, cellTemps);
+}
+
+/**
+ * Reads voltage and temperature data from BMS
+ * Converts and writes data into respective CanOutboxes
  **/
 void cellsPeriodic(float deltaTime) {
-    // Create SPI receive request
 
+    // Reads in 30 voltages per loop into indexes 280-339, then sorts them into correct order from 0-279 (28 bytes/chip, 10 LTC chips)
+    for(int i = 0 ; i < 5 ; i++) {
+        ltc6813_cmd_read(CMD_RDCVs[i], voltageData+280);
+        for(int j = 0 ; j < NUM_BMS_ICS ; j++) {
+            for(int k = 0 ; k < 6 ; k++) {
+                voltageData[j*28+i*6+k] = voltageData[280+j*10+k];
+            }
+        }
+    }
 
-    // Process Temperature Data
+    // Reads in 91 temps
     for(int i = 0 ; i < 91 ; i++) {
         // store data
 
@@ -19,25 +37,6 @@ void cellsPeriodic(float deltaTime) {
         if(minTemp > tempData[i]) minTemp = tempData[i];
     }
 
-    // Process Voltage Data
-    for(int i = 0 ; i < 140 ; i++) {
-        // store data
-
-    }
-
-    // Send Temp and Voltage Packets (periodically)
-    static float time1 = 0.0f;
-    static float time2 = 0.0f;
-    time1 += deltaTime;
-    time2 += deltaTime;
-    if(time1 >= 0.0285f) {
-        time1 = 0.0f;
-        sendVoltagePacket();
-    }
-    else if (time2 >= 0.0769f) {
-        time2 = 0.0f;
-        sendTempPacket();
-    }
 }
 
 /** sends 13 can packets with 7 bytes of temp data each, 1 byte per temp
