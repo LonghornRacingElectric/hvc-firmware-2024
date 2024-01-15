@@ -3,6 +3,7 @@
 #include "angel_can.h"
 #include "adbms.h"
 
+
 static LTC6813_Command_t CMD_RDCVs[5] = {CMD_RDCVA,CMD_RDCVB,CMD_RDCVC,CMD_RDCVD,CMD_RDCVE};
 static CanOutbox cellVoltages[35];
 static CanOutbox cellTemps[13];
@@ -16,7 +17,7 @@ void cellsInit() {
  * Reads voltage and temperature data from BMS
  * Converts and writes data into respective CanOutboxes
  **/
-void cellsPeriodic(float deltaTime) {
+void cellsPeriodic() {
 
     // Reads in 30 voltages per loop into indexes 280-339, then sorts them into correct order from 0-279 (28 bytes/chip, 10 LTC chips)
     for(int i = 0 ; i < 5 ; i++) {
@@ -36,7 +37,6 @@ void cellsPeriodic(float deltaTime) {
         if(maxTemp < tempData[i]) maxTemp = tempData[i];
         if(minTemp > tempData[i]) minTemp = tempData[i];
     }
-
 }
 
 /** sends 13 can packets with 7 bytes of temp data each, 1 byte per temp

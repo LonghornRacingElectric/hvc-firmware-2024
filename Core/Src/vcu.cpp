@@ -26,6 +26,7 @@ void vcuInit() {
  *  Get pack current, voltage, SoC, max temp -> store in data array (2 bytes each)
  *  Get imu accel and gyro data
  * */
+
 void vcuPeriodic(bool amsIndicator, bool imdIndicator) {
 
     // Battery Pack and IMU Data
