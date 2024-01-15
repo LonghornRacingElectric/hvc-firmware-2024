@@ -19,7 +19,7 @@ static float maxTemp;
 
 // Functions
 void cellsInit();
-void cellsPeriodic(float deltaTime);
+void cellsPeriodic();
 static float receiveSPIData();
 static void sendTempPacket(); // 12 packets, 1 byte per temp (int)
 static void sendVoltagePacket(); // 35 packets, 2 bytes per voltage (int)
