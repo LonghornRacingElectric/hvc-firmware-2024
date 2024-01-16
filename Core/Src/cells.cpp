@@ -13,8 +13,9 @@ static CanOutbox cellTemps[23];
  * Initializes CAN outboxes to send voltage and temp data
  **/
 void cellsInit() {
+    // Period set to update all values at a frequency of 1 Hz
     can_addOutboxes(HVC_VCU_CELL_VOLTAGES_START, HVC_VCU_CELL_VOLTAGES_END, 0.0285f, cellVoltages);
-    can_addOutboxes(HVC_VCU_CELL_TEMPS_START, HVC_VCU_CELL_TEMPS_END, 0.0769f, cellTemps);
+    can_addOutboxes(HVC_VCU_CELL_TEMPS_START, HVC_VCU_CELL_TEMPS_END, 0.0435f, cellTemps);
 }
 
 /**
