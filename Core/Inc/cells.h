@@ -20,7 +20,7 @@ static float maxTemp;
 // Functions
 void cellsInit();
 void cellsPeriodic();
-void updateMinMaxTemps();
+void checkMinMaxTemps(uint8_t byte1, uint8_t byte2);
 bool areCellVoltagesWithinBounds();
 float getSoC();
 float getMaxTemp();
