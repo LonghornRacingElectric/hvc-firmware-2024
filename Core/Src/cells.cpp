@@ -8,6 +8,9 @@ static LTC6813_Command_t CMD_RDCVs[5] = {CMD_RDCVA,CMD_RDCVB,CMD_RDCVC,CMD_RDCVD
 static CanOutbox cellVoltages[35];
 static CanOutbox cellTemps[13];
 
+/**
+ * Initializes CAN outboxes to send voltage and temp data
+ **/
 void cellsInit() {
     can_addOutboxes(HVC_VCU_CELL_VOLTAGES_START, HVC_VCU_CELL_VOLTAGES_END, 0.0285f, cellVoltages);
     can_addOutboxes(HVC_VCU_CELL_TEMPS_START, HVC_VCU_CELL_TEMPS_END, 0.0769f, cellTemps);
@@ -24,7 +27,7 @@ void cellsPeriodic() {
         ltc6813_cmd_read(CMD_RDCVs[i], voltageData+280);
         for(int j = 0 ; j < NUM_BMS_ICS ; j++) {
             for(int k = 0 ; k < 6 ; k++) {
-                voltageData[j*28+i*6+k] = voltageData[280+j*10+k];
+                voltageData[i*60+j*6+k] = voltageData[280+j*6+k];
             }
         }
     }
@@ -36,6 +39,13 @@ void cellsPeriodic() {
         // check for min and max temp of each data point
         if(maxTemp < tempData[i]) maxTemp = tempData[i];
         if(minTemp > tempData[i]) minTemp = tempData[i];
+    }
+
+    // Writes voltage values into CanOutboxes
+    for(int i = 0 ; i < 35 ; i++) {
+        for(int j = 0 ; j < 8 ; j++) {
+            can_writeBytes(cellVoltages[i].data, j, j, voltageData[i*8+j]);
+        }
     }
 }
 
