@@ -30,20 +30,20 @@ void vcuPeriodic(bool amsIndicator, bool imdIndicator) {
     // Battery Pack and IMU Data
     can_writeBytes(packStatus.data, 0, 1, (uint16_t) (getPackVoltage() / 0.01f));
     can_writeBytes(packStatus.data, 2, 3, (uint16_t) (getPackCurrent() / 0.1f));
-    can_writeBytes(packStatus.data, 4, 4, (uint16_t) getSoC());
+    can_writeBytes(packStatus.data, 4, 4, (uint8_t) getSoC());
     can_writeBytes(packStatus.data, 5, 5, (uint8_t) getMaxTemp());
 
-    can_writeBytes(imuAccel.data, 0, 1, (uint16_t) accelData.x);
-    can_writeBytes(imuAccel.data, 2, 2, (uint16_t) accelData.y);
-    can_writeBytes(imuAccel.data, 4, 5, (uint16_t) accelData.z);
+    can_writeBytes(imuAccel.data, 0, 1, (int16_t) accelData.x);
+    can_writeBytes(imuAccel.data, 2, 3, (int16_t) accelData.y);
+    can_writeBytes(imuAccel.data, 4, 5, (int16_t) accelData.z);
 
-    can_writeBytes(imuGyro.data, 0, 1, (uint16_t) gyroData.x);
-    can_writeBytes(imuGyro.data, 2, 3, (uint16_t) gyroData.y);
-    can_writeBytes(imuGyro.data, 4, 5, (uint16_t) gyroData.z);
+    can_writeBytes(imuGyro.data, 0, 1, (int16_t) gyroData.x);
+    can_writeBytes(imuGyro.data, 2, 3, (int16_t) gyroData.y);
+    can_writeBytes(imuGyro.data, 4, 5, (int16_t) gyroData.z);
 
     // Indicator Status
-    can_writeBytes(indicatorStatus.data, 0, 0, (uint16_t) amsIndicator);
-    can_writeBytes(indicatorStatus.data, 1, 1, (uint16_t) imdIndicator);
+    can_writeBytes(indicatorStatus.data, 0, 0, (uint8_t) amsIndicator);
+    can_writeBytes(indicatorStatus.data, 1, 1, (uint8_t) imdIndicator);
 
     // Check VCU->HVC Params Inbox
     if(parameterInbox.isRecent) {
