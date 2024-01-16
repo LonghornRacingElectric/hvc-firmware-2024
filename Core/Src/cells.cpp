@@ -5,8 +5,9 @@
 
 
 static LTC6813_Command_t CMD_RDCVs[5] = {CMD_RDCVA,CMD_RDCVB,CMD_RDCVC,CMD_RDCVD,CMD_RDCVE};
+static LTC6813_Command_t CMD_RDCTs[4] = {CMD_RDAUXA,CMD_RDAUXB,CMD_RDAUXC,CMD_RDAUXD};
 static CanOutbox cellVoltages[35];
-static CanOutbox cellTemps[13];
+static CanOutbox cellTemps[12];
 
 /**
  * Initializes CAN outboxes to send voltage and temp data
@@ -22,23 +23,14 @@ void cellsInit() {
  **/
 void cellsPeriodic() {
 
-    // Reads in 30 voltages per loop into indexes 280-339, then sorts them into correct order from 0-279 (28 bytes/chip, 10 LTC chips)
+    // Reads in 30 voltages per read loop into indexes 280-339, then sorts them into correct order from 0-279 (28 bytes/chip, 10 LTC chips)
     for(int i = 0 ; i < 5 ; i++) {
         ltc6813_cmd_read(CMD_RDCVs[i], voltageData+280);
         for(int j = 0 ; j < NUM_BMS_ICS ; j++) {
             for(int k = 0 ; k < 6 ; k++) {
-                voltageData[i*60+j*6+k] = voltageData[280+j*6+k];
+                voltageData[i*6+j*28+k] = voltageData[280+j*6+k];
             }
         }
-    }
-
-    // Reads in 91 temps
-    for(int i = 0 ; i < 91 ; i++) {
-        // store data
-
-        // check for min and max temp of each data point
-        if(maxTemp < tempData[i]) maxTemp = tempData[i];
-        if(minTemp > tempData[i]) minTemp = tempData[i];
     }
 
     // Writes voltage values into CanOutboxes
@@ -47,56 +39,41 @@ void cellsPeriodic() {
             can_writeBytes(cellVoltages[i].data, j, j, voltageData[i*8+j]);
         }
     }
-}
 
-/** sends 13 can packets with 7 bytes of temp data each, 1 byte per temp
- *  only sends 1 can packet when called, resets when it reaches 13
- */
-static void sendTempPacket() {
-    // keeps track of which canID we should be sending can packet over, resets after 13th packet
-    static uint32_t idTracker = HVC_VCU_CELL_TEMPS_START;
-    if(idTracker == HVC_VCU_CELL_TEMPS_START + 91) {
-        idTracker = HVC_VCU_CELL_TEMPS_START;
+    // Reads in 60 bytes of info into buffer, # of temp data values will differ based on which read cmd
+    for(int i = 0 ; i < 4 ; i++) {
+        ltc6813_cmd_read(CMD_RDCTs[i], tempData+180);
+
+        for(int j = 0 ; j < NUM_BMS_ICS ; j++) {
+            // For Auxiliary Register Group A and C, there are 3 temp values
+            if(i == 0 || i == 2) {
+                for(int k = 0 ; k < 6 ; k++) {
+                    tempData[i*5+j*6+k] = tempData[180+j*6+k];
+                }
+            }
+
+            // For Auxiliary Register Group B, there are 2 temp values
+            if(i == 1) {
+                for(int k = 0 ; k < 4 ; k++) {
+                    tempData[6+j*6+k] = tempData[180+j*6+k];
+                }
+            }
+
+            // For Auxiliary Register Group D, there is 1 temp value
+            if(i == 3) {
+                for(int k = 0 ; k < 2 ; k++) {
+                    tempData[16+j*6+k] = tempData[180+j*6+k];
+                }
+            }
+        }
+
+
+
+        // check for min and max temp of each data point
+        if(maxTemp < (float) tempData[i]) maxTemp = tempData[i];
+        if(minTemp > (float) tempData[i]) minTemp = tempData[i];
     }
 
-    // converts tempData from float to uint8_t of the specific can packet
-    static uint8_t rounded_temps[7];
-    static int offset = (int)(idTracker - HVC_VCU_CELL_TEMPS_START);
-    for(int i = offset ; i < (offset + 7) ; i++) {
-        rounded_temps[i-offset] = (uint8_t)tempData[i];
-    }
-
-    // sends data over can and increments canID
-    can_send(idTracker, 7, rounded_temps);
-    idTracker = idTracker + 7;
-}
-
-/** sends 35 can packets with 8 bytes of voltage data each, 2 byte per voltage
- *  only sends 1 can packet when called, resets when it reaches 35
- */
-static void sendVoltagePacket() {
-    // keeps track of which canID we should be sending can packet over, resets after 35th packet
-    static uint32_t idTracker = HVC_VCU_CELL_VOLTAGES_START;
-    if(idTracker == HVC_VCU_CELL_VOLTAGES_START + 280) {
-        idTracker = HVC_VCU_CELL_VOLTAGES_START;
-    }
-
-    // convert voltageData from float in mV to uint8_t that uses 2 bytes per voltage
-    static uint8_t voltages[8];
-    static int offset = (int)(idTracker - HVC_VCU_CELL_VOLTAGES_START) / 2;
-
-    for(int i = 0 ; i < 4; i++) {
-        auto value = (uint16_t) (voltageData[i+offset] / 0.001f);
-        auto byte1 = static_cast<uint8_t>((value & 0xFF00) >> 8);
-        auto byte2 = static_cast<uint8_t>(value & 0x00FF);
-
-        voltages[i*2] = byte1;
-        voltages[i*2+1] = byte2;
-    }
-
-    // sends data over can and increments canID
-    can_send(idTracker, 8, voltages);
-    idTracker = idTracker + 8;
 }
 
 float getSoC() {
