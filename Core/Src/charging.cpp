@@ -26,7 +26,7 @@ bool isChargingConnected() {
     return connected;
 }
 
-uint32_t charging_can_send(float volt_adj, float curr_adj) {
+uint32_t charging_can_send(uint16_t volt_adj, uint16_t curr_adj) {
     uint8_t data[8] = {0};
     can_writeBytes(data, 0, 1, volt_adj);
     can_writeBytes(data, 2, 3, curr_adj);
@@ -104,7 +104,7 @@ int chargingPeriodic(float voltage_limit, float current_limit, float& voltage_gi
         accum_time = 0;
     }
 
-    uint32_t error_tx = charging_can_send(voltage_limit * 10, current_limit * 10);
+    uint32_t error_tx = charging_can_send(static_cast<uint16_t>(voltage_limit * 10), static_cast<uint16_t>(current_limit * 10));
 
     uint32_t error_rx = charging_can_receive(voltage_given, current_given);
 
