@@ -5,10 +5,10 @@
 #include "vcu.h"
 #include "angel_can.h"
 
-static CanRx parameterMailbox;
+static CanInbox parameterMailbox;
 
 void vcuInit() {
-    can_addMailbox(VCU_HVC_PARAMS, &parameterMailbox);
+    can_addInbox(VCU_HVC_PARAMS, &parameterMailbox);
 }
 
 void vcuPeriodic() {

@@ -112,6 +112,7 @@ int main(void)
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
   clock_init();
+  chargingInit();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -122,6 +123,8 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
         float deltaTime = clock_getDeltaTime();
+        float voltage = 0;
+        float current = 0;
 
         bool hvOk = isTempWithinBounds();
         hvOk = hvOk && isPackVoltageWithinBounds();
@@ -130,14 +133,14 @@ int main(void)
         // TODO see if more checks are needed
         bool imdOk = isImdOk();
         bool shutdownClosed = isShutdownClosed();
-        bool chargerPresent = false; // isChargerPresent(); // TODO from CAN
+        bool chargerPresent = isChargingConnected();
 
         int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent);
 
         cellsPeriodic();
         thermalPeriodic();
         vcuPeriodic();
-        chargingPeriodic();
+        chargingPeriodic(0, 0, voltage, current, deltaTime / 1000);
         setIndicatorLights(!hvOk, !imdOk);
     }
   /* USER CODE END 3 */
