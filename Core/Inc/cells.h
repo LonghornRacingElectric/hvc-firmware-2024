@@ -8,19 +8,16 @@
 #include <cstdint>
 
 // Variables
-
-static uint8_t voltageData[340];  // 5 segments, 28 cells per segment
-                                  // 14 per LTC6813 chip, 2 bytes per voltage, volts in mV
-                                  // 280 bytes for voltages, 60 bytes buffer for reading
-static uint8_t tempData[240];     // 9 thermistors per LTC6813 chip, 2 bytes per temp (raw gpio data)
-                                  // 180 bytes for temps, 60 bytes buffer for reading
+static uint8_t rawData[60];       // Raw data from LTC read command
+static uint16_t voltageData[140]; // 5 segments, 28 cells per segment, 4 per LTC6813 chip, 2 bytes per voltage
+static uint16_t tempData[90];     // 9 thermistors per LTC6813 chip, 2 bytes per temp
 static float minTemp;
 static float maxTemp;
 
 // Functions
 void cellsInit();
 void cellsPeriodic();
-void checkMinMaxTemps(uint8_t byte1, uint8_t byte2);
+void checkMinMaxTemps(uint16_t temp);
 bool areCellVoltagesWithinBounds();
 float getSoC();
 float getMaxTemp();
