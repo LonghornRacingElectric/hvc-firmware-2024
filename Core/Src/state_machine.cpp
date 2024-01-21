@@ -3,7 +3,67 @@
 //
 
 #include "state_machine.h"
+#include "contactors.h"
+#include "vsense.h"
+#include "cells.h"
 
 int updateStateMachine(bool shutdownClosed, bool hvOk, bool chargerPresent) {
-    return STATE_NOT_ENERGIZED;
+    switch(currentState) {
+        case STATE_NOT_ENERGIZED:
+            setDriveContactor(false);
+            if(shutdownClosed) {
+                if(!chargerPresent) {
+                    currentState = STATE_PRECHARGING;
+                }
+                else {
+                    currentState = STATE_CHARGING_PRECHARGING;
+                }
+            }
+            break;
+
+        case STATE_PRECHARGING:
+            setPrechargeContactor(true);
+            if(!shutdownClosed || !hvOk) {
+                setPrechargeContactor(false);
+                currentState = STATE_NOT_ENERGIZED;
+            }
+            if(getTractiveVoltage() > 0.9f * getPackVoltageFromCells()) {
+                setDriveContactor(true);
+                setPrechargeContactor(false);
+                currentState = STATE_ENERGIZED;
+            }
+            break;
+
+        case STATE_ENERGIZED:
+            if(!shutdownClosed || !hvOk) {
+                setDriveContactor(false);
+                currentState = STATE_NOT_ENERGIZED;
+            }
+            break;
+
+        case STATE_CHARGING_PRECHARGING:
+            setPrechargeContactor(true);
+            if(!shutdownClosed || !hvOk || !chargerPresent) {
+                setDriveContactor(false);
+                currentState = STATE_NOT_ENERGIZED;
+            }
+            if(getTractiveVoltage() > 0.9f * getPackVoltageFromCells()) {
+                setDriveContactor(true);
+                setPrechargeContactor(false);
+                currentState = STATE_CHARGING;
+            }
+            break;
+
+        case STATE_CHARGING:
+            if(!shutdownClosed || !hvOk || !chargerPresent) {
+                setDriveContactor(false);
+                currentState = STATE_NOT_ENERGIZED;
+            }
+            break;
+
+        default:
+            setDriveContactor(false);
+            currentState = STATE_NOT_ENERGIZED;
+    }
+    return currentState;
 }
