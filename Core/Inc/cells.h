@@ -13,12 +13,15 @@ static uint16_t voltageData[140]; // 5 segments, 28 cells per segment, 4 per LTC
 static uint16_t tempData[90];     // 9 thermistors per LTC6813 chip, 2 bytes per temp
 static float minTemp;
 static float maxTemp;
+static float packVoltage;
 
 // Functions
 void cellsInit();
 void cellsPeriodic();
 void checkMinMaxTemps(uint16_t temp);
 bool areCellVoltagesWithinBounds();
+bool isPackVoltageWithinBounds();
+float getPackVoltageFromCells();
 float getSoC();
 float getMaxTemp();
 float getMinTemp();

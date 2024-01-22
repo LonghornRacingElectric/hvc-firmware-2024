@@ -101,6 +101,14 @@ bool areCellVoltagesWithinBounds() {
 
 }
 
+float getPackVoltageFromCells() {
+    packVoltage = 0.0f;
+    for(uint16_t value : voltageData) {
+        packVoltage += (float) value;
+    }
+    return packVoltage;
+}
+
 float getSoC() {
 
 }
