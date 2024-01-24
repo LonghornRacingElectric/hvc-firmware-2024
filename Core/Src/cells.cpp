@@ -88,13 +88,17 @@ void cellsPeriodic() {
         }
     }
 
-    cmd_ID++;
-    if(cmd_ID == 9) cmd_ID = 0;
+    cmd_ID = (cmd_ID + 1) % 9;
+
+    if(cmd_ID == 0) {
+        maxTemp = (float) currentMaxTemp;
+        minTemp = (float) currentMinTemp;
+    }
 }
 
 void checkMinMaxTemps(uint16_t temp) {
-    if(maxTemp < (float) temp) maxTemp = (float) temp;
-    if(minTemp > (float) temp) minTemp = (float) temp;
+    if(currentMaxTemp < temp) currentMaxTemp = temp;
+    if(currentMinTemp > temp) currentMinTemp = temp;
 }
 
 bool areCellVoltagesWithinBounds() {
