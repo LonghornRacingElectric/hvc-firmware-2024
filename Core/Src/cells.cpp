@@ -93,6 +93,8 @@ void cellsPeriodic() {
     if(cmd_ID == 0) {
         maxTemp = (float) currentMaxTemp;
         minTemp = (float) currentMinTemp;
+        currentMaxTemp = 0;
+        currentMinTemp = 0;
     }
 }
 
