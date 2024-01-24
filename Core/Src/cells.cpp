@@ -93,8 +93,8 @@ void cellsPeriodic() {
     if(cmd_ID == 0) {
         maxTemp = currentMaxTemp;
         minTemp = currentMinTemp;
-        currentMaxTemp = 0.0f;
-        currentMinTemp = 0.0f;
+        currentMaxTemp = -999.0f;
+        currentMinTemp = 999.0f;
     }
 }
 
@@ -104,7 +104,8 @@ void checkMinMaxTemps(float temp) {
 }
 
 bool areCellVoltagesWithinBounds() {
-
+    // TODO implement
+    return false;
 }
 
 float getPackVoltageFromCells() {
@@ -116,6 +117,7 @@ float getPackVoltageFromCells() {
 }
 
 float getSoC() {
+    // TODO implement
     return 0.0f;
 }
 
