@@ -10,6 +10,9 @@
 #ifndef ADBMS_H
 #define ADBMS_H
 
+#define LTC_SPI_TIMEOUT 1000 // Timeout
+#define NUM_BMS_ICS 10 // Number of BMS ICs in daisy chain
+
 // Not used here - just for reference
 #define CRC15_POLY 0x4599;
 
@@ -26,6 +29,7 @@
 typedef enum {
     LTC6813_OK,
     LTC6813_SPI_ERROR,
+    LTC6813_INVALID_DATA, // CRC mismatch
     LTC6813_ERROR //Todo: More specific
 } LTC6813_Error_t;
 
@@ -73,6 +77,14 @@ typedef enum {
     STATUS_GROUP_VA = 0x3,
     STATUS_GROUP_VD = 0x4
 } LTC6813_Status_Group_Selection_t;
+
+typedef struct {
+    int adc_number;
+    uint16_t cell_voltages[18];
+    uint16_t status[4];
+    uint16_t temperature;
+    uint16_t analog_gpio[5];
+} LTC6813_Data_t;
 
 // From UBC team's public Github code
 typedef enum {
@@ -212,12 +224,12 @@ const uint16_t pec15Table[256] = {0x0, 0xc599, 0xceab, 0xb32, 0xd8cf, 0x1d56, 0x
 LTC6813_Error_t ltc6813_cmd_write(LTC6813_Command_t command, uint8_t *data, uint8_t len);
 
 /**
- * @brief Generate pec15 CRC for LTC6813
+ * @brief Read command from LTC6813
  *
+ * @param command
  * @param data
- * @param len
- * @return uint16_t
+ * @return LTC6813_Error_t
  */
-uint16_t pec15 (char *data , int len);
+LTC6813_Error_t ltc6813_cmd_read(LTC6813_Command_t command, uint8_t *data_buf);
 
 #endif
