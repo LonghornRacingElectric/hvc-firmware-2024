@@ -35,6 +35,7 @@
 #include "vsense.h"
 #include "isense.h"
 #include "cells.h"
+#include "clock.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -109,6 +110,7 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
+  clock_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -118,22 +120,24 @@ int main(void)
 
     /* USER CODE BEGIN 3 */
 
-//        bool hvOk = isTempWithinBounds();
-//        hvOk = hvOk && isPackVoltageWithinBounds();
-//        hvOk = hvOk && isPackCurrentWithinBounds();
-//        hvOk = hvOk && areCellVoltagesWithinBounds();
-//        // TODO see if more checks are needed
-//        bool imdOk = isImdOk();
-//        bool shutdownClosed = isShutdownClosed();
-//        bool chargerPresent = isChargerPresent();
-//
-//        int state = updateStateMachine(hvOk, chargerPresent);
-//
-//        cellsPeriodic();
-//        thermalPeriodic();
-//        vcuPeriodic();
-//        chargingPeriodic();
-//        setIndicatorLights(!hvOk, !imdOk);
+        float deltaTime = clock_getDeltaTime();
+
+        bool hvOk = isTempWithinBounds();
+        hvOk = hvOk && isPackVoltageWithinBounds();
+        hvOk = hvOk && isPackCurrentWithinBounds();
+        hvOk = hvOk && areCellVoltagesWithinBounds();
+        // TODO see if more checks are needed
+        bool imdOk = isImdOk();
+        bool shutdownClosed = isShutdownClosed();
+        bool chargerPresent = false; // isChargerPresent(); // TODO from CAN
+
+        int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent);
+
+        cellsPeriodic();
+        thermalPeriodic();
+        vcuPeriodic();
+        chargingPeriodic();
+        setIndicatorLights(!hvOk, !imdOk);
     }
   /* USER CODE END 3 */
 }

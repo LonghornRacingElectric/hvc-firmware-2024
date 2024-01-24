@@ -5,6 +5,8 @@
 #ifndef HVC_FIRMWARE_2024_COOLING_H
 #define HVC_FIRMWARE_2024_COOLING_H
 
+#include <stdbool.h>
+
 static float minAllowedTemp = 0.0f;
 static float maxAllowedTemp = 60.0f;
 

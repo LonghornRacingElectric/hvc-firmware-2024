@@ -229,7 +229,6 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
 }
 
 /* USER CODE BEGIN 1 */
-
 int isShutdownClosed() {
     return 0; // TODO implement
 }
@@ -247,10 +246,10 @@ float getVSense() {
 }
 
 float getISenseLow() {
-    return (float) adcDataDMA[3] / 65535.0f * 5.0f;
+    return (float) adcDataDMA[3] / 65535.0f * 3.3f * 1.510f;
 }
 
 float getISenseHigh() {
-    return (float) adcDataDMA[4] / 65535.0f * 5.0f;
+    return (float) adcDataDMA[4] / 65535.0f * 3.3f * 1.510f;
 }
 /* USER CODE END 1 */

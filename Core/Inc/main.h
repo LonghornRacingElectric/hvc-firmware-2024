@@ -31,6 +31,7 @@ extern "C" {
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
+
 #include "imd.h"
 #include "thermal.h"
 #include "state_machine.h"
@@ -39,6 +40,7 @@ extern "C" {
 #include "vsense.h"
 #include "isense.h"
 #include "cells.h"
+
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/
