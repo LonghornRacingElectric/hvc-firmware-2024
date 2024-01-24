@@ -84,21 +84,21 @@ void cellsPeriodic() {
         for(int j = 0 ; j < 4 ; j++) {
             if(i == 22 && j > 1) break;
             can_writeBytes(cellTemps[i].data, j*2, j*2+1, tempData[i*4+j]);
-            checkMinMaxTemps(tempData[i*4+j]);
+            checkMinMaxTemps((float) tempData[i*4+j]);
         }
     }
 
     cmd_ID = (cmd_ID + 1) % 9;
 
     if(cmd_ID == 0) {
-        maxTemp = (float) currentMaxTemp;
-        minTemp = (float) currentMinTemp;
-        currentMaxTemp = 0;
-        currentMinTemp = 0;
+        maxTemp = currentMaxTemp;
+        minTemp = currentMinTemp;
+        currentMaxTemp = 0.0f;
+        currentMinTemp = 0.0f;
     }
 }
 
-void checkMinMaxTemps(uint16_t temp) {
+void checkMinMaxTemps(float temp) {
     if(currentMaxTemp < temp) currentMaxTemp = temp;
     if(currentMinTemp > temp) currentMinTemp = temp;
 }
