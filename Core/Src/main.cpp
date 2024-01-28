@@ -32,7 +32,6 @@
 #include "state_machine.h"
 #include "vcu.h"
 #include "charging.h"
-#include "indicators.h"
 #include "vsense.h"
 #include "isense.h"
 #include "cells.h"

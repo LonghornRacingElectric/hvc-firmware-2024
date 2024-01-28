@@ -1,108 +1,123 @@
-//
-// Created by rolandwang on 11/12/2023.
-//
 
 #include "cells.h"
 #include "angel_can.h"
+#include "adbms.h"
 
-/** creating spi request, store data, choose when to send temp & voltage packets
- * find min max temps after low pass filter
+// 0-4 is read cell voltages, 5-8 is read cell temperatures
+static LTC6813_Command_t CMD_RDCs[9] = {CMD_RDCVA,CMD_RDCVB,CMD_RDCVC,CMD_RDCVD,CMD_RDCVE,
+                                         CMD_RDAUXA,CMD_RDAUXB,CMD_RDAUXC,CMD_RDAUXD};
+static CanOutbox cellVoltages[35];
+static CanOutbox cellTemps[23];
+
+/**
+ * Initializes CAN outboxes to send voltage and temp data
+ **/
+void cellsInit() {
+    // Period set to update all values at a frequency of 1 Hz
+    can_addOutboxes(HVC_VCU_CELL_VOLTAGES_START, HVC_VCU_CELL_VOLTAGES_END, 1.0f, cellVoltages);
+    can_addOutboxes(HVC_VCU_CELL_TEMPS_START, HVC_VCU_CELL_TEMPS_END, 1.0f, cellTemps);
+}
+
+/**
+ * Reads voltage and temperature data from BMS
+ * Converts and writes data into respective CanOutboxes
  **/
 void cellsPeriodic() {
-    // Create SPI receive request
+    static int cmd_ID = 0; // Used to track and send only 1 LTC cmd per iteration
+    static uint16_t value = 0;
 
+    // LTC read cmd 0-4 for voltages
+    if(cmd_ID < 5) {
+        ltc6813_cmd_read(CMD_RDCs[cmd_ID], rawData);
+        for(int j = 0 ; j < NUM_BMS_ICS ; j++) {
+            if(cmd_ID == 4) {
+                for(int k = 0 ; k < 2 ; k++) {
+                    value = (rawData[j*6+k*2+1] << 8) | rawData[j*6+k*2];
+                    voltageData[cmd_ID*3+j*14+k] = value;
+                }
+            }
+            else {
+                for(int k = 0 ; k < 3 ; k++) {
+                    value = (rawData[j*6+k*2+1] << 8) | rawData[j*6+k*2];
+                    voltageData[cmd_ID*3+j*14+k] = value;
+                }
+            }
 
-    // Process Temperature Data
-    for(int i = 0 ; i < 91 ; i++) {
-        // store data
-
-        // check for min and max temp of each data point
-        if(maxTemp < tempData[i]) maxTemp = tempData[i];
-        if(minTemp > tempData[i]) minTemp = tempData[i];
+        }
     }
 
-    // Process Voltage Data
-    for(int i = 0 ; i < 140 ; i++) {
-        // store data
-
+    // Writes voltage values into CanOutboxes
+    for(int i = 0 ; i < 35 ; i++) {
+        for(int j = 0 ; j < 4 ; j++) {
+            can_writeBytes(cellVoltages[i].data, j*2, j*2+1, voltageData[i*4+j]);
+        }
     }
 
-    // Send Temp and Voltage Packets (periodically)
-    static int i = 0;
-    if(++i == 50) {
-        sendTempPacket();
-    }
-    else if (i >= 100) {
-        sendVoltagePacket();
-        i = 0;
+    // LTC read cmd 5-8 for temperatures
+    if(cmd_ID > 4 && cmd_ID < 9) {
+        ltc6813_cmd_read(CMD_RDCs[cmd_ID], rawData);
+        for(int j = 0 ; j < NUM_BMS_ICS ; j++) {
+            // For Auxiliary Register Group A and C, there are 3 temp values
+            if(cmd_ID == 5 || cmd_ID == 7) {
+                for(int k = 0 ; k < 3 ; k++) {
+                    value = (rawData[j*6+k*2+1] << 8) | rawData[j*6+k*2];
+                    tempData[(cmd_ID-5)/2*5+j*9+k] = value;
+                }
+            }
+            // For Auxiliary Register Group B, there are 2 temp values
+            if(cmd_ID == 6) {
+                for(int k = 0 ; k < 2 ; k++) {
+                    value = (rawData[j*6+k*2+1] << 8) | rawData[j*6+k*2];
+                    tempData[3+j*9+k] = value;
+                }
+            }
+            // For Auxiliary Register Group D, there is 1 temp value
+            if(cmd_ID == 8) {
+                value = (rawData[j*6+1] << 8) | rawData[j*6];
+                tempData[8+j*9] = value;
+            }
+        }
     }
 
-    // TODO receive data
+    // Writes temperature values into CanOutboxes
+    for(int i = 0 ; i < 23 ; i++) {
+        for(int j = 0 ; j < 4 ; j++) {
+            if(i == 22 && j > 1) break;
+            can_writeBytes(cellTemps[i].data, j*2, j*2+1, tempData[i*4+j]);
+            checkMinMaxTemps((float) tempData[i*4+j]);
+        }
+    }
+
+    cmd_ID = (cmd_ID + 1) % 9;
+
+    if(cmd_ID == 0) {
+        maxTemp = currentMaxTemp;
+        minTemp = currentMinTemp;
+        currentMaxTemp = -999.0f;
+        currentMinTemp = 999.0f;
+    }
 }
 
-/** sends 13 can packets with 7 bytes of temp data each, 1 byte per temp
- *  only sends 1 can packet when called, resets when it reaches 13
- */
-static void sendTempPacket() {
-    // keeps track of which canID we should be sending can packet over, resets after 13th packet
-    static uint32_t idTracker = HVC_VCU_CELL_TEMPS_START;
-    if(idTracker == HVC_VCU_CELL_TEMPS_START + 91) {
-        idTracker = HVC_VCU_CELL_TEMPS_START;
-    }
-
-    // converts tempData from float to uint8_t of the specific can packet
-    static uint8_t rounded_temps[7];
-    static int offset = (int)(idTracker - HVC_VCU_CELL_TEMPS_START);
-    for(int i = offset ; i < (offset + 7) ; i++) {
-        rounded_temps[i-offset] = (uint8_t)tempData[i];
-    }
-
-    // sends data over can and increments canID
-    can_send(idTracker, 7, rounded_temps);
-    idTracker = idTracker + 7;
-}
-
-/** sends 35 can packets with 8 bytes of voltage data each, 2 byte per voltage
- *  only sends 1 can packet when called, resets when it reaches 35
- */
-static void sendVoltagePacket() {
-    // keeps track of which canID we should be sending can packet over, resets after 35th packet
-    static uint32_t idTracker = HVC_VCU_CELL_VOLTAGES_START;
-    if(idTracker == HVC_VCU_CELL_VOLTAGES_START + 280) {
-        idTracker = HVC_VCU_CELL_VOLTAGES_START;
-    }
-
-    // convert voltageData from float in mV to uint8_t that uses 2 bytes per voltage
-    static uint8_t voltages[8];
-    static int offset = (int)(idTracker - HVC_VCU_CELL_VOLTAGES_START) / 2;
-
-    for(int i = 0 ; i < 4; i++) {
-        auto value = (uint16_t) (voltageData[i+offset] / 0.001f);
-        auto byte1 = static_cast<uint8_t>((value & 0xFF00) >> 8);
-        auto byte2 = static_cast<uint8_t>(value & 0x00FF);
-
-        voltages[i*2] = byte1;
-        voltages[i*2+1] = byte2;
-    }
-
-    // sends data over can and increments canID
-    can_send(idTracker, 8, voltages);
-    idTracker = idTracker + 8;
+void checkMinMaxTemps(float temp) {
+    if(currentMaxTemp < temp) currentMaxTemp = temp;
+    if(currentMinTemp > temp) currentMinTemp = temp;
 }
 
 bool areCellVoltagesWithinBounds() {
+    // TODO implement
     return false;
 }
 
-bool getPackVoltageFromCells() {
-    return false;
-}
-
-bool isPackVoltageWithinBounds() {
-    return false;
+float getPackVoltageFromCells() {
+    packVoltage = 0.0f;
+    for(uint16_t value : voltageData) {
+        packVoltage += (float) value;
+    }
+    return packVoltage;
 }
 
 float getSoC() {
+    // TODO implement
     return 0.0f;
 }
 
