@@ -11,7 +11,7 @@
 #define STATE_CHARGING_PRECHARGING 4
 #define STATE_CHARGING 5
 static int currentState = 1;
-static int verifyVoltage = 0;
+static float verifyVoltage = 0.0f;
 
 int updateStateMachine(bool shutdownClosed, bool hvOk, bool chargerPresent);
 

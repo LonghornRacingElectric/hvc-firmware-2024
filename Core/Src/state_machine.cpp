@@ -7,64 +7,70 @@
 #include "vsense.h"
 #include "cells.h"
 
-int updateStateMachine(bool shutdownClosed, bool hvOk, bool chargerPresent) {
+int updateStateMachine(bool shutdownClosed, bool hvOk, bool chargerPresent, float deltaTime) {
     switch(currentState) {
         case STATE_NOT_ENERGIZED:
             setDriveContactor(false);
             setPrechargeContactor(false);
             if(shutdownClosed) {
                 if(!chargerPresent) {
+                    verifyVoltage = 0.0f;
+                    setPrechargeContactor(true);
                     currentState = STATE_PRECHARGING;
                 }
                 else {
+                    verifyVoltage = 0.0f;
+                    setPrechargeContactor(true);
                     currentState = STATE_CHARGING_PRECHARGING;
                 }
             }
             break;
 
         case STATE_PRECHARGING:
-            setPrechargeContactor(true);
             if(!shutdownClosed || !hvOk) {
-                verifyVoltage = 0;
                 setPrechargeContactor(false);
                 setDriveContactor(false);
                 currentState = STATE_NOT_ENERGIZED;
             }
             if(getTractiveVoltage() > 0.9f * getPackVoltageFromCells()) {
-                verifyVoltage = (verifyVoltage + 1) % 11;
-                if(verifyVoltage == 10) {
-                    verifyVoltage = 0;
+                verifyVoltage += deltaTime;
+                if(verifyVoltage >= 0.5f) {
                     setDriveContactor(true);
                     setPrechargeContactor(false);
                     currentState = STATE_ENERGIZED;
                 }
+            }
+            else {
+                verifyVoltage = 0.0f;
             }
             break;
 
         case STATE_ENERGIZED:
             if(!shutdownClosed || !hvOk) {
                 setDriveContactor(false);
+                setPrechargeContactor(false);
                 currentState = STATE_NOT_ENERGIZED;
             }
             break;
 
         case STATE_CHARGING_PRECHARGING:
-            setPrechargeContactor(true);
             if(!shutdownClosed || !hvOk || !chargerPresent) {
-                verifyVoltage = 0;
                 setDriveContactor(false);
                 setPrechargeContactor(false);
                 currentState = STATE_NOT_ENERGIZED;
             }
             if(getTractiveVoltage() > 0.9f * getPackVoltageFromCells()) {
-                verifyVoltage = (verifyVoltage + 1) % 11;
-                if(verifyVoltage == 10) {
-                    verifyVoltage = 0;
+                verifyVoltage += deltaTime;
+                if(verifyVoltage >= 0.5f) {
                     setDriveContactor(true);
                     setPrechargeContactor(false);
-                    currentState = STATE_ENERGIZED;
+                    currentState = STATE_CHARGING;
                 }
             }
+            else {
+                verifyVoltage = 0.0f;
+            }
+
             break;
 
         case STATE_CHARGING:
