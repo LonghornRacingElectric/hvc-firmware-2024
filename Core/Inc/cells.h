@@ -17,7 +17,7 @@ void cellsPeriodic();
 static void sendTempPacket(); // 12 packets, 1 byte per temp (int)
 static void sendVoltagePacket(); // 35 packets, 2 bytes per voltage (int)
 bool areCellVoltagesWithinBounds();
-bool getPackVoltageFromCells();
+float getPackVoltageFromCells();
 bool isPackVoltageWithinBounds();
 
 float getSoC();

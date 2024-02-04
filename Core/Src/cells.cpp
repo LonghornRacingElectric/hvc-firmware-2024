@@ -94,7 +94,7 @@ bool areCellVoltagesWithinBounds() {
     return false;
 }
 
-bool getPackVoltageFromCells() {
+float getPackVolt ageFromCells() {
     return false;
 }
 

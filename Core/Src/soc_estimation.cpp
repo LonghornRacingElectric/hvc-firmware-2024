@@ -5,19 +5,39 @@
 
 
 #include "isense.h"
+#include "cells.h"
 
-float outputCurr = getPackCurrent();
-float battery_rated_capacity = 11.2244; // 6.6kWh at 588 V => 11.2244 Ah
+static float battery_rated_capacity = 40407.84f; // 6.6kWh at 588 V => 11.2244 Ah => 40407.84 Coulombs
 
 float calculateSoc(float deltaTime) {
-    float step_size = 0.003f;
-    float dt = deltaTime/step_size;
+
+    float dt = deltaTime;
     float soc = 0;
-    float charge = 0;
+    static float chargeRemaining = 0;
 
-    charge += outputCurr * dt;
-    soc = 100.0f + (-charge/battery_rated_capacity) * 100.0f;
+    float outputCurr = getPackCurrent();
+    float outputVoltage = getPackVoltageFromCells();
 
-    return soc;
+    float currentBound = 0.002f; // can set to something else
+
+    if (outputCurr < currentBound && outputCurr > -currentBound) {
+        return getSocWithVoltage(dt, soc, chargeRemaining, outputVoltage);
+    } else {
+        return getSocWithCurrent(dt, soc, chargeRemaining, outputCurr);
+    }
+
+}
+
+float getSocWithVoltage(float dt, float soc, float chargeRemaining, float outputVoltage) {
+    //piecewise function
+
+    return (float);
+}
+
+float getSocWithCurrent(float dt, float soc, float chargeRemaining, float outputCurr) {
+    chargeRemaining += outputCurr * dt;
+    soc =  (chargeRemaining/battery_rated_capacity) * 100.0f;
+
+    return (float) soc;
 }
 
