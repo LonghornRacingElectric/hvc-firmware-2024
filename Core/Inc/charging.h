@@ -1,6 +1,26 @@
 #ifndef HVC_FIRMWARE_2024_CHARGING_H
 #define HVC_FIRMWARE_2024_CHARGING_H
 #include "angel_can.h"
+
+
+#define MAX_CURRENT 13.5f // Max current that the battery can charge with
+#define MAX_VOLTAGE 595.0f // Max voltage that the battery can charge with
+#define PILOT_TOLERANCE 0.5f // Tolerance between the PWM high's and low's
+
+typedef enum ChargerCxnState {
+    NOT_CONNECTED, // Bruv you ain't even connected
+    SWITCH_PRESSED, // You're connected but the button is pressed, which releases S3, adding 330 ohms to the circuit
+    SWITCH_RELEASED, // You're connected and the button is released, which shorts S3, which removes 330 ohms from the circuit
+} ProxState;
+
+typedef enum ChargerStatus {
+    STANDBY,
+    DETECTION,
+    READY,
+    NOPOWER,
+    CHARGE_ERROR
+} PilotState;
+
 /**
  * Initialize the charging control system (CCS) CAN communication.
  */
@@ -11,6 +31,20 @@ void chargingInit();
  * @return true if connected
  */
 bool isChargingConnected();
+
+/**
+ * Get the state of the proximity signal
+ * States are NOT_CONNECTED, SWITCH_PRESSED, SWITCH_RELEASED
+ * @return the state of the proximity signal
+ */
+ProxState getProxState();
+
+/**
+ * Get the state of the pilot signal
+ * States are STANDBY, DETECTION, READY, NOPOWER, CHARGE_ERROR
+ * @return the state of the pilot signal
+ */
+PilotState getPilotState();
 
 /**
  * Send a CCS limit command, with the parameters being multiplied by 10 to reflect fixed-point system that CCS uses
@@ -31,13 +65,9 @@ uint32_t charging_can_receive(float& voltage_given, float& current_given);
 
 /**
  * Send a CCS limit command and read the CCS output. Sets fault according the the status byte
- * @param voltage_limit
- * @param current_limit
- * @param voltage_given
- * @param current_given
  * @param delta
  * @return CCS status byte
  */
-int chargingPeriodic(float voltage_limit, float current_limit, float& voltage_given, float& current_given, float delta);
+int chargingPeriodic(float delta);
 
 #endif //HVC_FIRMWARE_2024_CHARGING_H

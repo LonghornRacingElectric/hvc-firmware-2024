@@ -122,8 +122,6 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
         float deltaTime = clock_getDeltaTime();
-        float voltage = 0;
-        float current = 0;
 
         bool hvOk = isTempWithinBounds();
         hvOk = hvOk && isPackVoltageWithinBounds();
@@ -139,8 +137,7 @@ int main(void)
         cellsPeriodic();
         thermalPeriodic();
         vcuPeriodic();
-        chargingPeriodic(0, 0, voltage, current, deltaTime / 1000);
-        setIndicatorLights(!hvOk, !imdOk);
+        chargingPeriodic(deltaTime / 1000);
     }
   /* USER CODE END 3 */
 }

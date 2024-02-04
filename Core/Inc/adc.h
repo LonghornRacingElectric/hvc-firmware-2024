@@ -44,7 +44,8 @@ void MX_ADC1_Init(void);
 /* USER CODE BEGIN Prototypes */
 int isShutdownClosed();
 float getShutdownCircuit();
-float getControlPilot();
+float getProximity();
+float getPilot();
 float getVSense();
 float getISenseLow();
 float getISenseHigh();

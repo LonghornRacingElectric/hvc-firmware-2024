@@ -105,5 +105,8 @@ void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 2 */
+void writePilotCtrl(unsigned int state) {
+  HAL_GPIO_WritePin(Ctrl_to_MCU_GPIO_Port, Ctrl_to_MCU_Pin, state);
+}
 
 /* USER CODE END 2 */

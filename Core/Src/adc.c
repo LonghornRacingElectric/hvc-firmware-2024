@@ -237,8 +237,8 @@ float getShutdownCircuit() {
     return ((float) adcDataDMA[0]) / 65535.0f * 3.3f;
 }
 
-float getControlPilot() {
-    return (float) adcDataDMA[1] / 65535.0f * 3.3f / 3.13043478f * 24.0f;
+float getProximity() {
+    return (float) adcDataDMA[1] / 65535.0f * 3.3f;
 }
 
 float getVSense() {
@@ -251,5 +251,9 @@ float getISenseLow() {
 
 float getISenseHigh() {
     return (float) adcDataDMA[4] / 65535.0f * 3.3f * 1.510f;
+}
+
+float getPilot(){
+    return (float) adcDataDMA[0] / 65535.0f * 3.3f;
 }
 /* USER CODE END 1 */
