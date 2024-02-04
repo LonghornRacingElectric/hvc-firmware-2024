@@ -10,6 +10,7 @@
 #define STATE_ENERGIZED 3
 #define STATE_CHARGING_PRECHARGING 4
 #define STATE_CHARGING 5
+
 static int currentState = 1;
 static float verifyVoltage = 0.0f;
 
