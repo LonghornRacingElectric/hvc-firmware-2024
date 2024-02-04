@@ -7,6 +7,5 @@
 
 void setPrechargeContactor(bool on);
 void setDriveContactor(bool on);
-void setDischargeDisable(bool disable);
 
 #endif //HVC_FIRMWARE_2024_CONTACTORS_H
