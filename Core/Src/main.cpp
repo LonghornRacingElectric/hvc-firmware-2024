@@ -137,7 +137,6 @@ int main(void)
         thermalPeriodic();
         vcuPeriodic();
         chargingPeriodic();
-        setIndicatorLights(!hvOk, !imdOk);
     }
   /* USER CODE END 3 */
 }
