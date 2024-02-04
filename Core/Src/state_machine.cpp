@@ -7,11 +7,15 @@
 #include "vsense.h"
 #include "cells.h"
 
+void stateMachineInit() {
+    setDriveContactor(false);
+    setPrechargeContactor(false);
+    currentState = STATE_NOT_ENERGIZED;
+}
+
 int updateStateMachine(bool shutdownClosed, bool hvOk, bool chargerPresent, float deltaTime) {
     switch(currentState) {
         case STATE_NOT_ENERGIZED:
-            setDriveContactor(false);
-            setPrechargeContactor(false);
             if(shutdownClosed) {
                 if(!chargerPresent) {
                     verifyVoltage = 0.0f;
