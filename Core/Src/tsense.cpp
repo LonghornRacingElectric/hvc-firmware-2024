@@ -10,7 +10,7 @@ void tsenseInit() {
 }
 
 void tsensePeriodic() {
-    HAL_SPI_Receive(&hspi1, thermistorData, 1, SPI_TIMEOUT);
+    HAL_SPI_Receive(&hspi2, thermistorData, 1, SPI_TIMEOUT);
 }
 
 uint16_t getAmbientTemp() {
