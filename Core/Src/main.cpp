@@ -35,7 +35,7 @@
 #include "vsense.h"
 #include "isense.h"
 #include "cells.h"
-#include "clock.h"
+//#include "clock.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -110,7 +110,7 @@ int main(void)
   MX_TIM2_Init();
   MX_TIM3_Init();
   /* USER CODE BEGIN 2 */
-  clock_init();
+//  clock_init();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -119,8 +119,15 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+        
+        cellsInit();
+        cellsPeriodic();
+        // For testing
+        while(1) {
+          __asm("NOP");
+        }
 
-        float deltaTime = clock_getDeltaTime();
+//        float deltaTime = clock_getDeltaTime();
 
         bool hvOk = isTempWithinBounds();
         hvOk = hvOk && isPackVoltageWithinBounds();

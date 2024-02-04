@@ -3,6 +3,9 @@
 #include "angel_can.h"
 #include "adbms.h"
 
+#include "Libs/IsoSpi/ltc6813.h"
+#include "Libs/IsoSpi/ltc6813_daisy.h"
+
 // 0-4 is read cell voltages, 5-8 is read cell temperatures
 static LTC6813_Command_t CMD_RDCs[9] = {CMD_RDCVA,CMD_RDCVB,CMD_RDCVC,CMD_RDCVD,CMD_RDCVE,
                                          CMD_RDAUXA,CMD_RDAUXB,CMD_RDAUXC,CMD_RDAUXD};
@@ -28,22 +31,23 @@ void cellsPeriodic() {
 
     // LTC read cmd 0-4 for voltages
     if(cmd_ID < 5) {
-        ltc6813_cmd_read(CMD_RDCs[cmd_ID], rawData);
-        for(int j = 0 ; j < NUM_BMS_ICS ; j++) {
-            if(cmd_ID == 4) {
-                for(int k = 0 ; k < 2 ; k++) {
-                    value = (rawData[j*6+k*2+1] << 8) | rawData[j*6+k*2];
-                    voltageData[cmd_ID*3+j*14+k] = value;
-                }
-            }
-            else {
-                for(int k = 0 ; k < 3 ; k++) {
-                    value = (rawData[j*6+k*2+1] << 8) | rawData[j*6+k*2];
-                    voltageData[cmd_ID*3+j*14+k] = value;
-                }
-            }
-
-        }
+//        ltc6813_cmd_read(CMD_RDCs[cmd_ID], rawData);
+        // +1 because RDCVA = 1, RDCVB = 2, etc.
+        ltc6813daisy_rdcv(cmd_ID + 1, NUM_BMS_ICS, voltageData);
+//        for(int j = 0 ; j < NUM_BMS_ICS ; j++) {
+//            if(cmd_ID == 4) {
+//                for(int k = 0 ; k < 2 ; k++) {
+//                    value = (rawData[j*6+k*2+1] << 8) | rawData[j*6+k*2];
+//                    voltageData[cmd_ID*3+j*14+k] = value;
+//                }
+//            }
+//            else {
+//                for(int k = 0 ; k < 3 ; k++) {
+//                    value = (rawData[j*6+k*2+1] << 8) | rawData[j*6+k*2];
+//                    voltageData[cmd_ID*3+j*14+k] = value;
+//                }
+//            }
+//        }
     }
 
     // Writes voltage values into CanOutboxes
