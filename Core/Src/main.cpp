@@ -23,6 +23,7 @@
 #include "fdcan.h"
 #include "spi.h"
 #include "tim.h"
+#include "usart.h"
 #include "gpio.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -108,8 +109,10 @@ int main(void)
   MX_FDCAN2_Init();
   MX_ADC1_Init();
   MX_SPI1_Init();
-  MX_TIM2_Init();
   MX_TIM3_Init();
+  MX_SPI2_Init();
+  MX_TIM5_Init();
+  MX_UART4_Init();
   /* USER CODE BEGIN 2 */
   clock_init();
   /* USER CODE END 2 */
@@ -214,7 +217,8 @@ void PeriphCommonClock_Config(void)
 
   /** Initializes the peripherals clock
   */
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_SPI1;
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_SPI2
+                              |RCC_PERIPHCLK_SPI1;
   PeriphClkInitStruct.PLL2.PLL2M = 10;
   PeriphClkInitStruct.PLL2.PLL2N = 288;
   PeriphClkInitStruct.PLL2.PLL2P = 125;
