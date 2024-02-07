@@ -20,7 +20,7 @@ void setFanRpm(float rpm, float deltaTime) {
     static bool currTach = false;
 
 
-    currTach = HAL_GPIO_ReadPin(Tach_from_Fan_GPIO_Port, Tach_from_Fan_Pin) == GPIO_PIN_SET;
+    currTach = HAL_GPIO_ReadPin(Tach_from_Main_GPIO_Port, Tach_from_Main_Pin) == GPIO_PIN_SET;
     time += deltaTime;
 
     // Detects when tach falls from high to low, and stores pulse time

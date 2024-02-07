@@ -28,7 +28,7 @@ void vcuInit() {
 void vcuPeriodic(bool amsIndicator, bool imdIndicator) {
 
     // Battery Pack and IMU Data
-    can_writeBytes(packStatus.data, 0, 1, (uint16_t) (getPackVoltage() / 0.01f));
+    can_writeBytes(packStatus.data, 0, 1, (uint16_t) (getPackVoltageFromCells() / 0.01f));
     can_writeBytes(packStatus.data, 2, 3, (uint16_t) (getPackCurrent() / 0.1f));
     can_writeBytes(packStatus.data, 4, 4, (uint8_t) getSoC());
     can_writeBytes(packStatus.data, 5, 5, (uint8_t) getMaxTemp());

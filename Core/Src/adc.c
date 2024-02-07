@@ -51,7 +51,7 @@ void MX_ADC1_Init(void)
   hadc1.Init.EOCSelection = ADC_EOC_SINGLE_CONV;
   hadc1.Init.LowPowerAutoWait = DISABLE;
   hadc1.Init.ContinuousConvMode = DISABLE;
-  hadc1.Init.NbrOfConversion = 5;
+  hadc1.Init.NbrOfConversion = 6;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
@@ -88,7 +88,7 @@ void MX_ADC1_Init(void)
 
   /** Configure Regular Channel
   */
-  sConfig.Channel = ADC_CHANNEL_9;
+  sConfig.Channel = ADC_CHANNEL_10;
   sConfig.Rank = ADC_REGULAR_RANK_2;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
@@ -117,6 +117,15 @@ void MX_ADC1_Init(void)
   */
   sConfig.Channel = ADC_CHANNEL_13;
   sConfig.Rank = ADC_REGULAR_RANK_5;
+  if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
+  {
+    Error_Handler();
+  }
+
+  /** Configure Regular Channel
+  */
+  sConfig.Channel = ADC_CHANNEL_9;
+  sConfig.Rank = ADC_REGULAR_RANK_6;
   if (HAL_ADC_ConfigChannel(&hadc1, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -150,13 +159,14 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
     __HAL_RCC_GPIOA_CLK_ENABLE();
     __HAL_RCC_GPIOB_CLK_ENABLE();
     /**ADC1 GPIO Configuration
+    PC0     ------> ADC1_INP10
     PC1     ------> ADC1_INP11
     PC2     ------> ADC1_INP12
     PC3     ------> ADC1_INP13
     PA7     ------> ADC1_INP7
     PB0     ------> ADC1_INP9
     */
-    GPIO_InitStruct.Pin = A_HV_to_MCU_Pin|A_HV_lowCurr_to_MCU_Pin|A_HV_highCurr_to_MCU_Pin;
+    GPIO_InitStruct.Pin = Prox_to_MCU_Pin|A_HV_to_MCU_Pin|A_HV_lowCurr_to_MCU_Pin|A_HV_highCurr_to_MCU_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_ANALOG;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
@@ -208,13 +218,14 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
     __HAL_RCC_ADC12_CLK_DISABLE();
 
     /**ADC1 GPIO Configuration
+    PC0     ------> ADC1_INP10
     PC1     ------> ADC1_INP11
     PC2     ------> ADC1_INP12
     PC3     ------> ADC1_INP13
     PA7     ------> ADC1_INP7
     PB0     ------> ADC1_INP9
     */
-    HAL_GPIO_DeInit(GPIOC, A_HV_to_MCU_Pin|A_HV_lowCurr_to_MCU_Pin|A_HV_highCurr_to_MCU_Pin);
+    HAL_GPIO_DeInit(GPIOC, Prox_to_MCU_Pin|A_HV_to_MCU_Pin|A_HV_lowCurr_to_MCU_Pin|A_HV_highCurr_to_MCU_Pin);
 
     HAL_GPIO_DeInit(Contactor_PGood_Signal_GPIO_Port, Contactor_PGood_Signal_Pin);
 
@@ -237,8 +248,8 @@ float getShutdownCircuit() {
     return ((float) adcDataDMA[0]) / 65535.0f * 3.3f;
 }
 
-float getControlPilot() {
-    return (float) adcDataDMA[1] / 65535.0f * 3.3f / 3.13043478f * 24.0f;
+float getProximity() {
+    return (float) adcDataDMA[1] / 65535.0f * 3.3f;
 }
 
 float getVSense() {
@@ -251,5 +262,9 @@ float getISenseLow() {
 
 float getISenseHigh() {
     return (float) adcDataDMA[4] / 65535.0f * 3.3f * 1.510f;
+}
+
+float getPilot(){
+    return (float) adcDataDMA[5] / 65535.0f * 3.3f;
 }
 /* USER CODE END 1 */
