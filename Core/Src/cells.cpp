@@ -108,6 +108,11 @@ bool areCellVoltagesWithinBounds() {
     return false;
 }
 
+bool isPackVoltageWithinBounds() {
+    // TODO implement
+    return false;
+}
+
 float getPackVoltageFromCells() {
     packVoltage = 0.0f;
     for(uint16_t value : voltageData) {

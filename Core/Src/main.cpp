@@ -118,6 +118,7 @@ int main(void)
   stateMachineInit();
   vcuInit();
   cellsInit();
+  chargingInit();
 
   /* USER CODE END 2 */
 
@@ -137,14 +138,14 @@ int main(void)
         // TODO see if more checks are needed
         bool imdOk = isImdOk();
         bool shutdownClosed = isShutdownClosed();
-        bool chargerPresent = false; // isChargerPresent(); // TODO from CAN
+        bool chargerPresent = isChargingConnected();
 
         int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent, deltaTime);
 
         cellsPeriodic();
         thermalPeriodic();
-        vcuPeriodic();
-        chargingPeriodic();
+        vcuPeriodic(!hvOk, !imdOk);
+        chargingPeriodic(deltaTime / 1000);
     }
   /* USER CODE END 3 */
 }
