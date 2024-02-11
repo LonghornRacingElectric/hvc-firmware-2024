@@ -36,6 +36,7 @@
 #include "indicators.h"
 #include "vsense.h"
 #include "isense.h"
+#include "tsense.h"
 #include "cells.h"
 #include "clock.h"
 /* USER CODE END Includes */
@@ -115,6 +116,7 @@ int main(void)
   MX_UART4_Init();
   /* USER CODE BEGIN 2 */
   clock_init();
+  tsenseInit();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -139,6 +141,7 @@ int main(void)
 
         cellsPeriodic();
         thermalPeriodic();
+        tsensePeriodic();
         vcuPeriodic();
         chargingPeriodic();
         setIndicatorLights(!hvOk, !imdOk);

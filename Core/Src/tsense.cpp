@@ -10,9 +10,18 @@ void tsenseInit() {
 }
 
 void tsensePeriodic() {
-    HAL_SPI_Receive(&hspi2, thermistorData, 1, SPI_TIMEOUT);
+    HAL_SPI_Receive(&hspi1, thermistorData, 1, SPI_TIMEOUT);
 }
 
-uint16_t getAmbientTemp() {
-    return (uint16_t) ((thermistorData[1] << 8) || thermistorData[0]);
+float getAmbientTemp() {
+    rawTempData = ((thermistorData[1] << 8) || thermistorData[0]);
+
+    if(rawTempData & 0x8000u) { // If MSB is 1 -> negative temperature
+        ambientTemp = -256.0f + (float) ((rawTempData >> 3) & 0x0FFF) / 16.0f;
+    }
+    else {
+        ambientTemp = (float) ((rawTempData >> 3) & 0x0FFF) / 16.0f;
+    }
+
+    return ambientTemp;
 }
