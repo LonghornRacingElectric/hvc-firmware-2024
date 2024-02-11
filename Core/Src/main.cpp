@@ -112,9 +112,14 @@ int main(void)
   MX_SPI2_Init();
   MX_TIM5_Init();
   MX_UART4_Init();
+
   /* USER CODE BEGIN 2 */
   clock_init();
+  stateMachineInit();
+  vcuInit();
+  cellsInit();
   chargingInit();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -135,7 +140,7 @@ int main(void)
         bool shutdownClosed = isShutdownClosed();
         bool chargerPresent = isChargingConnected();
 
-        int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent);
+        int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent, deltaTime);
 
         cellsPeriodic();
         thermalPeriodic();
