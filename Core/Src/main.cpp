@@ -33,7 +33,6 @@
 #include "state_machine.h"
 #include "vcu.h"
 #include "charging.h"
-#include "indicators.h"
 #include "vsense.h"
 #include "isense.h"
 #include "tsense.h"
@@ -117,6 +116,7 @@ int main(void)
   /* USER CODE BEGIN 2 */
   clock_init();
   tsenseInit();
+  chargingInit();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -135,16 +135,15 @@ int main(void)
         // TODO see if more checks are needed
         bool imdOk = isImdOk();
         bool shutdownClosed = isShutdownClosed();
-        bool chargerPresent = false; // isChargerPresent(); // TODO from CAN
+        bool chargerPresent = isChargingConnected();
 
         int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent);
 
         cellsPeriodic();
         thermalPeriodic();
         tsensePeriodic();
-        vcuPeriodic();
-        chargingPeriodic();
-        setIndicatorLights(!hvOk, !imdOk);
+        vcuPeriodic(!hvOk, !imdOk);
+        chargingPeriodic(deltaTime / 1000);
     }
   /* USER CODE END 3 */
 }
