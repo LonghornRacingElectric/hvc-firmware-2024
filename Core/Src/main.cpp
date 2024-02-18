@@ -118,6 +118,7 @@ int main(void)
   tsenseInit();
   chargingInit();
   fansInit();
+  vcuInit();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -142,7 +143,7 @@ int main(void)
 
         cellsPeriodic();
         tsensePeriodic();
-        vcuPeriodic(!hvOk, !imdOk);
+        vcuPeriodic(!hvOk, !imdOk, state);
         chargingPeriodic(deltaTime / 1000);
         fansPeriodic(deltaTime);
     }

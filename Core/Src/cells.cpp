@@ -138,7 +138,7 @@ float getMinTemp() {
     return minTemp;
 }
 
-void updateParameters(float newMinTemp, float newMaxTemp) {
+void updateTempParameters(float newMinTemp, float newMaxTemp) {
     minAllowedTemp = newMinTemp;
     maxAllowedTemp = newMaxTemp;
 }

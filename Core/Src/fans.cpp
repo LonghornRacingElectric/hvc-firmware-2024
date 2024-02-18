@@ -35,7 +35,7 @@ void calculateTrueRpm(float deltaTime) {
     time += deltaTime;
     time2 += deltaTime;
 
-    // Detects when tach falls from high to low, and stores pulse time
+    // Detects when tach falls from high to low, and stores pulse time for main and unique
     if(prevTach > currTach) {
         if(time > 0.1f) {
             time = 0.0f;
@@ -58,7 +58,7 @@ void calculateTrueRpm(float deltaTime) {
     }
     prevTach2 = currTach2;
 
-    // Adds up total pulse time and counts num of pulses to calculate true rpm
+    // Adds up total pulse time and counts num of pulses to calculate true rpm for main and unique
     numPulses = 0;
     timeTotal = 0;
     for(float t : pulseTimes) {
