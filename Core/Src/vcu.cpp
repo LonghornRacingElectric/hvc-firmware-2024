@@ -5,12 +5,14 @@
 #include "vsense.h"
 #include "cells.h"
 #include "imu.h"
+#include "fans.h"
 
 static CanInbox parameterInbox;
 static CanOutbox packStatus;
 static CanOutbox imuAccel;
 static CanOutbox imuGyro;
 static CanOutbox indicatorStatus;
+static CanOutbox fanRPMs;
 
 void vcuInit() {
     can_addInbox(VCU_HVC_PARAMS, &parameterInbox);
@@ -18,6 +20,7 @@ void vcuInit() {
     can_addOutbox(HVC_VCU_IMU_ACCEL, 0.01f, &imuAccel);
     can_addOutbox(HVC_VCU_IMU_GYRO, 0.01f, &imuGyro);
     can_addOutbox(HVC_VCU_AMS_IMD, 0.1f, &indicatorStatus);
+    can_addOutbox(HVC_VCU_FAN_RPM, 0.1f, &fanRPMs);
 }
 
 /**
@@ -40,12 +43,16 @@ void vcuPeriodic(bool amsIndicator, bool imdIndicator) {
     can_writeBytes(imuGyro.data, 2, 3, (int16_t) gyroData.y);
     can_writeBytes(imuGyro.data, 4, 5, (int16_t) gyroData.z);
 
+    can_writeBytes(fanRPMs.data, 0, 1, (uint16_t) trueRpmMain);
+    can_writeBytes(fanRPMs.data, 2, 3, (uint16_t) trueRpmUnique);
+
     // Indicator Status
     can_writeBytes(indicatorStatus.data, 0, 0, (uint8_t) amsIndicator);
     can_writeBytes(indicatorStatus.data, 1, 1, (uint8_t) imdIndicator);
 
     // Check VCU->HVC Params Inbox
     if(parameterInbox.isRecent) {
+        parameterInbox.isRecent = false;
         auto minTempParam = (float) can_readBytes(parameterInbox.data, 0, 0);
         auto maxTempParam = (float) can_readBytes(parameterInbox.data, 1, 1);
         updateTempParameters(minTempParam, maxTempParam);
