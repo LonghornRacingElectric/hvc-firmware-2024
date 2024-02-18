@@ -14,14 +14,15 @@ static float battery_rated_capacity = 40407.84f; // 13920mAh at 587.58 V => 13.9
 static float soc = -1.0f;
 
 //when the tractive system is on
-float getSocWithCurrent(float dt, float chargeRemaining, float outputCurr) {
+//not a public function
+static float getSocWithCurrent(float dt, float chargeRemaining, float outputCurr) {
     chargeRemaining += outputCurr * dt;
     float soc =  (chargeRemaining/battery_rated_capacity) * 100.0f;
     return (float) soc;
 }
 
-
-int BinSearch(float *arr, int l, int r, float value) {
+//not a public function
+static int BinSearch(float *arr, int l, int r, float value) {
     //implement binary search of testX
     int middle = (l + r) / 2;
     if (r >= l) {
@@ -38,13 +39,13 @@ int BinSearch(float *arr, int l, int r, float value) {
     return middle;
 }
 
-
-float linearInterpolation(float x1, float x2, float y1, float y2, float x) {
+//not a public function
+static float linearInterpolation(float x1, float x2, float y1, float y2, float x) {
     return y1 + (x - x1) * (y2 - y1) / (x2 - x1);
 }
 
 //not a public function
-float socCalculation(float voltage, float *arrX, float *arrY, int n) {
+static float socCalculation(float voltage, float *arrX, float *arrY, int n) {
     int index = BinSearch(arrX, 0, n - 1, voltage);
     //implement linear interpolation
     //given the xy coordinates
@@ -59,7 +60,8 @@ float socCalculation(float voltage, float *arrX, float *arrY, int n) {
 }
 
 //when tractive system is off
-float getSocWithVoltage(float outputVoltage) {
+//not a public function
+static float getSocWithVoltage(float outputVoltage) {
     float voltage = outputVoltage;
     int n = ARR_LEN;
     float result = socCalculation(voltage, arrX, arrY, n);

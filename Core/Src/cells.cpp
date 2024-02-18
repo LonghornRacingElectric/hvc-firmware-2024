@@ -116,9 +116,7 @@ float getPackVoltageFromCells() {
     return packVoltage;
 }
 
-float getSoC() {
-    return calculateSoc(deltaTime);
-}
+
 
 float getMaxTemp() {
     return maxTemp;
