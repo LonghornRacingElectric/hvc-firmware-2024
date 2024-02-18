@@ -56,25 +56,25 @@ void cellsPeriodic() {
     // LTC read cmd 5-8 for temperatures
     if(cmd_ID > 4 && cmd_ID < 9) {
         ltc6813_cmd_read(CMD_RDCs[cmd_ID], rawData);
-        for(int j = 0 ; j < NUM_BMS_ICS ; j++) {
+        for (int j = 0; j < NUM_BMS_ICS; j++) {
             // For Auxiliary Register Group A and C, there are 3 temp values
-            if(cmd_ID == 5 || cmd_ID == 7) {
-                for(int k = 0 ; k < 3 ; k++) {
-                    value = (rawData[j*6+k*2+1] << 8) | rawData[j*6+k*2];
-                    tempData[(cmd_ID-5)/2*5+j*9+k] = value;
+            if (cmd_ID == 5 || cmd_ID == 7) {
+                for (int k = 0; k < 3; k++) {
+                    value = (rawData[j * 6 + k * 2 + 1] << 8) | rawData[j * 6 + k * 2];
+                    tempData[(cmd_ID - 5) / 2 * 5 + j * 9 + k] = value;
                 }
             }
             // For Auxiliary Register Group B, there are 2 temp values
-            if(cmd_ID == 6) {
-                for(int k = 0 ; k < 2 ; k++) {
-                    value = (rawData[j*6+k*2+1] << 8) | rawData[j*6+k*2];
-                    tempData[3+j*9+k] = value;
+            if (cmd_ID == 6) {
+                for (int k = 0; k < 2; k++) {
+                    value = (rawData[j * 6 + k * 2 + 1] << 8) | rawData[j * 6 + k * 2];
+                    tempData[3 + j * 9 + k] = value;
                 }
             }
             // For Auxiliary Register Group D, there is 1 temp value
-            if(cmd_ID == 8) {
-                value = (rawData[j*6+1] << 8) | rawData[j*6];
-                tempData[8+j*9] = value;
+            if (cmd_ID == 8) {
+                value = (rawData[j * 6 + 1] << 8) | rawData[j * 6];
+                tempData[8 + j * 9] = value;
             }
         }
     }
@@ -121,10 +121,7 @@ float getPackVoltageFromCells() {
     return packVoltage;
 }
 
-float getSoC() {
-    // TODO implement
-    return 0.0f;
-}
+
 
 bool isTempWithinBounds() {
     return getMinTemp() >= minAllowedTemp && getMaxTemp() <= maxAllowedTemp;
