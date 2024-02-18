@@ -15,10 +15,12 @@ static float soc = -1.0f;
 
 //when the tractive system is on
 //not a public function
-static float getSocWithCurrent(float dt, float chargeRemaining, float outputCurr) {
+static float getSocWithCurrent(float dt, float outputCurr) {
+
+    float chargeRemaining = (soc/100.0f) * battery_rated_capacity;
     chargeRemaining += outputCurr * dt;
-    float soc =  (chargeRemaining/battery_rated_capacity) * 100.0f;
-    return (float) soc;
+    float socNew =  (chargeRemaining/battery_rated_capacity) * 100.0f;
+    return socNew;
 }
 
 //not a public function
@@ -74,22 +76,16 @@ float socEstimation(float deltaTime) {
     bool isSocValid = (soc != -1.0f);
     float dt = deltaTime;
 
-    static float chargeRemaining = 0;
-
-    if (isSocValid) {
-        chargeRemaining = (soc/100.0f) * battery_rated_capacity;
-    }
-
     float outputCurr = getPackCurrent();
     float outputVoltage = getPackVoltageFromCells();
 
-    float currentBound = 0.002f; // can set bounds to something else
+    float currentBound = 0.005f; // can set bounds to something else
 
     bool withinBounds = (outputCurr < currentBound && outputCurr > -currentBound);
-    if (isSocValid || withinBounds) {
+    if (!isSocValid || withinBounds) {
         soc = getSocWithVoltage(outputVoltage);
     } else {
-        soc =  getSocWithCurrent(dt, chargeRemaining, outputCurr);
+        soc =  getSocWithCurrent(dt, outputCurr);
     }
     return soc;
 }
