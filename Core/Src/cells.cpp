@@ -121,8 +121,6 @@ float getPackVoltageFromCells() {
     return packVoltage;
 }
 
-
-
 bool isTempWithinBounds() {
     return getMinTemp() >= minAllowedTemp && getMaxTemp() <= maxAllowedTemp;
 }
