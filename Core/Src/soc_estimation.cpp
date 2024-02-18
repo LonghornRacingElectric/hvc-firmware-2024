@@ -48,8 +48,14 @@ static float linearInterpolation(float x1, float x2, float y1, float y2, float x
 
 //not a public function
 static float socCalculation(float voltage, float *arrX, float *arrY, int n) {
+    //clamping
+    if (voltage > arrX[0] ) {
+        return arrY[0];
+    } else if (voltage < arrX[ARR_LEN - 1]) {
+        return arrY[ARR_LEN - 1];
+    }
+
     int index = BinSearch(arrX, 0, n - 1, voltage);
-    //implement linear interpolation
     //given the xy coordinates
     if (index == ARR_LEN - 1) {
         return arrY[index];
