@@ -5,7 +5,6 @@
 #include "vsense.h"
 #include "cells.h"
 #include "imu.h"
-#include "thermal.h"
 
 static CanInbox parameterInbox;
 static CanOutbox packStatus;
@@ -49,6 +48,6 @@ void vcuPeriodic(bool amsIndicator, bool imdIndicator) {
     if(parameterInbox.isRecent) {
         auto minTempParam = (float) can_readBytes(parameterInbox.data, 0, 0);
         auto maxTempParam = (float) can_readBytes(parameterInbox.data, 1, 1);
-        updateParameters(minTempParam, maxTempParam);
+        updateTempParameters(minTempParam, maxTempParam);
     }
 }

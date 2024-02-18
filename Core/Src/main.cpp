@@ -37,6 +37,7 @@
 #include "tsense.h"
 #include "cells.h"
 #include "clock.h"
+#include "fans.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -116,6 +117,7 @@ int main(void)
   clock_init();
   tsenseInit();
   chargingInit();
+  fansInit();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -142,6 +144,7 @@ int main(void)
         tsensePeriodic();
         vcuPeriodic(!hvOk, !imdOk);
         chargingPeriodic(deltaTime / 1000);
+        fansPeriodic(deltaTime);
     }
   /* USER CODE END 3 */
 }
