@@ -126,10 +126,19 @@ float getSoC() {
     return 0.0f;
 }
 
+bool isTempWithinBounds() {
+    return getMinTemp() >= minAllowedTemp && getMaxTemp() <= maxAllowedTemp;
+}
+
 float getMaxTemp() {
     return maxTemp;
 }
 
 float getMinTemp() {
     return minTemp;
+}
+
+void updateParameters(float newMinTemp, float newMaxTemp) {
+    minAllowedTemp = newMinTemp;
+    maxAllowedTemp = newMaxTemp;
 }

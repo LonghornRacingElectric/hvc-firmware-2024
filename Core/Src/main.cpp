@@ -29,7 +29,6 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "imd.h"
-#include "thermal.h"
 #include "state_machine.h"
 #include "vcu.h"
 #include "charging.h"
@@ -140,7 +139,6 @@ int main(void)
         int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent);
 
         cellsPeriodic();
-        thermalPeriodic();
         tsensePeriodic();
         vcuPeriodic(!hvOk, !imdOk);
         chargingPeriodic(deltaTime / 1000);

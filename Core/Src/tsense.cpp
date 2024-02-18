@@ -14,7 +14,7 @@ void tsensePeriodic() {
 }
 
 float getAmbientTemp() {
-    rawTempData = ((thermistorData[1] << 8) || thermistorData[0]);
+    rawTempData = ((thermistorData[0] << 8) || thermistorData[1]);
 
     if(rawTempData & 0x8000u) { // If MSB is 1 -> negative temperature
         ambientTemp = -256.0f + (float) ((rawTempData >> 3) & 0x0FFF) / 16.0f;

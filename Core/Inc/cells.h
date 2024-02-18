@@ -13,9 +13,12 @@ static uint16_t voltageData[140]; // 5 segments, 28 cells per segment, 4 per LTC
 static uint16_t tempData[90];     // 9 thermistors per LTC6813 chip, 2 bytes per temp
 static float currentMinTemp = 999.0f;
 static float currentMaxTemp = -999.0f;
+static float minAllowedTemp = 0.0f;
+static float maxAllowedTemp = 60.0f;
 static float minTemp;
 static float maxTemp;
 static float packVoltage;
+
 
 // Functions
 void cellsInit();
@@ -23,9 +26,11 @@ void cellsPeriodic();
 void checkMinMaxTemps(float temp);
 bool areCellVoltagesWithinBounds();
 bool isPackVoltageWithinBounds();
+bool isTempWithinBounds();
 float getPackVoltageFromCells();
 float getSoC();
 float getMaxTemp();
 float getMinTemp();
+void updateTempParameters(float newMinTemp, float newMaxTemp);
 
 #endif //HVC_FIRMWARE_2024_CELLS_H

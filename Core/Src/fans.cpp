@@ -1,5 +1,5 @@
 
-#include "fan.h"
+#include "fans.h"
 #include "tim.h"
 #include "main.h"
 
