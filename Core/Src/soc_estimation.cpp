@@ -9,12 +9,14 @@
 
 using namespace std;
 
+
 static float battery_rated_capacity = 40407.84f; // 13920mAh at 587.58 V => 13.92 Ah => 50112 Coulombs
+static float soc = -1.0f;
 
 //when the tractive system is on
-float getSocWithCurrent(float dt, float soc, float chargeRemaining, float outputCurr) {
+float getSocWithCurrent(float dt, float chargeRemaining, float outputCurr) {
     chargeRemaining += outputCurr * dt;
-    soc =  (chargeRemaining/battery_rated_capacity) * 100.0f;
+    float soc =  (chargeRemaining/battery_rated_capacity) * 100.0f;
     return (float) soc;
 }
 
@@ -67,21 +69,27 @@ float getSocWithVoltage(float outputVoltage) {
 
 //this is the public function to call
 float socEstimation(float deltaTime) {
-
+    bool isSocValid = (soc != -1.0f);
     float dt = deltaTime;
-    float soc = 0;
+
     static float chargeRemaining = 0;
+
+    if (isSocValid) {
+        chargeRemaining = (soc/100.0f) * battery_rated_capacity;
+    }
 
     float outputCurr = getPackCurrent();
     float outputVoltage = getPackVoltageFromCells();
 
-    float currentBound = 0.002f; // can set to something else
+    float currentBound = 0.002f; // can set bounds to something else
 
-    if (outputCurr < currentBound && outputCurr > -currentBound) {
-        return getSocWithVoltage(outputVoltage);
+    bool withinBounds = (outputCurr < currentBound && outputCurr > -currentBound);
+    if (isSocValid || withinBounds) {
+        soc = getSocWithVoltage(outputVoltage);
     } else {
-        return getSocWithCurrent(dt, soc, chargeRemaining, outputCurr);
+        soc =  getSocWithCurrent(dt, chargeRemaining, outputCurr);
     }
+    return soc;
 }
 
 
