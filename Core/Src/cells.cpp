@@ -104,19 +104,28 @@ void checkMinMaxTemps(float temp) {
 }
 
 bool areCellVoltagesWithinBounds() {
-    // TODO implement
-    return false;
+    for(int i = 0 ; i < numCells ; i++) {
+        if(((float) voltageData[i] * 0.0001f) > 4.2f || ((float) voltageData[i] * 0.0001f) < 2.5f) {
+            // TODO send fault message
+            return false;
+        }
+    }
+    return true;
 }
 
 bool isPackVoltageWithinBounds() {
-    // TODO implement
-    return false;
+    packVoltage = getPackVoltageFromCells();
+    if(packVoltage > 420.0f || packVoltage < 250.0f) {
+        // TODO send fault message
+        return false;
+    }
+    return true;
 }
 
 float getPackVoltageFromCells() {
     packVoltage = 0.0f;
     for(uint16_t value : voltageData) {
-        packVoltage += (float) value;
+        packVoltage += ((float) value * 0.0001f);
     }
     return packVoltage;
 }
