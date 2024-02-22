@@ -145,7 +145,7 @@ int main(void)
         cellsPeriodic();
         thermalPeriodic();
         vcuPeriodic(!hvOk, !imdOk);
-        chargingPeriodic(deltaTime / 1000);
+        chargingPeriodic(deltaTime);
     }
   /* USER CODE END 3 */
 }
