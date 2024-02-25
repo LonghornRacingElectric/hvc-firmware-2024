@@ -83,7 +83,7 @@ void fansInit() {
 void fansPeriodic(float deltaTime) {
     if(coolingInbox.isRecent) {
         coolingInbox.isRecent = false;
-        reqPwm = (float) can_readBytes(coolingInbox.data, 0, 0);
+        reqPwm = (float) can_readInt(uint8_t, &coolingInbox, 0);
     }
     setFanPwm(reqPwm, deltaTime);
     calculateTrueRpm(deltaTime);

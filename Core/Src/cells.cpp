@@ -49,7 +49,7 @@ void cellsPeriodic() {
     // Writes voltage values into CanOutboxes
     for(int i = 0 ; i < 35 ; i++) {
         for(int j = 0 ; j < 4 ; j++) {
-            can_writeBytes(cellVoltages[i].data, j*2, j*2+1, voltageData[i*4+j]);
+            can_writeInt(uint16_t, &cellVoltages[i], j*2, voltageData[i*4+j]);
         }
     }
 
@@ -83,7 +83,7 @@ void cellsPeriodic() {
     for(int i = 0 ; i < 23 ; i++) {
         for(int j = 0 ; j < 4 ; j++) {
             if(i == 22 && j > 1) break;
-            can_writeBytes(cellTemps[i].data, j*2, j*2+1, tempData[i*4+j]);
+            can_writeInt(uint16_t, &cellTemps[i], j*2, tempData[i*4+j]);
             checkMinMaxTemps((float) tempData[i*4+j]);
         }
     }
