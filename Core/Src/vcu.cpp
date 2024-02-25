@@ -13,7 +13,7 @@ static CanOutbox packStatus;
 static CanOutbox imuAccel;
 static CanOutbox imuGyro;
 static CanOutbox indicatorStatus;
-static CanOutbox fanRPMs;
+static CanOutbox fanRPMs; // Percentage of max fan RPM
 
 void vcuInit() {
     can_addInbox(VCU_HVC_PARAMS, &parameterInbox);
@@ -45,8 +45,8 @@ void vcuPeriodic(bool amsIndicator, bool imdIndicator, int state) {
     can_writeBytes(imuGyro.data, 2, 3, (int16_t) gyroData.y);
     can_writeBytes(imuGyro.data, 4, 5, (int16_t) gyroData.z);
 
-    can_writeBytes(fanRPMs.data, 0, 1, (uint16_t) trueRpmMain);
-    can_writeBytes(fanRPMs.data, 2, 3, (uint16_t) trueRpmUnique);
+    can_writeBytes(fanRPMs.data, 0, 1, (int16_t) (trueRpmMain / maxRpmMain * 100.0f));
+    can_writeBytes(fanRPMs.data, 2, 3, (int16_t) (trueRpmUnique / maxRpmMain * 100.0f));
 
     // Indicator Status
     can_writeBytes(indicatorStatus.data, 0, 0, (uint8_t) amsIndicator);
