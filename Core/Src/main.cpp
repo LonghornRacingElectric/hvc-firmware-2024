@@ -147,7 +147,7 @@ int main(void)
         cellsPeriodic();
         tsensePeriodic();
         vcuPeriodic(!hvOk, !imdOk, state);
-        chargingPeriodic(deltaTime / 1000);
+        chargingPeriodic(deltaTime);
         fansPeriodic(deltaTime);
     }
   /* USER CODE END 3 */
