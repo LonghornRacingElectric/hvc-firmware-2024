@@ -7,18 +7,18 @@
 static CanInbox coolingInbox;
 
 /**
- * Ramps fan RPM to requested PWM value from the VCU
+ * Ramps fan PWM to requested PWM value from the VCU
  */
-void setFanRpm(float pwm, float deltaTime) {
+void setFanPwm(float pwm, float deltaTime) {
     pwmTimer += deltaTime;
     if(pwmTimer >= 0.02f) {
         pwmTimer = 0.0f;
 
-        pwmDutyCycleMain += (pwmDutyCycleMain > (pwm / 100.0f)) ? 0.01f : -0.01f;
+        pwmDutyCycleMain += (pwmDutyCycleMain < (pwm / 100.0f)) ? 0.01f : -0.01f;
         if(pwmDutyCycleMain > 1.0f) pwmDutyCycleMain = 1.0f;
         if(pwmDutyCycleMain < 0.0f) pwmDutyCycleMain = 0.0f;
 
-        pwmDutyCycleUnique += (pwmDutyCycleUnique > (pwm / 100.0f)) ? 0.01f : -0.01f;
+        pwmDutyCycleUnique += (pwmDutyCycleUnique < (pwm / 100.0f)) ? 0.01f : -0.01f;
         if(pwmDutyCycleUnique > 1.0f) pwmDutyCycleUnique = 1.0f;
         if(pwmDutyCycleUnique < 0.0f) pwmDutyCycleUnique = 0.0f;
 
@@ -85,6 +85,6 @@ void fansPeriodic(float deltaTime) {
         coolingInbox.isRecent = false;
         reqPwm = (float) can_readBytes(coolingInbox.data, 0, 0);
     }
-    setFanRpm(reqPwm, deltaTime);
+    setFanPwm(reqPwm, deltaTime);
     calculateTrueRpm(deltaTime);
 }

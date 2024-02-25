@@ -32,7 +32,7 @@ static bool currTach2 = false;
 /* Functions */
 void fansInit();
 void fansPeriodic(float deltaTime);
-void setFanRpm(float reqPwm, float deltaTime);
+void setFanPwm(float reqPwm, float deltaTime);
 void calculateTrueRpm(float deltaTime);
 
 #endif //HVC_FIRMWARE_2024_FANS_H
