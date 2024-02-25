@@ -52,41 +52,11 @@ void vcuPeriodic(bool amsIndicator, bool imdIndicator, int state) {
     can_writeInt(uint8_t, &indicatorStatus, 0, (uint8_t) amsIndicator);
     can_writeInt(uint8_t, &indicatorStatus, 1, (uint8_t) imdIndicator);
 
+    // Check VCU->HVC Params Inbox
     if(parameterInbox.isRecent) {
         parameterInbox.isRecent = false;
         auto minTempParam = (float) can_readInt(int8_t, &parameterInbox, 0);
         auto maxTempParam = (float) can_readInt(int8_t, &parameterInbox, 1);
         updateTempParameters(minTempParam, maxTempParam);
     }
-
-    /*
-    can_writeBytes(packStatus.data, 0, 1, (uint16_t) (getPackVoltageFromCells() / 0.01f));
-    can_writeBytes(packStatus.data, 2, 3, (uint16_t) (getPackCurrent() / 0.1f));
-    can_writeBytes(packStatus.data, 4, 4, (uint8_t) getSoC());
-    can_writeBytes(packStatus.data, 5, 5, (uint8_t) getMaxTemp());
-    can_writeBytes(packStatus.data, 6, 6, (uint8_t) getAmbientTemp());
-
-    can_writeBytes(imuAccel.data, 0, 1, (int16_t) accelData.x);
-    can_writeBytes(imuAccel.data, 2, 3, (int16_t) accelData.y);
-    can_writeBytes(imuAccel.data, 4, 5, (int16_t) accelData.z);
-
-    can_writeBytes(imuGyro.data, 0, 1, (int16_t) gyroData.x);
-    can_writeBytes(imuGyro.data, 2, 3, (int16_t) gyroData.y);
-    can_writeBytes(imuGyro.data, 4, 5, (int16_t) gyroData.z);
-
-    can_writeBytes(fanRPMs.data, 0, 1, (int16_t) (trueRpmMain / maxRpmMain * 100.0f));
-    can_writeBytes(fanRPMs.data, 2, 3, (int16_t) (trueRpmUnique / maxRpmMain * 100.0f));
-
-    // Indicator Status
-    can_writeBytes(indicatorStatus.data, 0, 0, (uint8_t) amsIndicator);
-    can_writeBytes(indicatorStatus.data, 1, 1, (uint8_t) imdIndicator);
-
-    // Check VCU->HVC Params Inbox
-    if(parameterInbox.isRecent) {
-        parameterInbox.isRecent = false;
-        auto minTempParam = (float) can_readBytes(parameterInbox.data, 0, 0);
-        auto maxTempParam = (float) can_readBytes(parameterInbox.data, 1, 1);
-        updateTempParameters(minTempParam, maxTempParam);
-    }
-     */
 }
