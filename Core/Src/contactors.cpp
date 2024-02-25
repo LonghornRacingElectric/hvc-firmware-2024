@@ -15,5 +15,5 @@ void setDriveContactor(bool on) {
 }
 
 void setDischargeDisable(bool disable) {
-    HAL_GPIO_WritePin(Discharge_Disable_GPIO_Port, Discharge_Disable_Pin, (GPIO_PinState) disable);
+    // HAL_GPIO_WritePin(Discharge_Disable_GPIO_Port, Discharge_Disable_Pin, (GPIO_PinState) disable);
 }

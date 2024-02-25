@@ -48,11 +48,11 @@ else ()
     add_compile_options(-Og -g)
 endif ()
 
-include_directories(Libs/LonghornLibrary ${includes})
+include_directories(Libs/LonghornLibrary Libs/IsoSpi ${includes})
 
 add_definitions(${defines})
 
-file(GLOB_RECURSE SOURCES ${sources} "Libs/LonghornLibrary/*.*")
+file(GLOB_RECURSE SOURCES ${sources} "Libs/LonghornLibrary/*.*" "Libs/IsoSpi/*.*")
 
 set(LINKER_SCRIPT $${CMAKE_SOURCE_DIR}/${linkerScript})
 

@@ -1,0 +1,103 @@
+ARM GAS  /tmp/ccvDlO6j.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"imd.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "Core/Src/imd.cpp"
+  19              		.section	.text._Z7isImdOkv,"ax",%progbits
+  20              		.align	1
+  21              		.global	_Z7isImdOkv
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	_Z7isImdOkv:
+  27              		.fnstart
+  28              	.LFB1279:
+   1:Core/Src/imd.cpp **** //
+   2:Core/Src/imd.cpp **** // Created by rolandwang on 11/12/2023.
+   3:Core/Src/imd.cpp **** //
+   4:Core/Src/imd.cpp **** 
+   5:Core/Src/imd.cpp **** #include "imd.h"
+   6:Core/Src/imd.cpp **** #include "main.h"
+   7:Core/Src/imd.cpp **** 
+   8:Core/Src/imd.cpp **** bool isImdOk() {
+  29              		.loc 1 8 16 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33 0000 08B5     		push	{r3, lr}
+  34              		.save {r3, lr}
+  35              		.cfi_def_cfa_offset 8
+  36              		.cfi_offset 3, -8
+  37              		.cfi_offset 14, -4
+   9:Core/Src/imd.cpp ****     return HAL_GPIO_ReadPin(IMD_Data_GPIO_Port, IMD_Data_Pin) == GPIO_PIN_SET;
+  38              		.loc 1 9 5 view .LVU1
+  39              		.loc 1 9 28 is_stmt 0 view .LVU2
+  40 0002 4FF40071 		mov	r1, #512
+  41 0006 0448     		ldr	r0, .L3
+  42 0008 FFF7FEFF 		bl	HAL_GPIO_ReadPin
+  43              	.LVL0:
+  10:Core/Src/imd.cpp **** }...
+  44              		.loc 1 10 1 view .LVU3
+  45 000c 0128     		cmp	r0, #1
+  46 000e 14BF     		ite	ne
+  47 0010 0020     		movne	r0, #0
+  48 0012 0120     		moveq	r0, #1
+ARM GAS  /tmp/ccvDlO6j.s 			page 2
+
+
+  49 0014 08BD     		pop	{r3, pc}
+  50              	.L4:
+  51 0016 00BF     		.align	2
+  52              	.L3:
+  53 0018 00000258 		.word	1476526080
+  54              		.cfi_endproc
+  55              	.LFE1279:
+  56              		.fnend
+  58              		.text
+  59              	.Letext0:
+  60              		.file 2 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+  61              		.file 3 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+  62              		.file 4 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+  63              		.file 5 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7a3xx.h"
+  64              		.file 6 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+  65              		.file 7 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+  66              		.file 8 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+  67              		.file 9 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+  68              		.file 10 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm
+  69              		.file 11 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm
+  70              		.file 12 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm
+  71              		.file 13 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm
+  72              		.file 14 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm
+  73              		.file 15 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio.h"
+  74              		.file 16 "Core/Inc/thermal.h"
+  75              		.file 17 "Core/Inc/cells.h"
+ARM GAS  /tmp/ccvDlO6j.s 			page 3
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 imd.cpp
+     /tmp/ccvDlO6j.s:20     .text._Z7isImdOkv:00000000 $t
+     /tmp/ccvDlO6j.s:26     .text._Z7isImdOkv:00000000 _Z7isImdOkv
+     /tmp/ccvDlO6j.s:53     .text._Z7isImdOkv:00000018 $d
+      .ARM.extab.text._Z7isImdOkv:00000000 $d
+      .ARM.exidx.text._Z7isImdOkv:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_GPIO_ReadPin
+__aeabi_unwind_cpp_pr1

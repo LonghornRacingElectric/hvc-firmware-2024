@@ -1,0 +1,1261 @@
+ARM GAS  /tmp/ccC69mL6.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"adbms.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "Core/Src/adbms.cpp"
+  19              		.section	.text._ZL5pec15Pci,"ax",%progbits
+  20              		.align	1
+  21              		.syntax unified
+  22              		.thumb
+  23              		.thumb_func
+  25              	_ZL5pec15Pci:
+  26              		.fnstart
+  27              	.LVL0:
+  28              	.LFB1284:
+   1:Core/Src/adbms.cpp **** /**
+   2:Core/Src/adbms.cpp ****  * @file adbms.cpp
+   3:Core/Src/adbms.cpp ****  * @author Pranit Arya
+   4:Core/Src/adbms.cpp ****  * @brief Communication functions for ADBMS IC (LTC6813)
+   5:Core/Src/adbms.cpp ****  * @version 0.1
+   6:Core/Src/adbms.cpp ****  * @date 2023-10-29
+   7:Core/Src/adbms.cpp ****  *
+   8:Core/Src/adbms.cpp ****  * Created by Pranit Arya 10/29/23
+   9:Core/Src/adbms.cpp ****  *
+  10:Core/Src/adbms.cpp ****  */
+  11:Core/Src/adbms.cpp **** 
+  12:Core/Src/adbms.cpp **** #include <cstdint>
+  13:Core/Src/adbms.cpp **** #include "adbms.h"
+  14:Core/Src/adbms.cpp **** #include "spi.h"
+  15:Core/Src/adbms.cpp **** 
+  16:Core/Src/adbms.cpp **** static uint16_t pec15 (char *data , int len);
+  17:Core/Src/adbms.cpp **** 
+  18:Core/Src/adbms.cpp **** // Interrupt callbacks
+  19:Core/Src/adbms.cpp **** static LTC6813_Error_t bms_error = LTC6813_ERROR;
+  20:Core/Src/adbms.cpp **** void HAL_SPI_TxCpltCallback(SPI_HandleTypeDef *hspi) {
+  21:Core/Src/adbms.cpp ****     bms_error = LTC6813_OK;
+  22:Core/Src/adbms.cpp **** }
+  23:Core/Src/adbms.cpp **** 
+  24:Core/Src/adbms.cpp **** void HAL_SPI_ErrorCallback(SPI_HandleTypeDef *hspi) {
+  25:Core/Src/adbms.cpp ****     bms_error = LTC6813_SPI_ERROR;
+  26:Core/Src/adbms.cpp **** }
+  27:Core/Src/adbms.cpp **** 
+  28:Core/Src/adbms.cpp **** extern SPI_HandleTypeDef hspi1; // BMS SPI
+  29:Core/Src/adbms.cpp **** 
+  30:Core/Src/adbms.cpp **** // voltages_buf must be >= 18*NUM_BMS_ICS = 180
+ARM GAS  /tmp/ccC69mL6.s 			page 2
+
+
+  31:Core/Src/adbms.cpp **** LTC6813_Error_t ltc6813_voltage_read(uint16_t *voltages_buf) {
+  32:Core/Src/adbms.cpp **** //    uint16_t data_buf[18*NUM_BMS_ICS];
+  33:Core/Src/adbms.cpp ****     LTC6813_Error_t status = LTC6813_OK;
+  34:Core/Src/adbms.cpp ****     LTC6813_Error_t err = LTC6813_OK;
+  35:Core/Src/adbms.cpp **** 
+  36:Core/Src/adbms.cpp ****     for(int i = 0; i < NUM_BMS_ICS; i++) {
+  37:Core/Src/adbms.cpp ****         status = ltc6813_cmd_read(CMD_RDCVA, ((uint8_t *)voltages_buf)+i);
+  38:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+  39:Core/Src/adbms.cpp ****             err = status;
+  40:Core/Src/adbms.cpp ****         status = ltc6813_cmd_read(CMD_RDCVB, ((uint8_t *)voltages_buf)+i+6);
+  41:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+  42:Core/Src/adbms.cpp ****             err = status;
+  43:Core/Src/adbms.cpp ****         status = ltc6813_cmd_read(CMD_RDCVC, ((uint8_t *)voltages_buf)+i+12);
+  44:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+  45:Core/Src/adbms.cpp ****             err = status;
+  46:Core/Src/adbms.cpp ****         status = ltc6813_cmd_read(CMD_RDCVD, ((uint8_t *)voltages_buf)+i+18);
+  47:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+  48:Core/Src/adbms.cpp ****             err = status;
+  49:Core/Src/adbms.cpp ****         status = ltc6813_cmd_read(CMD_RDCVE, ((uint8_t *)voltages_buf)+i+24);
+  50:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+  51:Core/Src/adbms.cpp ****             err = status;
+  52:Core/Src/adbms.cpp ****         status = ltc6813_cmd_read(CMD_RDCVF, ((uint8_t *)voltages_buf)+i+30);
+  53:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+  54:Core/Src/adbms.cpp ****             err = status;
+  55:Core/Src/adbms.cpp ****     }
+  56:Core/Src/adbms.cpp **** 
+  57:Core/Src/adbms.cpp ****     return err;
+  58:Core/Src/adbms.cpp **** }
+  59:Core/Src/adbms.cpp **** 
+  60:Core/Src/adbms.cpp **** LTC6813_Error_t ltc6813_cmd_write(LTC6813_Command_t command, uint8_t *data, uint8_t len) {
+  61:Core/Src/adbms.cpp ****     LTC6813_Command_t cmd_buf = command; // PEC15 requires pointer to command
+  62:Core/Src/adbms.cpp ****     uint16_t cmd_crc = pec15((char *) cmd_buf, 2);
+  63:Core/Src/adbms.cpp ****     uint16_t data_crc = pec15((char *) data, len);
+  64:Core/Src/adbms.cpp **** 
+  65:Core/Src/adbms.cpp ****     // Send command
+  66:Core/Src/adbms.cpp ****     if(HAL_SPI_Transmit(&hspi1, (uint8_t *) &cmd_buf, 2, LTC_SPI_TIMEOUT) != HAL_OK) {
+  67:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+  68:Core/Src/adbms.cpp ****     }
+  69:Core/Src/adbms.cpp ****     if(HAL_SPI_Transmit(&hspi1, (uint8_t *) &cmd_crc, 2, LTC_SPI_TIMEOUT) != HAL_OK) {
+  70:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+  71:Core/Src/adbms.cpp ****     }
+  72:Core/Src/adbms.cpp **** 
+  73:Core/Src/adbms.cpp ****     // TODO: Handle shifting (comm with multiple BMS ICs)
+  74:Core/Src/adbms.cpp ****     if(HAL_SPI_Transmit(&hspi1, data, len, LTC_SPI_TIMEOUT) != HAL_OK) {
+  75:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+  76:Core/Src/adbms.cpp ****     }
+  77:Core/Src/adbms.cpp ****     if(HAL_SPI_Transmit(&hspi1, (uint8_t *) &data_crc, 2, LTC_SPI_TIMEOUT) != HAL_OK) {
+  78:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+  79:Core/Src/adbms.cpp ****     }
+  80:Core/Src/adbms.cpp **** 
+  81:Core/Src/adbms.cpp ****     return LTC6813_OK;
+  82:Core/Src/adbms.cpp **** }
+  83:Core/Src/adbms.cpp **** 
+  84:Core/Src/adbms.cpp **** // data_buf must be >= data size (6 bytes per ADC IC?)
+  85:Core/Src/adbms.cpp **** LTC6813_Error_t ltc6813_cmd_read(LTC6813_Command_t command, uint8_t *data_buf) {
+  86:Core/Src/adbms.cpp ****     LTC6813_Command_t cmd_buf = command; // PEC15 requires pointer to command
+  87:Core/Src/adbms.cpp ****     LTC6813_Error_t output_status = LTC6813_OK;
+ARM GAS  /tmp/ccC69mL6.s 			page 3
+
+
+  88:Core/Src/adbms.cpp ****     uint16_t received_data_crc;
+  89:Core/Src/adbms.cpp ****     uint16_t cmd_crc = pec15((char *) cmd_buf, 2);
+  90:Core/Src/adbms.cpp **** 
+  91:Core/Src/adbms.cpp ****     // Send command
+  92:Core/Src/adbms.cpp ****     if(HAL_SPI_Transmit(&hspi1, (uint8_t *) &cmd_buf, 2, LTC_SPI_TIMEOUT) != HAL_OK) {
+  93:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+  94:Core/Src/adbms.cpp ****     }
+  95:Core/Src/adbms.cpp ****     if(HAL_SPI_Transmit(&hspi1, (uint8_t *) &cmd_crc, 2, LTC_SPI_TIMEOUT) != HAL_OK) {
+  96:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+  97:Core/Src/adbms.cpp ****     }
+  98:Core/Src/adbms.cpp **** 
+  99:Core/Src/adbms.cpp ****     // Get result from daisy chain, check CRC
+ 100:Core/Src/adbms.cpp ****     for(int i = 0; i < NUM_BMS_ICS; i++) {
+ 101:Core/Src/adbms.cpp ****         if(HAL_SPI_Receive(&hspi1, data_buf+(i*6), 6, LTC_SPI_TIMEOUT) != HAL_OK) {
+ 102:Core/Src/adbms.cpp ****             return LTC6813_SPI_ERROR;
+ 103:Core/Src/adbms.cpp ****         }
+ 104:Core/Src/adbms.cpp ****         if(HAL_SPI_Receive(&hspi1, (uint8_t *)(&received_data_crc), 2, LTC_SPI_TIMEOUT) != HAL_OK) 
+ 105:Core/Src/adbms.cpp ****             return LTC6813_SPI_ERROR;
+ 106:Core/Src/adbms.cpp ****         }
+ 107:Core/Src/adbms.cpp ****         uint16_t data_crc = pec15((char *)data_buf, 5);
+ 108:Core/Src/adbms.cpp ****         if(data_crc != received_data_crc) {
+ 109:Core/Src/adbms.cpp ****             output_status = LTC6813_INVALID_DATA;
+ 110:Core/Src/adbms.cpp ****         }
+ 111:Core/Src/adbms.cpp ****     }
+ 112:Core/Src/adbms.cpp **** 
+ 113:Core/Src/adbms.cpp ****     return output_status;
+ 114:Core/Src/adbms.cpp **** 
+ 115:Core/Src/adbms.cpp **** }
+ 116:Core/Src/adbms.cpp **** 
+ 117:Core/Src/adbms.cpp **** /************************************************
+ 118:Core/Src/adbms.cpp ****  * ADI-given PEC15 Code
+ 119:Core/Src/adbms.cpp **** *************************************************/
+ 120:Core/Src/adbms.cpp **** 
+ 121:Core/Src/adbms.cpp **** /************************************
+ 122:Core/Src/adbms.cpp **** Copyright 2012 Analog Devices, Inc. (ADI)
+ 123:Core/Src/adbms.cpp **** Permission to freely use, copy, modify, and distribute this software for any purpose with or
+ 124:Core/Src/adbms.cpp **** without fee is hereby granted, provided that the above copyright notice and this permission
+ 125:Core/Src/adbms.cpp **** notice appear in all copies: THIS SOFTWARE IS PROVIDED “AS IS” AND ADI DISCLAIMS ALL WARRANTIES
+ 126:Core/Src/adbms.cpp **** INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL ADI BE LIABLE FO
+ 127:Core/Src/adbms.cpp **** ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM AN
+ 128:Core/Src/adbms.cpp **** USE OF SAME, INCLUDING ANY LOSS OF USE OR DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIG
+ 129:Core/Src/adbms.cpp **** OR OTHER TORTUOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTW
+ 130:Core/Src/adbms.cpp **** ***************************************/
+ 131:Core/Src/adbms.cpp **** 
+ 132:Core/Src/adbms.cpp **** /**
+ 133:Core/Src/adbms.cpp ****  * @brief Generate pec15 CRC for LTC6813
+ 134:Core/Src/adbms.cpp ****  *
+ 135:Core/Src/adbms.cpp ****  * @param data
+ 136:Core/Src/adbms.cpp ****  * @param len
+ 137:Core/Src/adbms.cpp ****  * @return uint16_t
+ 138:Core/Src/adbms.cpp ****  */
+ 139:Core/Src/adbms.cpp **** static uint16_t pec15 (char *data , int len) {
+  29              		.loc 1 139 46 view -0
+  30              		.cfi_startproc
+  31              		@ args = 0, pretend = 0, frame = 0
+  32              		@ frame_needed = 0, uses_anonymous_args = 0
+  33              		@ link register save eliminated.
+ARM GAS  /tmp/ccC69mL6.s 			page 4
+
+
+ 140:Core/Src/adbms.cpp ****     uint16_t remainder, address;
+  34              		.loc 1 140 5 view .LVU1
+ 141:Core/Src/adbms.cpp ****     remainder = 16; // PEC seed
+  35              		.loc 1 141 5 view .LVU2
+ 142:Core/Src/adbms.cpp ****     for (int i = 0; i < len; i++) {
+  36              		.loc 1 142 5 view .LVU3
+  37              	.LBB2:
+  38              		.loc 1 142 14 is_stmt 0 view .LVU4
+  39 0000 4FF0000C 		mov	ip, #0
+  40              	.LBE2:
+ 141:Core/Src/adbms.cpp ****     remainder = 16; // PEC seed
+  41              		.loc 1 141 15 view .LVU5
+  42 0004 1023     		movs	r3, #16
+  43              	.LVL1:
+  44              	.LBB3:
+  45              		.loc 1 142 23 is_stmt 1 discriminator 1 view .LVU6
+  46 0006 8C45     		cmp	ip, r1
+  47 0008 14DA     		bge	.L8
+  48              	.LBE3:
+ 139:Core/Src/adbms.cpp ****     uint16_t remainder, address;
+  49              		.loc 1 139 46 is_stmt 0 view .LVU7
+  50 000a 10B4     		push	{r4}
+  51              		.cfi_def_cfa_offset 4
+  52              		.cfi_offset 4, -4
+  53              	.L3:
+  54              	.LBB4:
+ 143:Core/Src/adbms.cpp ****         address = ((remainder >> 7) ^ data[i]) & 0xff; //calculate PEC table address
+  55              		.loc 1 143 9 is_stmt 1 view .LVU8
+  56              		.loc 1 143 45 is_stmt 0 view .LVU9
+  57 000c 10F80C20 		ldrb	r2, [r0, ip]	@ zero_extendqisi2
+  58              		.loc 1 143 37 view .LVU10
+  59 0010 82EAD312 		eor	r2, r2, r3, lsr #7
+  60              		.loc 1 143 17 view .LVU11
+  61 0014 D2B2     		uxtb	r2, r2
+  62              	.LVL2:
+ 144:Core/Src/adbms.cpp ****         remainder = (remainder << 8 ) ^ pec15Table[address];
+  63              		.loc 1 144 9 is_stmt 1 view .LVU12
+  64              		.loc 1 144 59 is_stmt 0 view .LVU13
+  65 0016 094C     		ldr	r4, .L9
+  66 0018 34F81220 		ldrh	r2, [r4, r2, lsl #1]
+  67              	.LVL3:
+  68              		.loc 1 144 59 view .LVU14
+  69 001c 1B02     		lsls	r3, r3, #8
+  70              	.LVL4:
+  71              		.loc 1 144 59 view .LVU15
+  72 001e 9BB2     		uxth	r3, r3
+  73              		.loc 1 144 19 view .LVU16
+  74 0020 5340     		eors	r3, r3, r2
+  75              	.LVL5:
+ 142:Core/Src/adbms.cpp ****         address = ((remainder >> 7) ^ data[i]) & 0xff; //calculate PEC table address
+  76              		.loc 1 142 5 is_stmt 1 discriminator 3 view .LVU17
+  77 0022 0CF1010C 		add	ip, ip, #1
+  78              	.LVL6:
+ 142:Core/Src/adbms.cpp ****         address = ((remainder >> 7) ^ data[i]) & 0xff; //calculate PEC table address
+  79              		.loc 1 142 23 discriminator 1 view .LVU18
+  80 0026 8C45     		cmp	ip, r1
+  81 0028 F0DB     		blt	.L3
+ARM GAS  /tmp/ccC69mL6.s 			page 5
+
+
+  82              	.LBE4:
+ 145:Core/Src/adbms.cpp ****     }
+ 146:Core/Src/adbms.cpp ****     return (remainder*2);//The CRC15 has a 0 in the LSB so the final value must be multiplied by 2
+  83              		.loc 1 146 5 view .LVU19
+  84              		.loc 1 146 24 is_stmt 0 view .LVU20
+  85 002a 5800     		lsls	r0, r3, #1
+  86              	.LVL7:
+  87              		.loc 1 146 24 discriminator 1 view .LVU21
+  88 002c 80B2     		uxth	r0, r0
+ 147:Core/Src/adbms.cpp **** }
+  89              		.loc 1 147 1 view .LVU22
+  90 002e 5DF8044B 		ldr	r4, [sp], #4
+  91              		.cfi_restore 4
+  92              		.cfi_def_cfa_offset 0
+  93 0032 7047     		bx	lr
+  94              	.LVL8:
+  95              	.L8:
+ 146:Core/Src/adbms.cpp **** }
+  96              		.loc 1 146 5 is_stmt 1 view .LVU23
+ 146:Core/Src/adbms.cpp **** }
+  97              		.loc 1 146 24 is_stmt 0 view .LVU24
+  98 0034 5800     		lsls	r0, r3, #1
+  99              	.LVL9:
+ 146:Core/Src/adbms.cpp **** }
+ 100              		.loc 1 146 24 discriminator 1 view .LVU25
+ 101 0036 80B2     		uxth	r0, r0
+ 102              		.loc 1 147 1 view .LVU26
+ 103 0038 7047     		bx	lr
+ 104              	.L10:
+ 105 003a 00BF     		.align	2
+ 106              	.L9:
+ 107 003c 00000000 		.word	_ZL10pec15Table
+ 108              		.cfi_endproc
+ 109              	.LFE1284:
+ 110              		.cantunwind
+ 111              		.fnend
+ 113              		.section	.text.HAL_SPI_TxCpltCallback,"ax",%progbits
+ 114              		.align	1
+ 115              		.global	HAL_SPI_TxCpltCallback
+ 116              		.syntax unified
+ 117              		.thumb
+ 118              		.thumb_func
+ 120              	HAL_SPI_TxCpltCallback:
+ 121              		.fnstart
+ 122              	.LVL10:
+ 123              	.LFB1279:
+  20:Core/Src/adbms.cpp ****     bms_error = LTC6813_OK;
+ 124              		.loc 1 20 54 is_stmt 1 view -0
+ 125              		.cfi_startproc
+ 126              		@ args = 0, pretend = 0, frame = 0
+ 127              		@ frame_needed = 0, uses_anonymous_args = 0
+ 128              		@ link register save eliminated.
+  21:Core/Src/adbms.cpp **** }
+ 129              		.loc 1 21 5 view .LVU28
+  21:Core/Src/adbms.cpp **** }
+ 130              		.loc 1 21 15 is_stmt 0 view .LVU29
+ 131 0000 014B     		ldr	r3, .L12
+ARM GAS  /tmp/ccC69mL6.s 			page 6
+
+
+ 132 0002 0022     		movs	r2, #0
+ 133 0004 1A70     		strb	r2, [r3]
+  22:Core/Src/adbms.cpp **** 
+ 134              		.loc 1 22 1 view .LVU30
+ 135 0006 7047     		bx	lr
+ 136              	.L13:
+ 137              		.align	2
+ 138              	.L12:
+ 139 0008 00000000 		.word	_ZL9bms_error
+ 140              		.cfi_endproc
+ 141              	.LFE1279:
+ 142              		.cantunwind
+ 143              		.fnend
+ 145              		.section	.text.HAL_SPI_ErrorCallback,"ax",%progbits
+ 146              		.align	1
+ 147              		.global	HAL_SPI_ErrorCallback
+ 148              		.syntax unified
+ 149              		.thumb
+ 150              		.thumb_func
+ 152              	HAL_SPI_ErrorCallback:
+ 153              		.fnstart
+ 154              	.LVL11:
+ 155              	.LFB1280:
+  24:Core/Src/adbms.cpp ****     bms_error = LTC6813_SPI_ERROR;
+ 156              		.loc 1 24 53 is_stmt 1 view -0
+ 157              		.cfi_startproc
+ 158              		@ args = 0, pretend = 0, frame = 0
+ 159              		@ frame_needed = 0, uses_anonymous_args = 0
+ 160              		@ link register save eliminated.
+  25:Core/Src/adbms.cpp **** }
+ 161              		.loc 1 25 5 view .LVU32
+  25:Core/Src/adbms.cpp **** }
+ 162              		.loc 1 25 15 is_stmt 0 view .LVU33
+ 163 0000 014B     		ldr	r3, .L15
+ 164 0002 0122     		movs	r2, #1
+ 165 0004 1A70     		strb	r2, [r3]
+  26:Core/Src/adbms.cpp **** 
+ 166              		.loc 1 26 1 view .LVU34
+ 167 0006 7047     		bx	lr
+ 168              	.L16:
+ 169              		.align	2
+ 170              	.L15:
+ 171 0008 00000000 		.word	_ZL9bms_error
+ 172              		.cfi_endproc
+ 173              	.LFE1280:
+ 174              		.cantunwind
+ 175              		.fnend
+ 177              		.section	.text._Z17ltc6813_cmd_write17LTC6813_Command_tPhh,"ax",%progbits
+ 178              		.align	1
+ 179              		.global	_Z17ltc6813_cmd_write17LTC6813_Command_tPhh
+ 180              		.syntax unified
+ 181              		.thumb
+ 182              		.thumb_func
+ 184              	_Z17ltc6813_cmd_write17LTC6813_Command_tPhh:
+ 185              		.fnstart
+ 186              	.LVL12:
+ 187              	.LFB1282:
+ARM GAS  /tmp/ccC69mL6.s 			page 7
+
+
+  60:Core/Src/adbms.cpp ****     LTC6813_Command_t cmd_buf = command; // PEC15 requires pointer to command
+ 188              		.loc 1 60 90 is_stmt 1 view -0
+ 189              		.cfi_startproc
+ 190              		@ args = 0, pretend = 0, frame = 8
+ 191              		@ frame_needed = 0, uses_anonymous_args = 0
+  60:Core/Src/adbms.cpp ****     LTC6813_Command_t cmd_buf = command; // PEC15 requires pointer to command
+ 192              		.loc 1 60 90 is_stmt 0 view .LVU36
+ 193 0000 30B5     		push	{r4, r5, lr}
+ 194              		.save {r4, r5, lr}
+ 195              		.cfi_def_cfa_offset 12
+ 196              		.cfi_offset 4, -12
+ 197              		.cfi_offset 5, -8
+ 198              		.cfi_offset 14, -4
+ 199              		.pad #12
+ 200 0002 83B0     		sub	sp, sp, #12
+ 201              		.cfi_def_cfa_offset 24
+ 202 0004 0C46     		mov	r4, r1
+ 203 0006 1546     		mov	r5, r2
+  61:Core/Src/adbms.cpp ****     uint16_t cmd_crc = pec15((char *) cmd_buf, 2);
+ 204              		.loc 1 61 5 is_stmt 1 view .LVU37
+  61:Core/Src/adbms.cpp ****     uint16_t cmd_crc = pec15((char *) cmd_buf, 2);
+ 205              		.loc 1 61 23 is_stmt 0 view .LVU38
+ 206 0008 ADF80600 		strh	r0, [sp, #6]	@ movhi
+  62:Core/Src/adbms.cpp ****     uint16_t data_crc = pec15((char *) data, len);
+ 207              		.loc 1 62 5 is_stmt 1 view .LVU39
+  62:Core/Src/adbms.cpp ****     uint16_t data_crc = pec15((char *) data, len);
+ 208              		.loc 1 62 29 is_stmt 0 view .LVU40
+ 209 000c 0221     		movs	r1, #2
+ 210              	.LVL13:
+  62:Core/Src/adbms.cpp ****     uint16_t data_crc = pec15((char *) data, len);
+ 211              		.loc 1 62 29 view .LVU41
+ 212 000e FFF7FEFF 		bl	_ZL5pec15Pci
+ 213              	.LVL14:
+  62:Core/Src/adbms.cpp ****     uint16_t data_crc = pec15((char *) data, len);
+ 214              		.loc 1 62 49 discriminator 1 view .LVU42
+ 215 0012 ADF80400 		strh	r0, [sp, #4]	@ movhi
+  63:Core/Src/adbms.cpp **** 
+ 216              		.loc 1 63 5 is_stmt 1 view .LVU43
+  63:Core/Src/adbms.cpp **** 
+ 217              		.loc 1 63 30 is_stmt 0 view .LVU44
+ 218 0016 2946     		mov	r1, r5
+ 219 0018 2046     		mov	r0, r4
+ 220 001a FFF7FEFF 		bl	_ZL5pec15Pci
+ 221              	.LVL15:
+  63:Core/Src/adbms.cpp **** 
+ 222              		.loc 1 63 49 discriminator 1 view .LVU45
+ 223 001e ADF80200 		strh	r0, [sp, #2]	@ movhi
+  66:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+ 224              		.loc 1 66 5 is_stmt 1 view .LVU46
+  66:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+ 225              		.loc 1 66 24 is_stmt 0 view .LVU47
+ 226 0022 4FF47A73 		mov	r3, #1000
+ 227 0026 0222     		movs	r2, #2
+ 228 0028 0DF10601 		add	r1, sp, #6
+ 229 002c 1348     		ldr	r0, .L27
+ 230 002e FFF7FEFF 		bl	HAL_SPI_Transmit
+ 231              	.LVL16:
+ARM GAS  /tmp/ccC69mL6.s 			page 8
+
+
+  66:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+ 232              		.loc 1 66 5 discriminator 1 view .LVU48
+ 233 0032 10B1     		cbz	r0, .L24
+  67:Core/Src/adbms.cpp ****     }
+ 234              		.loc 1 67 16 view .LVU49
+ 235 0034 0120     		movs	r0, #1
+ 236              	.L18:
+  82:Core/Src/adbms.cpp **** 
+ 237              		.loc 1 82 1 view .LVU50
+ 238 0036 03B0     		add	sp, sp, #12
+ 239              		.cfi_remember_state
+ 240              		.cfi_def_cfa_offset 12
+ 241              		@ sp needed
+ 242 0038 30BD     		pop	{r4, r5, pc}
+ 243              	.LVL17:
+ 244              	.L24:
+ 245              		.cfi_restore_state
+  69:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+ 246              		.loc 1 69 5 is_stmt 1 view .LVU51
+  69:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+ 247              		.loc 1 69 24 is_stmt 0 view .LVU52
+ 248 003a 4FF47A73 		mov	r3, #1000
+ 249 003e 0222     		movs	r2, #2
+ 250 0040 01A9     		add	r1, sp, #4
+ 251 0042 0E48     		ldr	r0, .L27
+ 252 0044 FFF7FEFF 		bl	HAL_SPI_Transmit
+ 253              	.LVL18:
+  69:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+ 254              		.loc 1 69 5 discriminator 1 view .LVU53
+ 255 0048 08B1     		cbz	r0, .L25
+  70:Core/Src/adbms.cpp ****     }
+ 256              		.loc 1 70 16 view .LVU54
+ 257 004a 0120     		movs	r0, #1
+ 258 004c F3E7     		b	.L18
+ 259              	.L25:
+  74:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+ 260              		.loc 1 74 5 is_stmt 1 view .LVU55
+  74:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+ 261              		.loc 1 74 24 is_stmt 0 view .LVU56
+ 262 004e 4FF47A73 		mov	r3, #1000
+ 263 0052 2A46     		mov	r2, r5
+ 264 0054 2146     		mov	r1, r4
+ 265 0056 0948     		ldr	r0, .L27
+ 266 0058 FFF7FEFF 		bl	HAL_SPI_Transmit
+ 267              	.LVL19:
+  74:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+ 268              		.loc 1 74 5 discriminator 1 view .LVU57
+ 269 005c 08B1     		cbz	r0, .L26
+  75:Core/Src/adbms.cpp ****     }
+ 270              		.loc 1 75 16 view .LVU58
+ 271 005e 0120     		movs	r0, #1
+ 272 0060 E9E7     		b	.L18
+ 273              	.L26:
+  77:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+ 274              		.loc 1 77 5 is_stmt 1 view .LVU59
+  77:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+ 275              		.loc 1 77 24 is_stmt 0 view .LVU60
+ARM GAS  /tmp/ccC69mL6.s 			page 9
+
+
+ 276 0062 4FF47A73 		mov	r3, #1000
+ 277 0066 0222     		movs	r2, #2
+ 278 0068 0DEB0201 		add	r1, sp, r2
+ 279 006c 0348     		ldr	r0, .L27
+ 280 006e FFF7FEFF 		bl	HAL_SPI_Transmit
+ 281              	.LVL20:
+  77:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+ 282              		.loc 1 77 5 discriminator 1 view .LVU61
+ 283 0072 0028     		cmp	r0, #0
+ 284 0074 DFD0     		beq	.L18
+  78:Core/Src/adbms.cpp ****     }
+ 285              		.loc 1 78 16 view .LVU62
+ 286 0076 0120     		movs	r0, #1
+ 287 0078 DDE7     		b	.L18
+ 288              	.L28:
+ 289 007a 00BF     		.align	2
+ 290              	.L27:
+ 291 007c 00000000 		.word	hspi1
+ 292              		.cfi_endproc
+ 293              	.LFE1282:
+ 294              		.fnend
+ 296              		.section	.text._Z16ltc6813_cmd_read17LTC6813_Command_tPh,"ax",%progbits
+ 297              		.align	1
+ 298              		.global	_Z16ltc6813_cmd_read17LTC6813_Command_tPh
+ 299              		.syntax unified
+ 300              		.thumb
+ 301              		.thumb_func
+ 303              	_Z16ltc6813_cmd_read17LTC6813_Command_tPh:
+ 304              		.fnstart
+ 305              	.LVL21:
+ 306              	.LFB1283:
+  85:Core/Src/adbms.cpp ****     LTC6813_Command_t cmd_buf = command; // PEC15 requires pointer to command
+ 307              		.loc 1 85 80 is_stmt 1 view -0
+ 308              		.cfi_startproc
+ 309              		@ args = 0, pretend = 0, frame = 8
+ 310              		@ frame_needed = 0, uses_anonymous_args = 0
+  85:Core/Src/adbms.cpp ****     LTC6813_Command_t cmd_buf = command; // PEC15 requires pointer to command
+ 311              		.loc 1 85 80 is_stmt 0 view .LVU64
+ 312 0000 70B5     		push	{r4, r5, r6, lr}
+ 313              		.save {r4, r5, r6, lr}
+ 314              		.cfi_def_cfa_offset 16
+ 315              		.cfi_offset 4, -16
+ 316              		.cfi_offset 5, -12
+ 317              		.cfi_offset 6, -8
+ 318              		.cfi_offset 14, -4
+ 319              		.pad #8
+ 320 0002 82B0     		sub	sp, sp, #8
+ 321              		.cfi_def_cfa_offset 24
+ 322 0004 0D46     		mov	r5, r1
+  86:Core/Src/adbms.cpp ****     LTC6813_Error_t output_status = LTC6813_OK;
+ 323              		.loc 1 86 5 is_stmt 1 view .LVU65
+  86:Core/Src/adbms.cpp ****     LTC6813_Error_t output_status = LTC6813_OK;
+ 324              		.loc 1 86 23 is_stmt 0 view .LVU66
+ 325 0006 ADF80600 		strh	r0, [sp, #6]	@ movhi
+  87:Core/Src/adbms.cpp ****     uint16_t received_data_crc;
+ 326              		.loc 1 87 5 is_stmt 1 view .LVU67
+ 327              	.LVL22:
+ARM GAS  /tmp/ccC69mL6.s 			page 10
+
+
+  88:Core/Src/adbms.cpp ****     uint16_t cmd_crc = pec15((char *) cmd_buf, 2);
+ 328              		.loc 1 88 5 view .LVU68
+  89:Core/Src/adbms.cpp **** 
+ 329              		.loc 1 89 5 view .LVU69
+  89:Core/Src/adbms.cpp **** 
+ 330              		.loc 1 89 29 is_stmt 0 view .LVU70
+ 331 000a 0221     		movs	r1, #2
+ 332              	.LVL23:
+  89:Core/Src/adbms.cpp **** 
+ 333              		.loc 1 89 29 view .LVU71
+ 334 000c FFF7FEFF 		bl	_ZL5pec15Pci
+ 335              	.LVL24:
+  89:Core/Src/adbms.cpp **** 
+ 336              		.loc 1 89 49 discriminator 1 view .LVU72
+ 337 0010 ADF80200 		strh	r0, [sp, #2]	@ movhi
+  92:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+ 338              		.loc 1 92 5 is_stmt 1 view .LVU73
+  92:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+ 339              		.loc 1 92 24 is_stmt 0 view .LVU74
+ 340 0014 4FF47A73 		mov	r3, #1000
+ 341 0018 0222     		movs	r2, #2
+ 342 001a 0DF10601 		add	r1, sp, #6
+ 343 001e 1D48     		ldr	r0, .L41
+ 344 0020 FFF7FEFF 		bl	HAL_SPI_Transmit
+ 345              	.LVL25:
+  92:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+ 346              		.loc 1 92 5 discriminator 1 view .LVU75
+ 347 0024 18B1     		cbz	r0, .L40
+  93:Core/Src/adbms.cpp ****     }
+ 348              		.loc 1 93 16 view .LVU76
+ 349 0026 0126     		movs	r6, #1
+ 350              	.LVL26:
+ 351              	.L30:
+ 115:Core/Src/adbms.cpp **** 
+ 352              		.loc 1 115 1 view .LVU77
+ 353 0028 3046     		mov	r0, r6
+ 354 002a 02B0     		add	sp, sp, #8
+ 355              		.cfi_remember_state
+ 356              		.cfi_def_cfa_offset 16
+ 357              		@ sp needed
+ 358 002c 70BD     		pop	{r4, r5, r6, pc}
+ 359              	.LVL27:
+ 360              	.L40:
+ 361              		.cfi_restore_state
+  95:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+ 362              		.loc 1 95 5 is_stmt 1 view .LVU78
+  95:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+ 363              		.loc 1 95 24 is_stmt 0 view .LVU79
+ 364 002e 4FF47A73 		mov	r3, #1000
+ 365 0032 0222     		movs	r2, #2
+ 366 0034 0DEB0201 		add	r1, sp, r2
+ 367 0038 1648     		ldr	r0, .L41
+ 368 003a FFF7FEFF 		bl	HAL_SPI_Transmit
+ 369              	.LVL28:
+  95:Core/Src/adbms.cpp ****         return LTC6813_SPI_ERROR;
+ 370              		.loc 1 95 5 discriminator 1 view .LVU80
+ 371 003e 0646     		mov	r6, r0
+ARM GAS  /tmp/ccC69mL6.s 			page 11
+
+
+ 372 0040 08BB     		cbnz	r0, .L35
+ 373              	.LBB5:
+ 100:Core/Src/adbms.cpp ****         if(HAL_SPI_Receive(&hspi1, data_buf+(i*6), 6, LTC_SPI_TIMEOUT) != HAL_OK) {
+ 374              		.loc 1 100 13 view .LVU81
+ 375 0042 0024     		movs	r4, #0
+ 376 0044 00E0     		b	.L31
+ 377              	.LVL29:
+ 378              	.L32:
+ 100:Core/Src/adbms.cpp ****         if(HAL_SPI_Receive(&hspi1, data_buf+(i*6), 6, LTC_SPI_TIMEOUT) != HAL_OK) {
+ 379              		.loc 1 100 5 is_stmt 1 discriminator 2 view .LVU82
+ 380 0046 0134     		adds	r4, r4, #1
+ 381              	.LVL30:
+ 382              	.L31:
+ 100:Core/Src/adbms.cpp ****         if(HAL_SPI_Receive(&hspi1, data_buf+(i*6), 6, LTC_SPI_TIMEOUT) != HAL_OK) {
+ 383              		.loc 1 100 22 discriminator 1 view .LVU83
+ 384 0048 092C     		cmp	r4, #9
+ 385 004a EDDC     		bgt	.L30
+ 386              	.LBB6:
+ 101:Core/Src/adbms.cpp ****             return LTC6813_SPI_ERROR;
+ 387              		.loc 1 101 9 view .LVU84
+ 101:Core/Src/adbms.cpp ****             return LTC6813_SPI_ERROR;
+ 388              		.loc 1 101 47 is_stmt 0 view .LVU85
+ 389 004c 04EB4401 		add	r1, r4, r4, lsl #1
+ 101:Core/Src/adbms.cpp ****             return LTC6813_SPI_ERROR;
+ 390              		.loc 1 101 27 view .LVU86
+ 391 0050 4FF47A73 		mov	r3, #1000
+ 392 0054 0622     		movs	r2, #6
+ 393 0056 05EB4101 		add	r1, r5, r1, lsl #1
+ 394 005a 0E48     		ldr	r0, .L41
+ 395 005c FFF7FEFF 		bl	HAL_SPI_Receive
+ 396              	.LVL31:
+ 101:Core/Src/adbms.cpp ****             return LTC6813_SPI_ERROR;
+ 397              		.loc 1 101 9 discriminator 1 view .LVU87
+ 398 0060 98B9     		cbnz	r0, .L36
+ 104:Core/Src/adbms.cpp ****             return LTC6813_SPI_ERROR;
+ 399              		.loc 1 104 9 is_stmt 1 view .LVU88
+ 104:Core/Src/adbms.cpp ****             return LTC6813_SPI_ERROR;
+ 400              		.loc 1 104 27 is_stmt 0 view .LVU89
+ 401 0062 4FF47A73 		mov	r3, #1000
+ 402 0066 0222     		movs	r2, #2
+ 403 0068 01A9     		add	r1, sp, #4
+ 404 006a 0A48     		ldr	r0, .L41
+ 405 006c FFF7FEFF 		bl	HAL_SPI_Receive
+ 406              	.LVL32:
+ 104:Core/Src/adbms.cpp ****             return LTC6813_SPI_ERROR;
+ 407              		.loc 1 104 9 discriminator 1 view .LVU90
+ 408 0070 68B9     		cbnz	r0, .L37
+ 107:Core/Src/adbms.cpp ****         if(data_crc != received_data_crc) {
+ 409              		.loc 1 107 9 is_stmt 1 view .LVU91
+ 107:Core/Src/adbms.cpp ****         if(data_crc != received_data_crc) {
+ 410              		.loc 1 107 34 is_stmt 0 view .LVU92
+ 411 0072 0521     		movs	r1, #5
+ 412 0074 2846     		mov	r0, r5
+ 413 0076 FFF7FEFF 		bl	_ZL5pec15Pci
+ 414              	.LVL33:
+ 108:Core/Src/adbms.cpp ****             output_status = LTC6813_INVALID_DATA;
+ 415              		.loc 1 108 9 is_stmt 1 view .LVU93
+ARM GAS  /tmp/ccC69mL6.s 			page 12
+
+
+ 108:Core/Src/adbms.cpp ****             output_status = LTC6813_INVALID_DATA;
+ 416              		.loc 1 108 21 is_stmt 0 view .LVU94
+ 417 007a BDF80430 		ldrh	r3, [sp, #4]
+ 108:Core/Src/adbms.cpp ****             output_status = LTC6813_INVALID_DATA;
+ 418              		.loc 1 108 9 view .LVU95
+ 419 007e 8342     		cmp	r3, r0
+ 420 0080 E1D0     		beq	.L32
+ 109:Core/Src/adbms.cpp ****         }
+ 421              		.loc 1 109 27 view .LVU96
+ 422 0082 0226     		movs	r6, #2
+ 423              	.LVL34:
+ 109:Core/Src/adbms.cpp ****         }
+ 424              		.loc 1 109 27 view .LVU97
+ 425 0084 DFE7     		b	.L32
+ 426              	.LVL35:
+ 427              	.L35:
+ 109:Core/Src/adbms.cpp ****         }
+ 428              		.loc 1 109 27 view .LVU98
+ 429              	.LBE6:
+ 430              	.LBE5:
+  96:Core/Src/adbms.cpp ****     }
+ 431              		.loc 1 96 16 view .LVU99
+ 432 0086 0126     		movs	r6, #1
+ 433 0088 CEE7     		b	.L30
+ 434              	.LVL36:
+ 435              	.L36:
+ 436              	.LBB8:
+ 437              	.LBB7:
+ 102:Core/Src/adbms.cpp ****         }
+ 438              		.loc 1 102 20 view .LVU100
+ 439 008a 0126     		movs	r6, #1
+ 440              	.LVL37:
+ 102:Core/Src/adbms.cpp ****         }
+ 441              		.loc 1 102 20 view .LVU101
+ 442 008c CCE7     		b	.L30
+ 443              	.LVL38:
+ 444              	.L37:
+ 105:Core/Src/adbms.cpp ****         }
+ 445              		.loc 1 105 20 view .LVU102
+ 446 008e 0126     		movs	r6, #1
+ 447              	.LVL39:
+ 105:Core/Src/adbms.cpp ****         }
+ 448              		.loc 1 105 20 view .LVU103
+ 449 0090 CAE7     		b	.L30
+ 450              	.L42:
+ 451 0092 00BF     		.align	2
+ 452              	.L41:
+ 453 0094 00000000 		.word	hspi1
+ 454              	.LBE7:
+ 455              	.LBE8:
+ 456              		.cfi_endproc
+ 457              	.LFE1283:
+ 458              		.fnend
+ 460              		.section	.text._Z20ltc6813_voltage_readPt,"ax",%progbits
+ 461              		.align	1
+ 462              		.global	_Z20ltc6813_voltage_readPt
+ 463              		.syntax unified
+ARM GAS  /tmp/ccC69mL6.s 			page 13
+
+
+ 464              		.thumb
+ 465              		.thumb_func
+ 467              	_Z20ltc6813_voltage_readPt:
+ 468              		.fnstart
+ 469              	.LVL40:
+ 470              	.LFB1281:
+  31:Core/Src/adbms.cpp **** //    uint16_t data_buf[18*NUM_BMS_ICS];
+ 471              		.loc 1 31 62 is_stmt 1 view -0
+ 472              		.cfi_startproc
+ 473              		@ args = 0, pretend = 0, frame = 0
+ 474              		@ frame_needed = 0, uses_anonymous_args = 0
+  31:Core/Src/adbms.cpp **** //    uint16_t data_buf[18*NUM_BMS_ICS];
+ 475              		.loc 1 31 62 is_stmt 0 view .LVU105
+ 476 0000 2DE9F041 		push	{r4, r5, r6, r7, r8, lr}
+ 477              		.save {r4, r5, r6, r7, r8, lr}
+ 478              		.cfi_def_cfa_offset 24
+ 479              		.cfi_offset 4, -24
+ 480              		.cfi_offset 5, -20
+ 481              		.cfi_offset 6, -16
+ 482              		.cfi_offset 7, -12
+ 483              		.cfi_offset 8, -8
+ 484              		.cfi_offset 14, -4
+ 485 0004 0546     		mov	r5, r0
+  33:Core/Src/adbms.cpp ****     LTC6813_Error_t err = LTC6813_OK;
+ 486              		.loc 1 33 5 is_stmt 1 view .LVU106
+ 487              	.LVL41:
+  34:Core/Src/adbms.cpp **** 
+ 488              		.loc 1 34 5 view .LVU107
+  36:Core/Src/adbms.cpp ****         status = ltc6813_cmd_read(CMD_RDCVA, ((uint8_t *)voltages_buf)+i);
+ 489              		.loc 1 36 5 view .LVU108
+ 490              	.LBB9:
+  36:Core/Src/adbms.cpp ****         status = ltc6813_cmd_read(CMD_RDCVA, ((uint8_t *)voltages_buf)+i);
+ 491              		.loc 1 36 13 is_stmt 0 view .LVU109
+ 492 0006 0026     		movs	r6, #0
+ 493              	.LBE9:
+  34:Core/Src/adbms.cpp **** 
+ 494              		.loc 1 34 21 view .LVU110
+ 495 0008 3746     		mov	r7, r6
+ 496              	.LBB10:
+  36:Core/Src/adbms.cpp ****         status = ltc6813_cmd_read(CMD_RDCVA, ((uint8_t *)voltages_buf)+i);
+ 497              		.loc 1 36 5 view .LVU111
+ 498 000a 00E0     		b	.L44
+ 499              	.LVL42:
+ 500              	.L50:
+  36:Core/Src/adbms.cpp ****         status = ltc6813_cmd_read(CMD_RDCVA, ((uint8_t *)voltages_buf)+i);
+ 501              		.loc 1 36 5 is_stmt 1 discriminator 2 view .LVU112
+ 502 000c 0136     		adds	r6, r6, #1
+ 503              	.LVL43:
+ 504              	.L44:
+  36:Core/Src/adbms.cpp ****         status = ltc6813_cmd_read(CMD_RDCVA, ((uint8_t *)voltages_buf)+i);
+ 505              		.loc 1 36 22 discriminator 1 view .LVU113
+ 506 000e 092E     		cmp	r6, #9
+ 507 0010 35DC     		bgt	.L53
+  37:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 508              		.loc 1 37 9 view .LVU114
+  37:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 509              		.loc 1 37 72 is_stmt 0 view .LVU115
+ARM GAS  /tmp/ccC69mL6.s 			page 14
+
+
+ 510 0012 3446     		mov	r4, r6
+  37:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 511              		.loc 1 37 34 view .LVU116
+ 512 0014 A919     		adds	r1, r5, r6
+ 513 0016 0420     		movs	r0, #4
+ 514 0018 FFF7FEFF 		bl	_Z16ltc6813_cmd_read17LTC6813_Command_tPh
+ 515              	.LVL44:
+  38:Core/Src/adbms.cpp ****             err = status;
+ 516              		.loc 1 38 9 is_stmt 1 view .LVU117
+ 517 001c 8046     		mov	r8, r0
+ 518 001e 00B9     		cbnz	r0, .L45
+ 519 0020 B846     		mov	r8, r7
+ 520              	.L45:
+ 521              	.LVL45:
+  40:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 522              		.loc 1 40 9 view .LVU118
+  40:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 523              		.loc 1 40 73 is_stmt 0 view .LVU119
+ 524 0022 A11D     		adds	r1, r4, #6
+  40:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 525              		.loc 1 40 34 view .LVU120
+ 526 0024 2944     		add	r1, r1, r5
+ 527 0026 0620     		movs	r0, #6
+ 528              	.LVL46:
+  40:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 529              		.loc 1 40 34 view .LVU121
+ 530 0028 FFF7FEFF 		bl	_Z16ltc6813_cmd_read17LTC6813_Command_tPh
+ 531              	.LVL47:
+  41:Core/Src/adbms.cpp ****             err = status;
+ 532              		.loc 1 41 9 is_stmt 1 view .LVU122
+ 533 002c 0746     		mov	r7, r0
+ 534 002e 00B9     		cbnz	r0, .L46
+ 535 0030 4746     		mov	r7, r8
+ 536              	.L46:
+ 537              	.LVL48:
+  43:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 538              		.loc 1 43 9 view .LVU123
+  43:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 539              		.loc 1 43 73 is_stmt 0 view .LVU124
+ 540 0032 04F10C01 		add	r1, r4, #12
+  43:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 541              		.loc 1 43 34 view .LVU125
+ 542 0036 2944     		add	r1, r1, r5
+ 543 0038 0820     		movs	r0, #8
+ 544              	.LVL49:
+  43:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 545              		.loc 1 43 34 view .LVU126
+ 546 003a FFF7FEFF 		bl	_Z16ltc6813_cmd_read17LTC6813_Command_tPh
+ 547              	.LVL50:
+  44:Core/Src/adbms.cpp ****             err = status;
+ 548              		.loc 1 44 9 is_stmt 1 view .LVU127
+ 549 003e 8046     		mov	r8, r0
+ 550 0040 00B9     		cbnz	r0, .L47
+ 551 0042 B846     		mov	r8, r7
+ 552              	.L47:
+ 553              	.LVL51:
+  46:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ARM GAS  /tmp/ccC69mL6.s 			page 15
+
+
+ 554              		.loc 1 46 9 view .LVU128
+  46:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 555              		.loc 1 46 73 is_stmt 0 view .LVU129
+ 556 0044 04F11201 		add	r1, r4, #18
+  46:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 557              		.loc 1 46 34 view .LVU130
+ 558 0048 2944     		add	r1, r1, r5
+ 559 004a 0A20     		movs	r0, #10
+ 560              	.LVL52:
+  46:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 561              		.loc 1 46 34 view .LVU131
+ 562 004c FFF7FEFF 		bl	_Z16ltc6813_cmd_read17LTC6813_Command_tPh
+ 563              	.LVL53:
+  47:Core/Src/adbms.cpp ****             err = status;
+ 564              		.loc 1 47 9 is_stmt 1 view .LVU132
+ 565 0050 0746     		mov	r7, r0
+ 566 0052 00B9     		cbnz	r0, .L48
+ 567 0054 4746     		mov	r7, r8
+ 568              	.L48:
+ 569              	.LVL54:
+  49:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 570              		.loc 1 49 9 view .LVU133
+  49:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 571              		.loc 1 49 73 is_stmt 0 view .LVU134
+ 572 0056 04F11801 		add	r1, r4, #24
+  49:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 573              		.loc 1 49 34 view .LVU135
+ 574 005a 2944     		add	r1, r1, r5
+ 575 005c 0920     		movs	r0, #9
+ 576              	.LVL55:
+  49:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 577              		.loc 1 49 34 view .LVU136
+ 578 005e FFF7FEFF 		bl	_Z16ltc6813_cmd_read17LTC6813_Command_tPh
+ 579              	.LVL56:
+  50:Core/Src/adbms.cpp ****             err = status;
+ 580              		.loc 1 50 9 is_stmt 1 view .LVU137
+ 581 0062 8046     		mov	r8, r0
+ 582 0064 00B9     		cbnz	r0, .L49
+ 583 0066 B846     		mov	r8, r7
+ 584              	.L49:
+ 585              	.LVL57:
+  52:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 586              		.loc 1 52 9 view .LVU138
+  52:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 587              		.loc 1 52 73 is_stmt 0 view .LVU139
+ 588 0068 04F11E01 		add	r1, r4, #30
+  52:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 589              		.loc 1 52 34 view .LVU140
+ 590 006c 2944     		add	r1, r1, r5
+ 591 006e 0B20     		movs	r0, #11
+ 592              	.LVL58:
+  52:Core/Src/adbms.cpp ****         if(status != LTC6813_OK)
+ 593              		.loc 1 52 34 view .LVU141
+ 594 0070 FFF7FEFF 		bl	_Z16ltc6813_cmd_read17LTC6813_Command_tPh
+ 595              	.LVL59:
+  53:Core/Src/adbms.cpp ****             err = status;
+ 596              		.loc 1 53 9 is_stmt 1 view .LVU142
+ARM GAS  /tmp/ccC69mL6.s 			page 16
+
+
+ 597 0074 0746     		mov	r7, r0
+ 598 0076 0028     		cmp	r0, #0
+ 599 0078 C8D1     		bne	.L50
+ 600 007a 4746     		mov	r7, r8
+ 601 007c C6E7     		b	.L50
+ 602              	.LVL60:
+ 603              	.L53:
+  53:Core/Src/adbms.cpp ****             err = status;
+ 604              		.loc 1 53 9 is_stmt 0 view .LVU143
+ 605              	.LBE10:
+  57:Core/Src/adbms.cpp **** }
+ 606              		.loc 1 57 5 is_stmt 1 view .LVU144
+  58:Core/Src/adbms.cpp **** 
+ 607              		.loc 1 58 1 is_stmt 0 view .LVU145
+ 608 007e 3846     		mov	r0, r7
+ 609 0080 BDE8F081 		pop	{r4, r5, r6, r7, r8, pc}
+  58:Core/Src/adbms.cpp **** 
+ 610              		.loc 1 58 1 view .LVU146
+ 611              		.cfi_endproc
+ 612              	.LFE1281:
+ 613              		.fnend
+ 615              		.section	.bss._ZL9bms_error,"aw",%nobits
+ 618              	_ZL9bms_error:
+ 619 0000 00       		.space	1
+ 620              		.section	.rodata._ZL10pec15Table,"a"
+ 621              		.align	2
+ 624              	_ZL10pec15Table:
+ 625 0000 0000     		.short	0
+ 626 0002 99C5     		.short	-14951
+ 627 0004 ABCE     		.short	-12629
+ 628 0006 320B     		.short	2866
+ 629 0008 CFD8     		.short	-10033
+ 630 000a 561D     		.short	7510
+ 631 000c 6416     		.short	5732
+ 632 000e FDD3     		.short	-11267
+ 633 0010 07F4     		.short	-3065
+ 634 0012 9E31     		.short	12702
+ 635 0014 AC3A     		.short	15020
+ 636 0016 35FF     		.short	-203
+ 637 0018 C82C     		.short	11464
+ 638 001a 51E9     		.short	-5807
+ 639 001c 63E2     		.short	-7581
+ 640 001e FA27     		.short	10234
+ 641 0020 97AD     		.short	-21097
+ 642 0022 0E68     		.short	26638
+ 643 0024 3C63     		.short	25404
+ 644 0026 A5A6     		.short	-22875
+ 645 0028 5875     		.short	30040
+ 646 002a C1B0     		.short	-20287
+ 647 002c F3BB     		.short	-17421
+ 648 002e 6A7E     		.short	32362
+ 649 0030 9059     		.short	22928
+ 650 0032 099C     		.short	-25591
+ 651 0034 3B97     		.short	-26821
+ 652 0036 A252     		.short	21154
+ 653 0038 5F81     		.short	-32417
+ 654 003a C644     		.short	17606
+ARM GAS  /tmp/ccC69mL6.s 			page 17
+
+
+ 655 003c F44F     		.short	20468
+ 656 003e 6D8A     		.short	-30099
+ 657 0040 2E5B     		.short	23342
+ 658 0042 B79E     		.short	-24905
+ 659 0044 8595     		.short	-27259
+ 660 0046 1C50     		.short	20508
+ 661 0048 E183     		.short	-31775
+ 662 004a 7846     		.short	18040
+ 663 004c 4A4D     		.short	19786
+ 664 004e D388     		.short	-30509
+ 665 0050 29AF     		.short	-20695
+ 666 0052 B06A     		.short	27312
+ 667 0054 8261     		.short	24962
+ 668 0056 1BA4     		.short	-23525
+ 669 0058 E677     		.short	30694
+ 670 005a 7FB2     		.short	-19841
+ 671 005c 4DB9     		.short	-18099
+ 672 005e D47C     		.short	31956
+ 673 0060 B9F6     		.short	-2375
+ 674 0062 2033     		.short	13088
+ 675 0064 1238     		.short	14354
+ 676 0066 8BFD     		.short	-629
+ 677 0068 762E     		.short	11894
+ 678 006a EFEB     		.short	-5137
+ 679 006c DDE0     		.short	-7971
+ 680 006e 4425     		.short	9540
+ 681 0070 BE02     		.short	702
+ 682 0072 27C7     		.short	-14553
+ 683 0074 15CC     		.short	-13291
+ 684 0076 8C09     		.short	2444
+ 685 0078 71DA     		.short	-9615
+ 686 007a E81F     		.short	8168
+ 687 007c DA14     		.short	5338
+ 688 007e 43D1     		.short	-11965
+ 689 0080 C5F3     		.short	-3131
+ 690 0082 5C36     		.short	13916
+ 691 0084 6E3D     		.short	15726
+ 692 0086 F7F8     		.short	-1801
+ 693 0088 0A2B     		.short	11018
+ 694 008a 93EE     		.short	-4461
+ 695 008c A1E5     		.short	-6751
+ 696 008e 3820     		.short	8248
+ 697 0090 C207     		.short	1986
+ 698 0092 5BC2     		.short	-15781
+ 699 0094 69C9     		.short	-13975
+ 700 0096 F00C     		.short	3312
+ 701 0098 0DDF     		.short	-8435
+ 702 009a 941A     		.short	6804
+ 703 009c A611     		.short	4518
+ 704 009e 3FD4     		.short	-11201
+ 705 00a0 525E     		.short	24146
+ 706 00a2 CB9B     		.short	-25653
+ 707 00a4 F990     		.short	-28423
+ 708 00a6 6055     		.short	21856
+ 709 00a8 9D86     		.short	-31075
+ 710 00aa 0443     		.short	17156
+ 711 00ac 3648     		.short	18486
+ARM GAS  /tmp/ccC69mL6.s 			page 18
+
+
+ 712 00ae AF8D     		.short	-29265
+ 713 00b0 55AA     		.short	-21931
+ 714 00b2 CC6F     		.short	28620
+ 715 00b4 FE64     		.short	25854
+ 716 00b6 67A1     		.short	-24217
+ 717 00b8 9A72     		.short	29338
+ 718 00ba 03B7     		.short	-18685
+ 719 00bc 31BC     		.short	-17359
+ 720 00be A879     		.short	31144
+ 721 00c0 EBA8     		.short	-22293
+ 722 00c2 726D     		.short	28018
+ 723 00c4 4066     		.short	26176
+ 724 00c6 D9A3     		.short	-23591
+ 725 00c8 2470     		.short	28708
+ 726 00ca BDB5     		.short	-19011
+ 727 00cc 8FBE     		.short	-16753
+ 728 00ce 167B     		.short	31510
+ 729 00d0 EC5C     		.short	23788
+ 730 00d2 7599     		.short	-26251
+ 731 00d4 4792     		.short	-28089
+ 732 00d6 DE57     		.short	22494
+ 733 00d8 2384     		.short	-31709
+ 734 00da BA41     		.short	16826
+ 735 00dc 884A     		.short	19080
+ 736 00de 118F     		.short	-28911
+ 737 00e0 7C05     		.short	1404
+ 738 00e2 E5C0     		.short	-16155
+ 739 00e4 D7CB     		.short	-13353
+ 740 00e6 4E0E     		.short	3662
+ 741 00e8 B3DD     		.short	-8781
+ 742 00ea 2A18     		.short	6186
+ 743 00ec 1813     		.short	4888
+ 744 00ee 81D6     		.short	-10623
+ 745 00f0 7BF1     		.short	-3717
+ 746 00f2 E234     		.short	13538
+ 747 00f4 D03F     		.short	16336
+ 748 00f6 49FA     		.short	-1463
+ 749 00f8 B429     		.short	10676
+ 750 00fa 2DEC     		.short	-5075
+ 751 00fc 1FE7     		.short	-6369
+ 752 00fe 8622     		.short	8838
+ 753 0100 13A2     		.short	-24045
+ 754 0102 8A67     		.short	26506
+ 755 0104 B86C     		.short	27832
+ 756 0106 21A9     		.short	-22239
+ 757 0108 DC7A     		.short	31452
+ 758 010a 45BF     		.short	-16571
+ 759 010c 77B4     		.short	-19337
+ 760 010e EE71     		.short	29166
+ 761 0110 1456     		.short	22036
+ 762 0112 8D93     		.short	-27763
+ 763 0114 BF98     		.short	-26433
+ 764 0116 265D     		.short	23846
+ 765 0118 DB8E     		.short	-28965
+ 766 011a 424B     		.short	19266
+ 767 011c 7040     		.short	16496
+ 768 011e E985     		.short	-31255
+ARM GAS  /tmp/ccC69mL6.s 			page 19
+
+
+ 769 0120 840F     		.short	3972
+ 770 0122 1DCA     		.short	-13795
+ 771 0124 2FC1     		.short	-16081
+ 772 0126 B604     		.short	1206
+ 773 0128 4BD7     		.short	-10421
+ 774 012a D212     		.short	4818
+ 775 012c E019     		.short	6624
+ 776 012e 79DC     		.short	-9095
+ 777 0130 83FB     		.short	-1149
+ 778 0132 1A3E     		.short	15898
+ 779 0134 2835     		.short	13608
+ 780 0136 B1F0     		.short	-3919
+ 781 0138 4C23     		.short	9036
+ 782 013a D5E6     		.short	-6443
+ 783 013c E7ED     		.short	-4633
+ 784 013e 7E28     		.short	10366
+ 785 0140 3DF9     		.short	-1731
+ 786 0142 A43C     		.short	15524
+ 787 0144 9637     		.short	14230
+ 788 0146 0FF2     		.short	-3569
+ 789 0148 F221     		.short	8690
+ 790 014a 6BE4     		.short	-7061
+ 791 014c 59EF     		.short	-4263
+ 792 014e C02A     		.short	10944
+ 793 0150 3A0D     		.short	3386
+ 794 0152 A3C8     		.short	-14173
+ 795 0154 91C3     		.short	-15471
+ 796 0156 0806     		.short	1544
+ 797 0158 F5D5     		.short	-10763
+ 798 015a 6C10     		.short	4204
+ 799 015c 5E1B     		.short	7006
+ 800 015e C7DE     		.short	-8505
+ 801 0160 AA54     		.short	21674
+ 802 0162 3391     		.short	-28365
+ 803 0164 019A     		.short	-26111
+ 804 0166 985F     		.short	24472
+ 805 0168 658C     		.short	-29595
+ 806 016a FC49     		.short	18940
+ 807 016c CE42     		.short	17102
+ 808 016e 5787     		.short	-30889
+ 809 0170 ADA0     		.short	-24403
+ 810 0172 3465     		.short	25908
+ 811 0174 066E     		.short	28166
+ 812 0176 9FAB     		.short	-21601
+ 813 0178 6278     		.short	30818
+ 814 017a FBBD     		.short	-16901
+ 815 017c C9B6     		.short	-18743
+ 816 017e 5073     		.short	29520
+ 817 0180 D651     		.short	20950
+ 818 0182 4F94     		.short	-27569
+ 819 0184 7D9F     		.short	-24707
+ 820 0186 E45A     		.short	23268
+ 821 0188 1989     		.short	-30439
+ 822 018a 804C     		.short	19584
+ 823 018c B247     		.short	18354
+ 824 018e 2B82     		.short	-32213
+ 825 0190 D1A5     		.short	-23087
+ARM GAS  /tmp/ccC69mL6.s 			page 20
+
+
+ 826 0192 4860     		.short	24648
+ 827 0194 7A6B     		.short	27514
+ 828 0196 E3AE     		.short	-20765
+ 829 0198 1E7D     		.short	32030
+ 830 019a 87B8     		.short	-18297
+ 831 019c B5B3     		.short	-19531
+ 832 019e 2C76     		.short	30252
+ 833 01a0 41FC     		.short	-959
+ 834 01a2 D839     		.short	14808
+ 835 01a4 EA32     		.short	13034
+ 836 01a6 73F7     		.short	-2189
+ 837 01a8 8E24     		.short	9358
+ 838 01aa 17E1     		.short	-7913
+ 839 01ac 25EA     		.short	-5595
+ 840 01ae BC2F     		.short	12220
+ 841 01b0 4608     		.short	2118
+ 842 01b2 DFCD     		.short	-12833
+ 843 01b4 EDC6     		.short	-14611
+ 844 01b6 7403     		.short	884
+ 845 01b8 89D0     		.short	-12151
+ 846 01ba 1015     		.short	5392
+ 847 01bc 221E     		.short	7714
+ 848 01be BBDB     		.short	-9285
+ 849 01c0 F80A     		.short	2808
+ 850 01c2 61CF     		.short	-12447
+ 851 01c4 53C4     		.short	-15277
+ 852 01c6 CA01     		.short	458
+ 853 01c8 37D2     		.short	-11721
+ 854 01ca AE17     		.short	6062
+ 855 01cc 9C1C     		.short	7324
+ 856 01ce 05D9     		.short	-9979
+ 857 01d0 FFFE     		.short	-257
+ 858 01d2 663B     		.short	15206
+ 859 01d4 5430     		.short	12372
+ 860 01d6 CDF5     		.short	-2611
+ 861 01d8 3026     		.short	9776
+ 862 01da A9E3     		.short	-7255
+ 863 01dc 9BE8     		.short	-5989
+ 864 01de 022D     		.short	11522
+ 865 01e0 6FA7     		.short	-22673
+ 866 01e2 F662     		.short	25334
+ 867 01e4 C469     		.short	27076
+ 868 01e6 5DAC     		.short	-21411
+ 869 01e8 A07F     		.short	32672
+ 870 01ea 39BA     		.short	-17863
+ 871 01ec 0BB1     		.short	-20213
+ 872 01ee 9274     		.short	29842
+ 873 01f0 6853     		.short	21352
+ 874 01f2 F196     		.short	-26895
+ 875 01f4 C39D     		.short	-25149
+ 876 01f6 5A58     		.short	22618
+ 877 01f8 A78B     		.short	-29785
+ 878 01fa 3E4E     		.short	20030
+ 879 01fc 0C45     		.short	17676
+ 880 01fe 9580     		.short	-32619
+ 881              		.text
+ 882              	.Letext0:
+ARM GAS  /tmp/ccC69mL6.s 			page 21
+
+
+ 883              		.file 2 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 884              		.file 3 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 885              		.file 4 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 886              		.file 5 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 887              		.file 6 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 888              		.file 7 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 889              		.file 8 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 890              		.file 9 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 891              		.file 10 "Core/Inc/adbms.h"
+ 892              		.file 11 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7a3xx.h"
+ 893              		.file 12 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm
+ 894              		.file 13 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm
+ 895              		.file 14 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm
+ 896              		.file 15 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm
+ 897              		.file 16 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_def.h"
+ 898              		.file 17 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_dma.h"
+ 899              		.file 18 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_spi.h"
+ 900              		.file 19 "Core/Inc/thermal.h"
+ 901              		.file 20 "Core/Inc/cells.h"
+ 902              		.file 21 "Core/Inc/spi.h"
+ARM GAS  /tmp/ccC69mL6.s 			page 22
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 adbms.cpp
+     /tmp/ccC69mL6.s:20     .text._ZL5pec15Pci:00000000 $t
+     /tmp/ccC69mL6.s:25     .text._ZL5pec15Pci:00000000 _ZL5pec15Pci
+     /tmp/ccC69mL6.s:107    .text._ZL5pec15Pci:0000003c $d
+     /tmp/ccC69mL6.s:624    .rodata._ZL10pec15Table:00000000 _ZL10pec15Table
+     .ARM.exidx.text._ZL5pec15Pci:00000000 $d
+     /tmp/ccC69mL6.s:114    .text.HAL_SPI_TxCpltCallback:00000000 $t
+     /tmp/ccC69mL6.s:120    .text.HAL_SPI_TxCpltCallback:00000000 HAL_SPI_TxCpltCallback
+     /tmp/ccC69mL6.s:139    .text.HAL_SPI_TxCpltCallback:00000008 $d
+     /tmp/ccC69mL6.s:618    .bss._ZL9bms_error:00000000 _ZL9bms_error
+.ARM.exidx.text.HAL_SPI_TxCpltCallback:00000000 $d
+     /tmp/ccC69mL6.s:146    .text.HAL_SPI_ErrorCallback:00000000 $t
+     /tmp/ccC69mL6.s:152    .text.HAL_SPI_ErrorCallback:00000000 HAL_SPI_ErrorCallback
+     /tmp/ccC69mL6.s:171    .text.HAL_SPI_ErrorCallback:00000008 $d
+.ARM.exidx.text.HAL_SPI_ErrorCallback:00000000 $d
+     /tmp/ccC69mL6.s:178    .text._Z17ltc6813_cmd_write17LTC6813_Command_tPhh:00000000 $t
+     /tmp/ccC69mL6.s:184    .text._Z17ltc6813_cmd_write17LTC6813_Command_tPhh:00000000 _Z17ltc6813_cmd_write17LTC6813_Command_tPhh
+     /tmp/ccC69mL6.s:291    .text._Z17ltc6813_cmd_write17LTC6813_Command_tPhh:0000007c $d
+.ARM.exidx.text._Z17ltc6813_cmd_write17LTC6813_Command_tPhh:00000000 $d
+     /tmp/ccC69mL6.s:297    .text._Z16ltc6813_cmd_read17LTC6813_Command_tPh:00000000 $t
+     /tmp/ccC69mL6.s:303    .text._Z16ltc6813_cmd_read17LTC6813_Command_tPh:00000000 _Z16ltc6813_cmd_read17LTC6813_Command_tPh
+     /tmp/ccC69mL6.s:453    .text._Z16ltc6813_cmd_read17LTC6813_Command_tPh:00000094 $d
+.ARM.exidx.text._Z16ltc6813_cmd_read17LTC6813_Command_tPh:00000000 $d
+     /tmp/ccC69mL6.s:461    .text._Z20ltc6813_voltage_readPt:00000000 $t
+     /tmp/ccC69mL6.s:467    .text._Z20ltc6813_voltage_readPt:00000000 _Z20ltc6813_voltage_readPt
+.ARM.exidx.text._Z20ltc6813_voltage_readPt:00000000 $d
+     /tmp/ccC69mL6.s:619    .bss._ZL9bms_error:00000000 $d
+     /tmp/ccC69mL6.s:621    .rodata._ZL10pec15Table:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_SPI_Transmit
+hspi1
+__aeabi_unwind_cpp_pr0
+HAL_SPI_Receive

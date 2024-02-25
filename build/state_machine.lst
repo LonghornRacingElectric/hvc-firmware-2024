@@ -1,0 +1,67 @@
+ARM GAS  /tmp/ccSFgbX0.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"state_machine.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "Core/Src/state_machine.cpp"
+  19              		.section	.text._Z18updateStateMachinebbb,"ax",%progbits
+  20              		.align	1
+  21              		.global	_Z18updateStateMachinebbb
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	_Z18updateStateMachinebbb:
+  27              		.fnstart
+  28              	.LVL0:
+  29              	.LFB0:
+   1:Core/Src/state_machine.cpp **** //
+   2:Core/Src/state_machine.cpp **** // Created by rolandwang on 11/12/2023.
+   3:Core/Src/state_machine.cpp **** //
+   4:Core/Src/state_machine.cpp **** 
+   5:Core/Src/state_machine.cpp **** #include "state_machine.h"
+   6:Core/Src/state_machine.cpp **** 
+   7:Core/Src/state_machine.cpp **** int updateStateMachine(bool shutdownClosed, bool hvOk, bool chargerPresent) {
+  30              		.loc 1 7 77 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+   8:Core/Src/state_machine.cpp ****     return STATE_NOT_ENERGIZED;
+  35              		.loc 1 8 5 view .LVU1
+   9:Core/Src/state_machine.cpp **** }
+  36              		.loc 1 9 1 is_stmt 0 view .LVU2
+  37 0000 0120     		movs	r0, #1
+  38              	.LVL1:
+  39              		.loc 1 9 1 view .LVU3
+  40 0002 7047     		bx	lr
+  41              		.cfi_endproc
+  42              	.LFE0:
+  43              		.cantunwind
+  44              		.fnend
+  46              		.text
+  47              	.Letext0:
+ARM GAS  /tmp/ccSFgbX0.s 			page 2
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 state_machine.cpp
+     /tmp/ccSFgbX0.s:20     .text._Z18updateStateMachinebbb:00000000 $t
+     /tmp/ccSFgbX0.s:26     .text._Z18updateStateMachinebbb:00000000 _Z18updateStateMachinebbb
+.ARM.exidx.text._Z18updateStateMachinebbb:00000000 $d
+
+NO UNDEFINED SYMBOLS

@@ -5,7 +5,7 @@
 #ifndef HVC_FIRMWARE_2024_CELLS_H
 #define HVC_FIRMWARE_2024_CELLS_H
 
-#include <cstdint>
+#include <stdint.h>
 
 // Variables
 static uint8_t rawData[60];       // Raw data from LTC read command

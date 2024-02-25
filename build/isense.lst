@@ -1,0 +1,246 @@
+ARM GAS  /tmp/ccPDfSwC.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"isense.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "Core/Src/isense.cpp"
+  19              		.section	.text._Z20calculateHallCurrentff,"ax",%progbits
+  20              		.align	1
+  21              		.global	_Z20calculateHallCurrentff
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	_Z20calculateHallCurrentff:
+  27              		.fnstart
+  28              	.LVL0:
+  29              	.LFB1280:
+   1:Core/Src/isense.cpp **** //
+   2:Core/Src/isense.cpp **** // Created by rolandwang on 11/12/2023.
+   3:Core/Src/isense.cpp **** // Developed by angelasrsh on 1/8/24.
+   4:Core/Src/isense.cpp **** //
+   5:Core/Src/isense.cpp **** 
+   6:Core/Src/isense.cpp **** #include "isense.h"
+   7:Core/Src/isense.cpp **** #include "adc.h"
+   8:Core/Src/isense.cpp **** //checks if current is within max to open shutdown in case if curr too high
+   9:Core/Src/isense.cpp **** bool isPackCurrentWithinBounds() {
+  10:Core/Src/isense.cpp ****     float maxCurrSetting; //TODO: Add this in when we do testing
+  11:Core/Src/isense.cpp **** 
+  12:Core/Src/isense.cpp ****     if (getPackCurrent() > maxCurrSetting) {
+  13:Core/Src/isense.cpp ****         return false;
+  14:Core/Src/isense.cpp ****     }
+  15:Core/Src/isense.cpp ****     return true;
+  16:Core/Src/isense.cpp **** }
+  17:Core/Src/isense.cpp **** float calculateHallCurrent(float hv_voltage_reading, float sensitivity) {
+  30              		.loc 1 17 73 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+  18:Core/Src/isense.cpp ****     // current is measured by I = ((5/(supply voltage = Uc)) * Vout - (Voffset = 2.5)) * 1/(sensiti
+  19:Core/Src/isense.cpp ****     //TODO check if we have a reading on supply voltage to enter in this formula
+  20:Core/Src/isense.cpp ****     float hv_supply; // bottom 5 in the eq
+  35              		.loc 1 20 5 view .LVU1
+  21:Core/Src/isense.cpp ****     return (float) ((5.0f/5.0f) * hv_voltage_reading - 2.5f) * (1.0f/(sensitivity));
+  36              		.loc 1 21 5 view .LVU2
+  37              		.loc 1 21 54 is_stmt 0 view .LVU3
+ARM GAS  /tmp/ccPDfSwC.s 			page 2
+
+
+  38 0000 F0EE047A 		vmov.f32	s15, #2.5e+0
+  39 0004 30EE670A 		vsub.f32	s0, s0, s15
+  40              	.LVL1:
+  41              		.loc 1 21 69 view .LVU4
+  42 0008 B7EE007A 		vmov.f32	s14, #1.0e+0
+  43 000c C7EE207A 		vdiv.f32	s15, s14, s1
+  22:Core/Src/isense.cpp **** }
+  44              		.loc 1 22 1 view .LVU5
+  45 0010 20EE270A 		vmul.f32	s0, s0, s15
+  46 0014 7047     		bx	lr
+  47              		.cfi_endproc
+  48              	.LFE1280:
+  49              		.cantunwind
+  50              		.fnend
+  52              		.section	.text._Z14getPackCurrentv,"ax",%progbits
+  53              		.align	1
+  54              		.global	_Z14getPackCurrentv
+  55              		.syntax unified
+  56              		.thumb
+  57              		.thumb_func
+  59              	_Z14getPackCurrentv:
+  60              		.fnstart
+  61              	.LFB1281:
+  23:Core/Src/isense.cpp **** 
+  24:Core/Src/isense.cpp **** //Returns the current rating measured directly (mostly HighCurrVal)
+  25:Core/Src/isense.cpp **** //±50 A for channel 1
+  26:Core/Src/isense.cpp **** //±300 A for channel 2
+  27:Core/Src/isense.cpp **** float getPackCurrent() {
+  62              		.loc 1 27 24 is_stmt 1 view -0
+  63              		.cfi_startproc
+  64              		@ args = 0, pretend = 0, frame = 0
+  65              		@ frame_needed = 0, uses_anonymous_args = 0
+  66 0000 10B5     		push	{r4, lr}
+  67              		.save {r4, lr}
+  68              		.cfi_def_cfa_offset 8
+  69              		.cfi_offset 4, -8
+  70              		.cfi_offset 14, -4
+  28:Core/Src/isense.cpp ****     // current is measured by I = ((5/(supply voltage = Uc)) * Vout - Voffset) * 1/(sensitivity = 6
+  29:Core/Src/isense.cpp ****     float lowCurr = calculateHallCurrent(getISenseLow(), 40.0f);
+  71              		.loc 1 29 5 view .LVU7
+  72              		.loc 1 29 41 is_stmt 0 view .LVU8
+  73 0002 FFF7FEFF 		bl	getISenseLow
+  74              	.LVL2:
+  75              		.loc 1 29 41 discriminator 1 view .LVU9
+  76 0006 DFED0E0A 		vldr.32	s1, .L7
+  77 000a FFF7FEFF 		bl	_Z20calculateHallCurrentff
+  78              	.LVL3:
+  79 000e 10EE104A 		vmov	r4, s0
+  80              	.LVL4:
+  30:Core/Src/isense.cpp ****     float highCurr = calculateHallCurrent(getISenseHigh(), 6.67f);
+  81              		.loc 1 30 5 is_stmt 1 view .LVU10
+  82              		.loc 1 30 42 is_stmt 0 view .LVU11
+  83 0012 FFF7FEFF 		bl	getISenseHigh
+  84              	.LVL5:
+  85              		.loc 1 30 42 discriminator 1 view .LVU12
+  86 0016 DFED0B0A 		vldr.32	s1, .L7+4
+  87 001a FFF7FEFF 		bl	_Z20calculateHallCurrentff
+ARM GAS  /tmp/ccPDfSwC.s 			page 3
+
+
+  88              	.LVL6:
+  31:Core/Src/isense.cpp **** 
+  32:Core/Src/isense.cpp ****     if (highCurr >= 50.0f || highCurr <= -50.0f) { // most used cuz HV outputs higher than 50A arou
+  89              		.loc 1 32 5 is_stmt 1 view .LVU13
+  90 001e DFED0A7A 		vldr.32	s15, .L7+8
+  91 0022 B4EEE70A 		vcmpe.f32	s0, s15
+  92 0026 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+  93 002a 08DA     		bge	.L2
+  94              		.loc 1 32 27 is_stmt 0 discriminator 1 view .LVU14
+  95 002c DFED077A 		vldr.32	s15, .L7+12
+  96 0030 B4EEE70A 		vcmpe.f32	s0, s15
+  97 0034 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+  98 0038 01D9     		bls	.L2
+  33:Core/Src/isense.cpp ****         return highCurr;
+  34:Core/Src/isense.cpp ****     } else return lowCurr;
+  99              		.loc 1 34 19 view .LVU15
+ 100 003a 00EE104A 		vmov	s0, r4
+ 101              	.LVL7:
+ 102              	.L2:
+  35:Core/Src/isense.cpp **** }
+ 103              		.loc 1 35 1 view .LVU16
+ 104 003e 10BD     		pop	{r4, pc}
+ 105              	.LVL8:
+ 106              	.L8:
+ 107              		.loc 1 35 1 view .LVU17
+ 108              		.align	2
+ 109              	.L7:
+ 110 0040 00002042 		.word	1109393408
+ 111 0044 A470D540 		.word	1087729828
+ 112 0048 00004842 		.word	1112014848
+ 113 004c 000048C2 		.word	-1035468800
+ 114              		.cfi_endproc
+ 115              	.LFE1281:
+ 116              		.fnend
+ 118              		.section	.text._Z25isPackCurrentWithinBoundsv,"ax",%progbits
+ 119              		.align	1
+ 120              		.global	_Z25isPackCurrentWithinBoundsv
+ 121              		.syntax unified
+ 122              		.thumb
+ 123              		.thumb_func
+ 125              	_Z25isPackCurrentWithinBoundsv:
+ 126              		.fnstart
+ 127              	.LFB1279:
+   9:Core/Src/isense.cpp ****     float maxCurrSetting; //TODO: Add this in when we do testing
+ 128              		.loc 1 9 34 is_stmt 1 view -0
+ 129              		.cfi_startproc
+ 130              		@ args = 0, pretend = 0, frame = 0
+ 131              		@ frame_needed = 0, uses_anonymous_args = 0
+ 132 0000 08B5     		push	{r3, lr}
+ 133              		.save {r3, lr}
+ 134              		.cfi_def_cfa_offset 8
+ 135              		.cfi_offset 3, -8
+ 136              		.cfi_offset 14, -4
+  10:Core/Src/isense.cpp **** 
+ 137              		.loc 1 10 5 view .LVU19
+  12:Core/Src/isense.cpp ****         return false;
+ 138              		.loc 1 12 5 view .LVU20
+ARM GAS  /tmp/ccPDfSwC.s 			page 4
+
+
+  12:Core/Src/isense.cpp ****         return false;
+ 139              		.loc 1 12 23 is_stmt 0 view .LVU21
+ 140 0002 FFF7FEFF 		bl	_Z14getPackCurrentv
+ 141              	.LVL9:
+  12:Core/Src/isense.cpp ****         return false;
+ 142              		.loc 1 12 5 discriminator 1 view .LVU22
+ 143 0006 B5EEC00A 		vcmpe.f32	s0, #0
+ 144 000a F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 145 000e 01DC     		bgt	.L11
+  15:Core/Src/isense.cpp **** }
+ 146              		.loc 1 15 12 view .LVU23
+ 147 0010 0120     		movs	r0, #1
+ 148              	.L10:
+  16:Core/Src/isense.cpp **** float calculateHallCurrent(float hv_voltage_reading, float sensitivity) {
+ 149              		.loc 1 16 1 view .LVU24
+ 150 0012 08BD     		pop	{r3, pc}
+ 151              	.L11:
+  13:Core/Src/isense.cpp ****     }
+ 152              		.loc 1 13 16 view .LVU25
+ 153 0014 0020     		movs	r0, #0
+ 154 0016 FCE7     		b	.L10
+ 155              		.cfi_endproc
+ 156              	.LFE1279:
+ 157              		.fnend
+ 159              		.text
+ 160              	.Letext0:
+ 161              		.file 2 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 162              		.file 3 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 163              		.file 4 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 164              		.file 5 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 165              		.file 6 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 166              		.file 7 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 167              		.file 8 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 168              		.file 9 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 169              		.file 10 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm
+ 170              		.file 11 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm
+ 171              		.file 12 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm
+ 172              		.file 13 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm
+ 173              		.file 14 "Core/Inc/thermal.h"
+ 174              		.file 15 "Core/Inc/cells.h"
+ 175              		.file 16 "Core/Inc/adc.h"
+ARM GAS  /tmp/ccPDfSwC.s 			page 5
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 isense.cpp
+     /tmp/ccPDfSwC.s:20     .text._Z20calculateHallCurrentff:00000000 $t
+     /tmp/ccPDfSwC.s:26     .text._Z20calculateHallCurrentff:00000000 _Z20calculateHallCurrentff
+.ARM.exidx.text._Z20calculateHallCurrentff:00000000 $d
+     /tmp/ccPDfSwC.s:53     .text._Z14getPackCurrentv:00000000 $t
+     /tmp/ccPDfSwC.s:59     .text._Z14getPackCurrentv:00000000 _Z14getPackCurrentv
+     /tmp/ccPDfSwC.s:110    .text._Z14getPackCurrentv:00000040 $d
+.ARM.exidx.text._Z14getPackCurrentv:00000000 $d
+     /tmp/ccPDfSwC.s:119    .text._Z25isPackCurrentWithinBoundsv:00000000 $t
+     /tmp/ccPDfSwC.s:125    .text._Z25isPackCurrentWithinBoundsv:00000000 _Z25isPackCurrentWithinBoundsv
+.ARM.extab.text._Z25isPackCurrentWithinBoundsv:00000000 $d
+.ARM.exidx.text._Z25isPackCurrentWithinBoundsv:00000000 $d
+
+UNDEFINED SYMBOLS
+getISenseLow
+getISenseHigh
+__aeabi_unwind_cpp_pr0
+__aeabi_unwind_cpp_pr1

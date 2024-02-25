@@ -1,0 +1,209 @@
+ARM GAS  /tmp/cc1iX6rj.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"thermal.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "Core/Src/thermal.cpp"
+  19              		.section	.text._Z16updateParametersff,"ax",%progbits
+  20              		.align	1
+  21              		.global	_Z16updateParametersff
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	_Z16updateParametersff:
+  27              		.fnstart
+  28              	.LVL0:
+  29              	.LFB2:
+   1:Core/Src/thermal.cpp **** 
+   2:Core/Src/thermal.cpp **** #include "thermal.h"
+   3:Core/Src/thermal.cpp **** #include "cells.h"
+   4:Core/Src/thermal.cpp **** #include "fan.h"
+   5:Core/Src/thermal.cpp **** 
+   6:Core/Src/thermal.cpp **** void updateParameters(float newMinTemp, float newMaxTemp) {
+  30              		.loc 1 6 59 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		@ link register save eliminated.
+   7:Core/Src/thermal.cpp ****     minAllowedTemp = newMinTemp;
+  35              		.loc 1 7 5 view .LVU1
+  36              		.loc 1 7 20 is_stmt 0 view .LVU2
+  37 0000 034B     		ldr	r3, .L2
+  38 0002 83ED000A 		vstr.32	s0, [r3]
+   8:Core/Src/thermal.cpp ****     maxAllowedTemp = newMaxTemp;
+  39              		.loc 1 8 5 is_stmt 1 view .LVU3
+  40              		.loc 1 8 20 is_stmt 0 view .LVU4
+  41 0006 034B     		ldr	r3, .L2+4
+  42 0008 C3ED000A 		vstr.32	s1, [r3]
+   9:Core/Src/thermal.cpp **** }
+  43              		.loc 1 9 1 view .LVU5
+  44 000c 7047     		bx	lr
+  45              	.L3:
+  46 000e 00BF     		.align	2
+  47              	.L2:
+  48 0010 00000000 		.word	_ZL14minAllowedTemp
+  49 0014 00000000 		.word	_ZL14maxAllowedTemp
+ARM GAS  /tmp/cc1iX6rj.s 			page 2
+
+
+  50              		.cfi_endproc
+  51              	.LFE2:
+  52              		.cantunwind
+  53              		.fnend
+  55              		.section	.text._Z18isTempWithinBoundsv,"ax",%progbits
+  56              		.align	1
+  57              		.global	_Z18isTempWithinBoundsv
+  58              		.syntax unified
+  59              		.thumb
+  60              		.thumb_func
+  62              	_Z18isTempWithinBoundsv:
+  63              		.fnstart
+  64              	.LFB3:
+  10:Core/Src/thermal.cpp **** 
+  11:Core/Src/thermal.cpp **** bool isTempWithinBounds() {
+  65              		.loc 1 11 27 is_stmt 1 view -0
+  66              		.cfi_startproc
+  67              		@ args = 0, pretend = 0, frame = 0
+  68              		@ frame_needed = 0, uses_anonymous_args = 0
+  69 0000 08B5     		push	{r3, lr}
+  70              		.save {r3, lr}
+  71              		.cfi_def_cfa_offset 8
+  72              		.cfi_offset 3, -8
+  73              		.cfi_offset 14, -4
+  12:Core/Src/thermal.cpp ****     return getMinTemp() >= minAllowedTemp && getMaxTemp() <= maxAllowedTemp;
+  74              		.loc 1 12 5 view .LVU7
+  75              		.loc 1 12 22 is_stmt 0 view .LVU8
+  76 0002 FFF7FEFF 		bl	_Z10getMinTempv
+  77              	.LVL1:
+  78              		.loc 1 12 25 discriminator 1 view .LVU9
+  79 0006 0C4B     		ldr	r3, .L16
+  80 0008 D3ED007A 		vldr.32	s15, [r3]
+  81              		.loc 1 12 43 discriminator 1 view .LVU10
+  82 000c F4EEC07A 		vcmpe.f32	s15, s0
+  83 0010 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+  84 0014 01D9     		bls	.L15
+  85              		.loc 1 12 43 discriminator 4 view .LVU11
+  86 0016 0020     		movs	r0, #0
+  87              	.L5:
+  13:Core/Src/thermal.cpp **** }
+  88              		.loc 1 13 1 view .LVU12
+  89 0018 08BD     		pop	{r3, pc}
+  90              	.L15:
+  12:Core/Src/thermal.cpp ****     return getMinTemp() >= minAllowedTemp && getMaxTemp() <= maxAllowedTemp;
+  91              		.loc 1 12 56 discriminator 1 view .LVU13
+  92 001a FFF7FEFF 		bl	_Z10getMaxTempv
+  93              	.LVL2:
+  12:Core/Src/thermal.cpp ****     return getMinTemp() >= minAllowedTemp && getMaxTemp() <= maxAllowedTemp;
+  94              		.loc 1 12 59 discriminator 1 view .LVU14
+  95 001e 074B     		ldr	r3, .L16+4
+  96 0020 D3ED007A 		vldr.32	s15, [r3]
+  12:Core/Src/thermal.cpp ****     return getMinTemp() >= minAllowedTemp && getMaxTemp() <= maxAllowedTemp;
+  97              		.loc 1 12 43 discriminator 1 view .LVU15
+  98 0024 F4EEC07A 		vcmpe.f32	s15, s0
+  99 0028 F1EE10FA 		vmrs	APSR_nzcv, FPSCR
+ 100 002c 01DB     		blt	.L13
+  12:Core/Src/thermal.cpp ****     return getMinTemp() >= minAllowedTemp && getMaxTemp() <= maxAllowedTemp;
+ARM GAS  /tmp/cc1iX6rj.s 			page 3
+
+
+ 101              		.loc 1 12 43 discriminator 3 view .LVU16
+ 102 002e 0120     		movs	r0, #1
+ 103 0030 F2E7     		b	.L5
+ 104              	.L13:
+  12:Core/Src/thermal.cpp ****     return getMinTemp() >= minAllowedTemp && getMaxTemp() <= maxAllowedTemp;
+ 105              		.loc 1 12 43 discriminator 4 view .LVU17
+ 106 0032 0020     		movs	r0, #0
+ 107 0034 F0E7     		b	.L5
+ 108              	.L17:
+ 109 0036 00BF     		.align	2
+ 110              	.L16:
+ 111 0038 00000000 		.word	_ZL14minAllowedTemp
+ 112 003c 00000000 		.word	_ZL14maxAllowedTemp
+ 113              		.cfi_endproc
+ 114              	.LFE3:
+ 115              		.fnend
+ 117              		.section	.text._Z15thermalPeriodicv,"ax",%progbits
+ 118              		.align	1
+ 119              		.global	_Z15thermalPeriodicv
+ 120              		.syntax unified
+ 121              		.thumb
+ 122              		.thumb_func
+ 124              	_Z15thermalPeriodicv:
+ 125              		.fnstart
+ 126              	.LFB4:
+  14:Core/Src/thermal.cpp **** 
+  15:Core/Src/thermal.cpp **** void thermalPeriodic() {
+ 127              		.loc 1 15 24 is_stmt 1 view -0
+ 128              		.cfi_startproc
+ 129              		@ args = 0, pretend = 0, frame = 0
+ 130              		@ frame_needed = 0, uses_anonymous_args = 0
+ 131              		@ link register save eliminated.
+  16:Core/Src/thermal.cpp ****     // TODO implement
+  17:Core/Src/thermal.cpp **** }...
+ 132              		.loc 1 17 1 is_stmt 0 view .LVU19
+ 133 0000 7047     		bx	lr
+ 134              		.cfi_endproc
+ 135              	.LFE4:
+ 136              		.cantunwind
+ 137              		.fnend
+ 139              		.section	.data._ZL14maxAllowedTemp,"aw"
+ 140              		.align	2
+ 143              	_ZL14maxAllowedTemp:
+ 144 0000 00007042 		.word	1114636288
+ 145              		.section	.bss._ZL14minAllowedTemp,"aw",%nobits
+ 146              		.align	2
+ 149              	_ZL14minAllowedTemp:
+ 150 0000 00000000 		.space	4
+ 151              		.text
+ 152              	.Letext0:
+ 153              		.file 2 "Core/Inc/thermal.h"
+ 154              		.file 3 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 155              		.file 4 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 156              		.file 5 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 157              		.file 6 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 158              		.file 7 "Core/Inc/cells.h"
+ 159              		.file 8 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ARM GAS  /tmp/cc1iX6rj.s 			page 4
+
+
+ARM GAS  /tmp/cc1iX6rj.s 			page 5
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 thermal.cpp
+     /tmp/cc1iX6rj.s:20     .text._Z16updateParametersff:00000000 $t
+     /tmp/cc1iX6rj.s:26     .text._Z16updateParametersff:00000000 _Z16updateParametersff
+     /tmp/cc1iX6rj.s:48     .text._Z16updateParametersff:00000010 $d
+     /tmp/cc1iX6rj.s:149    .bss._ZL14minAllowedTemp:00000000 _ZL14minAllowedTemp
+     /tmp/cc1iX6rj.s:143    .data._ZL14maxAllowedTemp:00000000 _ZL14maxAllowedTemp
+.ARM.exidx.text._Z16updateParametersff:00000000 $d
+     /tmp/cc1iX6rj.s:56     .text._Z18isTempWithinBoundsv:00000000 $t
+     /tmp/cc1iX6rj.s:62     .text._Z18isTempWithinBoundsv:00000000 _Z18isTempWithinBoundsv
+     /tmp/cc1iX6rj.s:111    .text._Z18isTempWithinBoundsv:00000038 $d
+.ARM.extab.text._Z18isTempWithinBoundsv:00000000 $d
+.ARM.exidx.text._Z18isTempWithinBoundsv:00000000 $d
+     /tmp/cc1iX6rj.s:118    .text._Z15thermalPeriodicv:00000000 $t
+     /tmp/cc1iX6rj.s:124    .text._Z15thermalPeriodicv:00000000 _Z15thermalPeriodicv
+.ARM.exidx.text._Z15thermalPeriodicv:00000000 $d
+     /tmp/cc1iX6rj.s:140    .data._ZL14maxAllowedTemp:00000000 $d
+     /tmp/cc1iX6rj.s:146    .bss._ZL14minAllowedTemp:00000000 $d
+
+UNDEFINED SYMBOLS
+_Z10getMinTempv
+_Z10getMaxTempv
+__aeabi_unwind_cpp_pr1

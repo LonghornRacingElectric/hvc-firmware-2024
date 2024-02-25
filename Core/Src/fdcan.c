@@ -157,7 +157,7 @@ void HAL_FDCAN_MspInit(FDCAN_HandleTypeDef* fdcanHandle)
     PA11     ------> FDCAN1_RX
     PA12     ------> FDCAN1_TX
     */
-    GPIO_InitStruct.Pin = CAN_RX_Pin|CAN_TX_Pin;
+    GPIO_InitStruct.Pin = CAN_RX_MCU_Pin|CAN_TX_MCU_Pin;
     GPIO_InitStruct.Mode = GPIO_MODE_AF_PP;
     GPIO_InitStruct.Pull = GPIO_NOPULL;
     GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
@@ -225,7 +225,7 @@ void HAL_FDCAN_MspDeInit(FDCAN_HandleTypeDef* fdcanHandle)
     PA11     ------> FDCAN1_RX
     PA12     ------> FDCAN1_TX
     */
-    HAL_GPIO_DeInit(GPIOA, CAN_RX_Pin|CAN_TX_Pin);
+    HAL_GPIO_DeInit(GPIOA, CAN_RX_MCU_Pin|CAN_TX_MCU_Pin);
 
   /* USER CODE BEGIN FDCAN1_MspDeInit 1 */
 

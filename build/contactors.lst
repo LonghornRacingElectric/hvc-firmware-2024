@@ -1,0 +1,196 @@
+ARM GAS  /tmp/ccUdLFZj.s 			page 1
+
+
+   1              		.cpu cortex-m7
+   2              		.arch armv7e-m
+   3              		.fpu fpv5-d16
+   4              		.eabi_attribute 28, 1
+   5              		.eabi_attribute 20, 1
+   6              		.eabi_attribute 21, 1
+   7              		.eabi_attribute 23, 3
+   8              		.eabi_attribute 24, 1
+   9              		.eabi_attribute 25, 1
+  10              		.eabi_attribute 26, 1
+  11              		.eabi_attribute 30, 1
+  12              		.eabi_attribute 34, 1
+  13              		.eabi_attribute 18, 4
+  14              		.file	"contactors.cpp"
+  15              		.text
+  16              	.Ltext0:
+  17              		.cfi_sections	.debug_frame
+  18              		.file 1 "Core/Src/contactors.cpp"
+  19              		.section	.text._Z21setPrechargeContactorb,"ax",%progbits
+  20              		.align	1
+  21              		.global	_Z21setPrechargeContactorb
+  22              		.syntax unified
+  23              		.thumb
+  24              		.thumb_func
+  26              	_Z21setPrechargeContactorb:
+  27              		.fnstart
+  28              	.LVL0:
+  29              	.LFB1279:
+   1:Core/Src/contactors.cpp **** //
+   2:Core/Src/contactors.cpp **** // Created by rolandwang on 11/12/2023.
+   3:Core/Src/contactors.cpp **** //
+   4:Core/Src/contactors.cpp **** 
+   5:Core/Src/contactors.cpp **** #include "contactors.h"
+   6:Core/Src/contactors.cpp **** #include "main.h"
+   7:Core/Src/contactors.cpp **** 
+   8:Core/Src/contactors.cpp **** void setPrechargeContactor(bool on) {
+  30              		.loc 1 8 37 view -0
+  31              		.cfi_startproc
+  32              		@ args = 0, pretend = 0, frame = 0
+  33              		@ frame_needed = 0, uses_anonymous_args = 0
+  34              		.loc 1 8 37 is_stmt 0 view .LVU1
+  35 0000 08B5     		push	{r3, lr}
+  36              		.save {r3, lr}
+  37              		.cfi_def_cfa_offset 8
+  38              		.cfi_offset 3, -8
+  39              		.cfi_offset 14, -4
+  40 0002 0246     		mov	r2, r0
+   9:Core/Src/contactors.cpp ****     HAL_GPIO_WritePin(Precharge_Enable_GPIO_Port, Precharge_Enable_Pin, (GPIO_PinState) on);
+  41              		.loc 1 9 5 is_stmt 1 view .LVU2
+  42              		.loc 1 9 22 is_stmt 0 view .LVU3
+  43 0004 0821     		movs	r1, #8
+  44 0006 0248     		ldr	r0, .L3
+  45              	.LVL1:
+  46              		.loc 1 9 22 view .LVU4
+  47 0008 FFF7FEFF 		bl	HAL_GPIO_WritePin
+  48              	.LVL2:
+  10:Core/Src/contactors.cpp **** }
+ARM GAS  /tmp/ccUdLFZj.s 			page 2
+
+
+  49              		.loc 1 10 1 view .LVU5
+  50 000c 08BD     		pop	{r3, pc}
+  51              	.L4:
+  52 000e 00BF     		.align	2
+  53              	.L3:
+  54 0010 00000258 		.word	1476526080
+  55              		.cfi_endproc
+  56              	.LFE1279:
+  57              		.fnend
+  59              		.section	.text._Z17setDriveContactorb,"ax",%progbits
+  60              		.align	1
+  61              		.global	_Z17setDriveContactorb
+  62              		.syntax unified
+  63              		.thumb
+  64              		.thumb_func
+  66              	_Z17setDriveContactorb:
+  67              		.fnstart
+  68              	.LVL3:
+  69              	.LFB1280:
+  11:Core/Src/contactors.cpp **** 
+  12:Core/Src/contactors.cpp **** void setDriveContactor(bool on) {
+  70              		.loc 1 12 33 is_stmt 1 view -0
+  71              		.cfi_startproc
+  72              		@ args = 0, pretend = 0, frame = 0
+  73              		@ frame_needed = 0, uses_anonymous_args = 0
+  74              		.loc 1 12 33 is_stmt 0 view .LVU7
+  75 0000 38B5     		push	{r3, r4, r5, lr}
+  76              		.save {r3, r4, r5, lr}
+  77              		.cfi_def_cfa_offset 16
+  78              		.cfi_offset 3, -16
+  79              		.cfi_offset 4, -12
+  80              		.cfi_offset 5, -8
+  81              		.cfi_offset 14, -4
+  82 0002 0446     		mov	r4, r0
+  13:Core/Src/contactors.cpp ****     HAL_GPIO_WritePin(Close_HV_P_Signal_GPIO_Port, Close_HV_P_Signal_Pin, (GPIO_PinState) on);
+  83              		.loc 1 13 5 is_stmt 1 view .LVU8
+  84              		.loc 1 13 22 is_stmt 0 view .LVU9
+  85 0004 054D     		ldr	r5, .L7
+  86 0006 0246     		mov	r2, r0
+  87 0008 2021     		movs	r1, #32
+  88 000a 2846     		mov	r0, r5
+  89              	.LVL4:
+  90              		.loc 1 13 22 view .LVU10
+  91 000c FFF7FEFF 		bl	HAL_GPIO_WritePin
+  92              	.LVL5:
+  14:Core/Src/contactors.cpp ****     HAL_GPIO_WritePin(Close_HV_N_Signal_GPIO_Port, Close_HV_N_Signal_Pin, (GPIO_PinState) on);
+  93              		.loc 1 14 5 is_stmt 1 view .LVU11
+  94              		.loc 1 14 22 is_stmt 0 view .LVU12
+  95 0010 2246     		mov	r2, r4
+  96 0012 1021     		movs	r1, #16
+  97 0014 2846     		mov	r0, r5
+  98 0016 FFF7FEFF 		bl	HAL_GPIO_WritePin
+  99              	.LVL6:
+  15:Core/Src/contactors.cpp **** }
+ 100              		.loc 1 15 1 view .LVU13
+ 101 001a 38BD     		pop	{r3, r4, r5, pc}
+ 102              	.LVL7:
+ARM GAS  /tmp/ccUdLFZj.s 			page 3
+
+
+ 103              	.L8:
+ 104              		.loc 1 15 1 view .LVU14
+ 105              		.align	2
+ 106              	.L7:
+ 107 001c 00080258 		.word	1476528128
+ 108              		.cfi_endproc
+ 109              	.LFE1280:
+ 110              		.fnend
+ 112              		.section	.text._Z19setDischargeDisableb,"ax",%progbits
+ 113              		.align	1
+ 114              		.global	_Z19setDischargeDisableb
+ 115              		.syntax unified
+ 116              		.thumb
+ 117              		.thumb_func
+ 119              	_Z19setDischargeDisableb:
+ 120              		.fnstart
+ 121              	.LVL8:
+ 122              	.LFB1281:
+  16:Core/Src/contactors.cpp **** 
+  17:Core/Src/contactors.cpp **** void setDischargeDisable(bool disable) {
+ 123              		.loc 1 17 40 is_stmt 1 view -0
+ 124              		.cfi_startproc
+ 125              		@ args = 0, pretend = 0, frame = 0
+ 126              		@ frame_needed = 0, uses_anonymous_args = 0
+ 127              		@ link register save eliminated.
+  18:Core/Src/contactors.cpp ****     // HAL_GPIO_WritePin(Discharge_Disable_GPIO_Port, Discharge_Disable_Pin, (GPIO_PinState) disabl
+  19:Core/Src/contactors.cpp **** }...
+ 128              		.loc 1 19 1 is_stmt 0 view .LVU16
+ 129 0000 7047     		bx	lr
+ 130              		.cfi_endproc
+ 131              	.LFE1281:
+ 132              		.cantunwind
+ 133              		.fnend
+ 135              		.text
+ 136              	.Letext0:
+ 137              		.file 2 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 138              		.file 3 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 139              		.file 4 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 140              		.file 5 "Drivers/CMSIS/Device/ST/STM32H7xx/Include/stm32h7a3xx.h"
+ 141              		.file 6 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 142              		.file 7 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 143              		.file 8 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 144              		.file 9 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm-
+ 145              		.file 10 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm
+ 146              		.file 11 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm
+ 147              		.file 12 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm
+ 148              		.file 13 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm
+ 149              		.file 14 "/home/p7810456/.config/Code/User/globalStorage/bmd.stm32-for-vscode/@xpack-dev-tools/arm
+ 150              		.file 15 "Drivers/STM32H7xx_HAL_Driver/Inc/stm32h7xx_hal_gpio.h"
+ 151              		.file 16 "Core/Inc/thermal.h"
+ 152              		.file 17 "Core/Inc/cells.h"
+ARM GAS  /tmp/ccUdLFZj.s 			page 4
+
+
+DEFINED SYMBOLS
+                            *ABS*:00000000 contactors.cpp
+     /tmp/ccUdLFZj.s:20     .text._Z21setPrechargeContactorb:00000000 $t
+     /tmp/ccUdLFZj.s:26     .text._Z21setPrechargeContactorb:00000000 _Z21setPrechargeContactorb
+     /tmp/ccUdLFZj.s:54     .text._Z21setPrechargeContactorb:00000010 $d
+.ARM.extab.text._Z21setPrechargeContactorb:00000000 $d
+.ARM.exidx.text._Z21setPrechargeContactorb:00000000 $d
+     /tmp/ccUdLFZj.s:60     .text._Z17setDriveContactorb:00000000 $t
+     /tmp/ccUdLFZj.s:66     .text._Z17setDriveContactorb:00000000 _Z17setDriveContactorb
+     /tmp/ccUdLFZj.s:107    .text._Z17setDriveContactorb:0000001c $d
+.ARM.exidx.text._Z17setDriveContactorb:00000000 $d
+     /tmp/ccUdLFZj.s:113    .text._Z19setDischargeDisableb:00000000 $t
+     /tmp/ccUdLFZj.s:119    .text._Z19setDischargeDisableb:00000000 _Z19setDischargeDisableb
+.ARM.exidx.text._Z19setDischargeDisableb:00000000 $d
+
+UNDEFINED SYMBOLS
+HAL_GPIO_WritePin
+__aeabi_unwind_cpp_pr1
+__aeabi_unwind_cpp_pr0
