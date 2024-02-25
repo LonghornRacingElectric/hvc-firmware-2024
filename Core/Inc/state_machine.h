@@ -11,6 +11,10 @@
 #define STATE_CHARGING_PRECHARGING 4
 #define STATE_CHARGING 5
 
-int updateStateMachine(bool shutdownClosed, bool hvOk, bool chargerPresent);
+static int currentState = 1;
+static float verifyVoltage = 0.0f;
+
+void stateMachineInit();
+int updateStateMachine(bool shutdownClosed, bool hvOk, bool chargerPresent, float deltaTime);
 
 #endif //HVC_FIRMWARE_2024_STATE_MACHINE_H

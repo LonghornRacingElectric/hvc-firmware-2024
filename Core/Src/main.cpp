@@ -36,7 +36,7 @@
 #include "vsense.h"
 #include "isense.h"
 #include "cells.h"
-//#include "clock.h"
+#include "clock.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -112,8 +112,14 @@ int main(void)
   MX_SPI2_Init();
   MX_TIM5_Init();
   MX_UART4_Init();
+
   /* USER CODE BEGIN 2 */
-//  clock_init();
+  clock_init();
+  stateMachineInit();
+  vcuInit();
+  cellsInit();
+  chargingInit();
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -122,15 +128,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-        
-        cellsInit();
-        cellsPeriodic();
-        // For testing
-        while(1) {
-          __asm("NOP");
-        }
 
-//        float deltaTime = clock_getDeltaTime();
+        float deltaTime = clock_getDeltaTime();
 
         bool hvOk = isTempWithinBounds();
         hvOk = hvOk && isPackVoltageWithinBounds();
@@ -139,15 +138,14 @@ int main(void)
         // TODO see if more checks are needed
         bool imdOk = isImdOk();
         bool shutdownClosed = isShutdownClosed();
-        bool chargerPresent = false; // isChargerPresent(); // TODO from CAN
+        bool chargerPresent = isChargingConnected();
 
-        int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent);
+        int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent, deltaTime);
 
         cellsPeriodic();
         thermalPeriodic();
-        vcuPeriodic();
-        chargingPeriodic();
-        setIndicatorLights(!hvOk, !imdOk);
+        vcuPeriodic(!hvOk, !imdOk);
+        chargingPeriodic(deltaTime);
     }
   /* USER CODE END 3 */
 }

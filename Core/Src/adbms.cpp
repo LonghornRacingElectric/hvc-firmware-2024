@@ -1,7 +1,7 @@
 /**
  * @file adbms.cpp
  * @author Pranit Arya
- * @brief Communication functions for ADBMS IC (LTC6813)
+ * @brief Communication functions for ADBMScheck IC (LTC6813)
  * @version 0.1
  * @date 2023-10-29
  *

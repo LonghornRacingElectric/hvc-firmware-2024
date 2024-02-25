@@ -32,15 +32,6 @@ extern "C" {
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
-#include "imd.h"
-#include "thermal.h"
-#include "state_machine.h"
-#include "vcu.h"
-#include "charging.h"
-#include "vsense.h"
-#include "isense.h"
-#include "cells.h"
-
 /* USER CODE END Includes */
 
 /* Exported types ------------------------------------------------------------*/

@@ -35,7 +35,8 @@ extern "C" {
 extern ADC_HandleTypeDef hadc1;
 
 /* USER CODE BEGIN Private defines */
-static uint16_t adcDataDMA[5];
+#define NUM_ADC_CHANNELS 6
+static uint16_t adcDataDMA[NUM_ADC_CHANNELS];
 //int adcConversionComplete= 0;
 /* USER CODE END Private defines */
 
@@ -44,7 +45,8 @@ void MX_ADC1_Init(void);
 /* USER CODE BEGIN Prototypes */
 int isShutdownClosed();
 float getShutdownCircuit();
-float getControlPilot();
+float getProximity();
+float getPilot();
 float getVSense();
 float getISenseLow();
 float getISenseHigh();
