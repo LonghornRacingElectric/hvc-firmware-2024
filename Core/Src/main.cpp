@@ -29,14 +29,15 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "imd.h"
-#include "thermal.h"
 #include "state_machine.h"
 #include "vcu.h"
 #include "charging.h"
 #include "vsense.h"
 #include "isense.h"
+#include "tsense.h"
 #include "cells.h"
 #include "clock.h"
+#include "fans.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -115,11 +116,12 @@ int main(void)
 
   /* USER CODE BEGIN 2 */
   clock_init();
-  stateMachineInit();
-  vcuInit();
-  cellsInit();
+  tsenseInit();
   chargingInit();
-
+  fansInit();
+  vcuInit();
+  stateMachineInit();
+  cellsInit();
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -143,9 +145,10 @@ int main(void)
         int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent, deltaTime);
 
         cellsPeriodic();
-        thermalPeriodic();
-        vcuPeriodic(!hvOk, !imdOk);
-        chargingPeriodic(deltaTime / 1000);
+        tsensePeriodic();
+        vcuPeriodic(!hvOk, !imdOk, state);
+        chargingPeriodic(deltaTime);
+        fansPeriodic(deltaTime);
     }
   /* USER CODE END 3 */
 }
