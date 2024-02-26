@@ -13,9 +13,6 @@ static PilotState pilot_state = STANDBY;
 static float max_charger_current = 0.0; //Max current that charger will provide
 
 
-
-static CanOutbox ccs_outbox;
-
 void chargingInit() {
     int error = HAL_FDCAN_Start(&hfdcan2);
     if(error != HAL_OK) {
@@ -23,7 +20,6 @@ void chargingInit() {
     }
     ccs_can_handle = &hfdcan2;
     accum_time = 0;
-    can_addOutbox(HVC_VCU_CCS_INFO, 1.0f, &ccs_outbox);
 }
 
 bool isChargingConnected() {
