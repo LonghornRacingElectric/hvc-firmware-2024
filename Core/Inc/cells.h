@@ -20,6 +20,7 @@ static float maxAllowedTemp = 60.0f;
 static float minTemp;
 static float maxTemp;
 static float packVoltage;
+static int numCells = 140;
 
 
 // Functions
