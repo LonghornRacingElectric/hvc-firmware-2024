@@ -49,12 +49,18 @@ void vcuPeriodic(bool amsIndicator, bool imdIndicator, int state) {
     can_writeFloat(int16_t, &imuGyro, 2, gyroData.y, 0.01f);
     can_writeFloat(int16_t, &imuGyro, 4, gyroData.z, 0.01f);
 
-    can_writeInt(int16_t, &fanRPMs, 0, (int16_t) trueRpmMain);
-    can_writeInt(int16_t, &fanRPMs, 2, (int16_t) trueRpmUnique);
+    can_writeInt(int16_t, &fanRPMs, 0, trueRpmMain);
+    can_writeInt(int16_t, &fanRPMs, 2, trueRpmUnique);
 
     // Indicator Status
-    can_writeInt(uint8_t, &indicatorStatus, 0, (uint8_t) amsIndicator);
-    can_writeInt(uint8_t, &indicatorStatus, 1, (uint8_t) imdIndicator);
+    can_writeInt(uint8_t, &indicatorStatus, 0, amsIndicator);
+    can_writeInt(uint8_t, &indicatorStatus, 1, imdIndicator);
+
+    // CCS Info
+    // TODO implement
+
+    // Contactor Status
+    can_writeInt(uint8_t, &contactorStatus, 0, state);
 
     // Check VCU->HVC Params Inbox
     if(parameterInbox.isRecent) {
