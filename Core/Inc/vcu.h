@@ -7,7 +7,7 @@ void vcuInit();
 /**
  * gather IMU and pack data, send packets periodically
  */
-void vcuPeriodic(bool amsIndicator, bool imdIndicator);
+void vcuPeriodic(bool amsIndicator, bool imdIndicator, int state);
 
 
 #endif //HVC_FIRMWARE_2024_VCU_H
