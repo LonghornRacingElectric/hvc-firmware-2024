@@ -33,13 +33,13 @@ void cellsPeriodic() {
             if(cmd_ID == 4) {
                 for(int k = 0 ; k < 2 ; k++) {
                     value = (rawData[j*6+k*2+1] << 8) | rawData[j*6+k*2];
-                    voltageData[cmd_ID*3+j*14+k] = value;
+                    voltageData[cmd_ID*3+j*14+k] = convertVoltage(value);
                 }
             }
             else {
                 for(int k = 0 ; k < 3 ; k++) {
                     value = (rawData[j*6+k*2+1] << 8) | rawData[j*6+k*2];
-                    voltageData[cmd_ID*3+j*14+k] = value;
+                    voltageData[cmd_ID*3+j*14+k] = convertVoltage(value);
                 }
             }
 
@@ -49,7 +49,7 @@ void cellsPeriodic() {
     // Writes voltage values into CanOutboxes
     for(int i = 0 ; i < 35 ; i++) {
         for(int j = 0 ; j < 4 ; j++) {
-            can_writeBytes(cellVoltages[i].data, j*2, j*2+1, voltageData[i*4+j]);
+            can_writeFloat(uint16_t, &cellVoltages[i], j*2, voltageData[i*4+j], 0.0001f);
         }
     }
 
@@ -61,20 +61,20 @@ void cellsPeriodic() {
             if (cmd_ID == 5 || cmd_ID == 7) {
                 for (int k = 0; k < 3; k++) {
                     value = (rawData[j * 6 + k * 2 + 1] << 8) | rawData[j * 6 + k * 2];
-                    tempData[(cmd_ID - 5) / 2 * 5 + j * 9 + k] = value;
+                    tempData[(cmd_ID - 5) / 2 * 5 + j * 9 + k] = convertTemp(value);
                 }
             }
             // For Auxiliary Register Group B, there are 2 temp values
             if (cmd_ID == 6) {
                 for (int k = 0; k < 2; k++) {
                     value = (rawData[j * 6 + k * 2 + 1] << 8) | rawData[j * 6 + k * 2];
-                    tempData[3 + j * 9 + k] = value;
+                    tempData[3 + j * 9 + k] = convertTemp(value);
                 }
             }
             // For Auxiliary Register Group D, there is 1 temp value
             if (cmd_ID == 8) {
                 value = (rawData[j * 6 + 1] << 8) | rawData[j * 6];
-                tempData[8 + j * 9] = value;
+                tempData[8 + j * 9] = convertTemp(value);
             }
         }
     }
@@ -83,8 +83,8 @@ void cellsPeriodic() {
     for(int i = 0 ; i < 23 ; i++) {
         for(int j = 0 ; j < 4 ; j++) {
             if(i == 22 && j > 1) break;
-            can_writeBytes(cellTemps[i].data, j*2, j*2+1, tempData[i*4+j]);
-            checkMinMaxTemps((float) tempData[i*4+j]);
+            can_writeFloat(uint16_t, &cellTemps[i], j*2, tempData[i*4+j], 0.1f);
+            checkMinMaxTemps(tempData[i*4+j]);
         }
     }
 
@@ -104,24 +104,35 @@ void checkMinMaxTemps(float temp) {
 }
 
 bool areCellVoltagesWithinBounds() {
-    // TODO implement
-    return false;
+    for(int i = 0 ; i < numCells ; i++) {
+        if(voltageData[i] > 4.2f || voltageData[i] < 2.5f) {
+            // TODO send fault message: specify which cell is bad
+            return false;
+        }
+    }
+    return true;
 }
 
 bool isPackVoltageWithinBounds() {
-    // TODO implement
-    return false;
+    packVoltage = getPackVoltageFromCells();
+    if(packVoltage > 420.0f || packVoltage < 250.0f) {
+        // TODO send fault message
+        return false;
+    }
+    return true;
 }
 
 float getPackVoltageFromCells() {
     packVoltage = 0.0f;
-    for(uint16_t value : voltageData) {
-        packVoltage += (float) value;
+    for(float value : voltageData) {
+        packVoltage += value;
     }
     return packVoltage;
 }
 
-
+bool isTempWithinBounds() {
+    return getMinTemp() >= minAllowedTemp && getMaxTemp() <= maxAllowedTemp;
+}
 
 float getMaxTemp() {
     return maxTemp;
@@ -129,4 +140,17 @@ float getMaxTemp() {
 
 float getMinTemp() {
     return minTemp;
+}
+
+float convertTemp(uint16_t Vout) {
+    return ((float) Vout - Voc) / Tc;
+}
+
+float convertVoltage(uint16_t voltage) {
+    return ((float) voltage * 0.0001f);
+}
+
+void updateTempParameters(float newMinTemp, float newMaxTemp) {
+    minAllowedTemp = newMinTemp;
+    maxAllowedTemp = newMaxTemp;
 }
