@@ -49,8 +49,8 @@ void vcuPeriodic(bool amsIndicator, bool imdIndicator, int state) {
     can_writeFloat(int16_t, &imuGyro, 2, gyroData.y, 0.01f);
     can_writeFloat(int16_t, &imuGyro, 4, gyroData.z, 0.01f);
 
-    can_writeInt(int16_t, &fanRPMs, 0, trueRpmMain);
-    can_writeInt(int16_t, &fanRPMs, 2, trueRpmUnique);
+    can_writeFloat(int16_t, &fanRPMs, 0, trueRpmMain, 1.0f);
+    can_writeFloat(int16_t, &fanRPMs, 2, trueRpmUnique, 1.0f);
 
     // Indicator Status
     can_writeInt(uint8_t, &indicatorStatus, 0, amsIndicator);
