@@ -17,6 +17,8 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <cstring>
+#include <string>
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
@@ -38,6 +40,7 @@
 #include "cells.h"
 #include "clock.h"
 #include "fans.h"
+#include "led.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -113,15 +116,19 @@ int main(void)
   MX_SPI2_Init();
   MX_TIM5_Init();
   MX_UART4_Init();
-
   /* USER CODE BEGIN 2 */
   clock_init();
-  tsenseInit();
-  chargingInit();
-  fansInit();
-  vcuInit();
-  stateMachineInit();
-  cellsInit();
+  led_init();
+//  tsenseInit();
+//  chargingInit();
+//  fansInit();
+//  vcuInit();
+//  stateMachineInit();
+//  cellsInit();
+
+  std::string str = "Hi, it's the HVC!\n";
+  auto data = (uint8_t*) str.c_str();
+  HAL_UART_Transmit(&huart4, data, strlen(str.c_str()), 1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -132,23 +139,24 @@ int main(void)
     /* USER CODE BEGIN 3 */
 
         float deltaTime = clock_getDeltaTime();
+        led_rainbow(deltaTime);
 
-        bool hvOk = isTempWithinBounds();
-        hvOk = hvOk && isPackVoltageWithinBounds();
-        hvOk = hvOk && isPackCurrentWithinBounds();
-        hvOk = hvOk && areCellVoltagesWithinBounds();
-        // TODO see if more checks are needed
-        bool imdOk = isImdOk();
-        bool shutdownClosed = isShutdownClosed();
-        bool chargerPresent = isChargingConnected();
-
-        int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent, deltaTime);
-
-        cellsPeriodic();
-        tsensePeriodic();
-        vcuPeriodic(!hvOk, !imdOk, state);
-        chargingPeriodic(deltaTime);
-        fansPeriodic(deltaTime);
+//        bool hvOk = isTempWithinBounds();
+//        hvOk = hvOk && isPackVoltageWithinBounds();
+//        hvOk = hvOk && isPackCurrentWithinBounds();
+//        hvOk = hvOk && areCellVoltagesWithinBounds();
+//        // TODO see if more checks are needed
+//        bool imdOk = isImdOk();
+//        bool shutdownClosed = isShutdownClosed();
+//        bool chargerPresent = isChargingConnected();
+//
+//        int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent, deltaTime);
+//
+//        cellsPeriodic();
+//        tsensePeriodic();
+//        vcuPeriodic(!hvOk, !imdOk, state);
+//        chargingPeriodic(deltaTime);
+//        fansPeriodic(deltaTime);
     }
   /* USER CODE END 3 */
 }

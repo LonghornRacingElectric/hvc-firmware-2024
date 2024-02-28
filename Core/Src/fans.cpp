@@ -40,10 +40,10 @@ void calculateTrueRpm(float deltaTime) {
         if(time > 0.1f) {
             time = 0.0f;
         }
-        pulseTimes[index] = time;
+        pulseTimes[index1] = time;
         time = 0.0f;
-        index++;
-        index %= 10;
+        index1++;
+      index1 %= 10;
     }
     prevTach = currTach;
 

@@ -16,7 +16,7 @@ static float maxRpmMain = 8300.0f;
 static float pulseTimes[10];
 static float timeTotal = 0.0f;
 static float numPulses = 0.0f;
-static int index = 0;
+static int index1 = 0;
 static bool prevTach = false;
 static bool currTach = false;
 

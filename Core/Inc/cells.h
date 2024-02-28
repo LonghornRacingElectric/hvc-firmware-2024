@@ -28,7 +28,6 @@ bool areCellVoltagesWithinBounds();
 bool isPackVoltageWithinBounds();
 bool isTempWithinBounds();
 float getPackVoltageFromCells();
-float getSoC();
 float getMaxTemp();
 float getMinTemp();
 void updateTempParameters(float newMinTemp, float newMaxTemp);
