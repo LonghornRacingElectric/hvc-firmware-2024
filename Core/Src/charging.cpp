@@ -148,9 +148,9 @@ PilotState getPilotState(){
 uint32_t charging_can_send(uint16_t volt_adj, uint16_t curr_adj) {
 
     uint8_t data[8] = {0};
-    can_writeBytes(data, 0, 1, volt_adj);
-    can_writeBytes(data, 2, 3, curr_adj);
-    can_writeBytes(data, 4, 7, 0);
+//    can_writeBytes(data, 0, 1, volt_adj);
+//    can_writeBytes(data, 2, 3, curr_adj);
+//    can_writeBytes(data, 4, 7, 0);
 
     static FDCAN_TxHeaderTypeDef TxHeader;
     TxHeader.Identifier = HVC_CCS_LIMIT;
@@ -173,8 +173,8 @@ uint32_t charging_can_send(uint16_t volt_adj, uint16_t curr_adj) {
     }
 
   // Sends out CCS data to VCU -> Texas Tune
-    can_writeBytes(ccs_outbox.data, 0, 1, volt_adj * 10);
-    can_writeBytes(ccs_outbox.data, 2, 3, curr_adj * 10);
+//    can_writeBytes(ccs_outbox.data, 0, 1, volt_adj * 10);
+//    can_writeBytes(ccs_outbox.data, 2, 3, curr_adj * 10);
     return 0;
 }
 
@@ -191,29 +191,29 @@ uint32_t charging_can_receive(float& voltage_given, float& current_given) {
     }
     if(id != CCS_HVC_OUTPUT && id != HVC_CCS_LIMIT) return 0; //If this happens, there is a collision between Charging CAN and our CAN
 
-    voltage_given = ((float) can_readBytes(data, 0, 1)) / 10.0f;
-    current_given = ((float) can_readBytes(data, 2, 3)) / 10.0f;
-    uint8_t status = can_readBytes(data, 5, 5);
-    if(status & 0b00000001) {
-        // Set CCS Hardware Failure Fault
-        FAULT_SET(&hvc_fault_vector, FAULT_HVC_CCS_HARDWARE);
-    }
-    if(status & 0b00000010) {
-        // Set CCS Over Temperature Protection Fault
-        FAULT_SET(&hvc_fault_vector, FAULT_HVC_CCS_OVERTEMP);
-    }
-    if(status & 0b00000100) {
-        // Set CCS Incorrect Voltage Fault
-        FAULT_SET(&hvc_fault_vector, FAULT_HVC_CCS_INCORRECT_VOLTAGE);
-    }
-    if(status & 0b00001000) {
-        // Set Charger is Off Fault
-        FAULT_SET(&hvc_fault_vector, FAULT_HVC_CCS_CHARGER_OFF);
-    }
-    if(status & 0b00010000) {
-        // Set CCS Communication TimeOut Fault
-        FAULT_SET(&hvc_fault_vector, FAULT_HVC_CCS);
-    }
+//    voltage_given = ((float) can_readBytes(data, 0, 1)) / 10.0f;
+//    current_given = ((float) can_readBytes(data, 2, 3)) / 10.0f;
+//    uint8_t status = can_readBytes(data, 5, 5);
+//    if(status & 0b00000001) {
+//        // Set CCS Hardware Failure Fault
+//        FAULT_SET(&hvc_fault_vector, FAULT_HVC_CCS_HARDWARE);
+//    }
+//    if(status & 0b00000010) {
+//        // Set CCS Over Temperature Protection Fault
+//        FAULT_SET(&hvc_fault_vector, FAULT_HVC_CCS_OVERTEMP);
+//    }
+//    if(status & 0b00000100) {
+//        // Set CCS Incorrect Voltage Fault
+//        FAULT_SET(&hvc_fault_vector, FAULT_HVC_CCS_INCORRECT_VOLTAGE);
+//    }
+//    if(status & 0b00001000) {
+//        // Set Charger is Off Fault
+//        FAULT_SET(&hvc_fault_vector, FAULT_HVC_CCS_CHARGER_OFF);
+//    }
+//    if(status & 0b00010000) {
+//        // Set CCS Communication TimeOut Fault
+//        FAULT_SET(&hvc_fault_vector, FAULT_HVC_CCS);
+//    }
     return 0;
 }
 
