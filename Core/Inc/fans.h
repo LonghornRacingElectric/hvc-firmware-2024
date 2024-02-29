@@ -11,8 +11,7 @@ static float pwmDutyCycleUnique = 0.0f;
 
 // Main Fan
 static float time;
-static float trueRpmMain = 0.0f;
-static float maxRpmMain = 8300.0f;
+static float trueRpmMain = 0.0f; // 8300 RPM max
 static float pulseTimes[10];
 static float timeTotal = 0.0f;
 static float numPulses = 0.0f;
@@ -22,8 +21,7 @@ static bool currTach = false;
 
 //Unique Fan
 static float time2;
-static float trueRpmUnique = 0.0f;
-static float maxRpmUnique = 9000.0f;
+static float trueRpmUnique = 0.0f; // 9000 RPM max
 static float pulseTimes2[10];
 static float timeTotal2 = 0.0f;
 static float numPulses2 = 0.0f;

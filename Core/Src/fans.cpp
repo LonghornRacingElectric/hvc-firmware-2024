@@ -36,7 +36,7 @@ void calculateTrueRpm(float deltaTime) {
     time2 += deltaTime;
 
     // Detects when tach falls from high to low, and stores pulse time for main and unique
-    if(prevTach > currTach) {
+    if(prevTach > currTach || time > 0.1f) {
         if(time > 0.1f) {
             time = 0.0f;
         }
@@ -47,7 +47,7 @@ void calculateTrueRpm(float deltaTime) {
     }
     prevTach = currTach;
 
-    if(prevTach2 > currTach2) {
+    if(prevTach2 > currTach2 || time2 > 0.1f) {
         if(time2 > 0.1f) {
             time2 = 0.0f;
         }
@@ -65,7 +65,7 @@ void calculateTrueRpm(float deltaTime) {
         if(t > 0.0f) numPulses += 1;
         timeTotal += t;
     }
-    trueRpmMain = (timeTotal != 0.0f) ? (numPulses / timeTotal * 60.0f) : 0.0f;
+    trueRpmMain = (numPulses >= 5) ? (numPulses / timeTotal * 60.0f) : 0.0f;
 
     numPulses2 = 0;
     timeTotal2 = 0;
@@ -73,7 +73,7 @@ void calculateTrueRpm(float deltaTime) {
         if(t > 0.0f) numPulses2 += 1;
         timeTotal2 += t;
     }
-    trueRpmUnique = (timeTotal2 != 0.0f) ? (numPulses2 / timeTotal2 * 60.0f) : 0.0f;
+    trueRpmUnique = (numPulses2 >= 5) ? (numPulses2 / timeTotal2 * 60.0f) : 0.0f;
 }
 
 void fansInit() {

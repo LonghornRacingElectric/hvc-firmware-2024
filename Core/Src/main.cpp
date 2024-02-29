@@ -17,8 +17,6 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include <cstring>
-#include <string>
 #include "main.h"
 #include "adc.h"
 #include "dma.h"
@@ -41,6 +39,7 @@
 #include "clock.h"
 #include "fans.h"
 #include "led.h"
+#include "usb.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -126,9 +125,6 @@ int main(void)
 //  stateMachineInit();
 //  cellsInit();
 
-  std::string str = "Hi, it's the HVC!\n";
-  auto data = (uint8_t*) str.c_str();
-  HAL_UART_Transmit(&huart4, data, strlen(str.c_str()), 1000);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -140,6 +136,9 @@ int main(void)
 
         float deltaTime = clock_getDeltaTime();
         led_rainbow(deltaTime);
+
+        std::string x = "hello world!";
+//        println(x);
 
 //        bool hvOk = isTempWithinBounds();
 //        hvOk = hvOk && isPackVoltageWithinBounds();
@@ -154,7 +153,7 @@ int main(void)
 //
 //        cellsPeriodic();
 //        tsensePeriodic();
-//        vcuPeriodic(!hvOk, !imdOk, state);
+//        vcuPeriodic(!hvOk, !imdOk, state, deltaTime);
 //        chargingPeriodic(deltaTime);
 //        fansPeriodic(deltaTime);
     }
