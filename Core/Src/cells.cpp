@@ -1,7 +1,6 @@
 #include "cells.h"
 #include "angel_can.h"
 #include "adbms.h"
-#include "usb.h"
 
 // 0-4 is read cell voltages, 5-8 is read cell temperatures
 static LTC6813_Command_t CMD_RDCs[9] = {CMD_RDCVA, CMD_RDCVB, CMD_RDCVC, CMD_RDCVD, CMD_RDCVE,
@@ -119,7 +118,6 @@ bool areCellVoltagesWithinBounds() {
 
 bool isPackVoltageWithinBounds() {
   packVoltage = getPackVoltageFromCells();
-//  println(packVoltage);
   if (packVoltage > 420.0f || packVoltage < 250.0f) {
     // TODO send fault message
     return false;
@@ -149,13 +147,11 @@ float getMinTemp() {
 
 float convertTemp(uint16_t Vout) {
   float temp = (Vout/10.0f - Voc) / Tc;
-  println(temp);
   return temp;
 }
 
 float convertVoltage(uint16_t v) {
   float voltage = v * 0.0001f;
-//  println(voltage);
   return voltage;
 }
 
