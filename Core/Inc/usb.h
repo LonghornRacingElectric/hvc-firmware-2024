@@ -4,6 +4,7 @@
 #include "usart.h"
 #include <string>
 
-void println(std::string& line);
+void println(float f);
+void println(std::string& s);
 
 #endif //HVC_FIRMWARE_2024_USB_H

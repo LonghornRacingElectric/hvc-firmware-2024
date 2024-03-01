@@ -3,13 +3,18 @@
 
 static uint8_t buffer[1024];
 
-void println(std::string& line) {
-  if(line.size() > 1000) {
+void println(float f) {
+  std::string s = std::to_string(f);
+  println(s);
+}
+
+void println(std::string& s) {
+  if(s.size() > 1000) {
     return;
   }
-  strcpy(reinterpret_cast<char *>(buffer), line.c_str());
-  size_t s = line.size();
-  buffer[s++] = '\n';
-  buffer[s] = '\0';
-  HAL_UART_Transmit(&huart4, buffer, s, 100);
+  strcpy(reinterpret_cast<char *>(buffer), s.c_str());
+  size_t size = s.size();
+  buffer[size++] = '\n';
+  buffer[size] = '\0';
+  HAL_UART_Transmit(&huart4, buffer, size, 100);
 }
