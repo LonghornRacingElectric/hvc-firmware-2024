@@ -37,8 +37,8 @@ void calculateTrueRpm(float deltaTime) {
   time2 += deltaTime;
 
   // Detects when tach falls from high to low, and stores pulse time for main and unique
-  if (prevTach > currTach || time > 0.1f) {
-    if (time > 0.1f) {
+  if (prevTach > currTach || time > tachTimeout) {
+    if (time > tachTimeout) {
       time = 0.0f;
     }
     pulseTimes[index1] = time;
@@ -48,8 +48,8 @@ void calculateTrueRpm(float deltaTime) {
   }
   prevTach = currTach;
 
-  if (prevTach2 > currTach2 || time2 > 0.1f) {
-    if (time2 > 0.1f) {
+  if (prevTach2 > currTach2 || time2 > tachTimeout) {
+    if (time2 > tachTimeout) {
       time2 = 0.0f;
     }
     pulseTimes2[index2] = time2;
@@ -60,6 +60,7 @@ void calculateTrueRpm(float deltaTime) {
   prevTach2 = currTach2;
 
   // Adds up total pulse time and counts num of pulses to calculate true rpm for main and unique
+  // TODO tends to give wonky numbers as fan RPM goes really low (i think it's related to the >= 5 thing, and i noticed it's better when the tachTimeout is larger)
   numPulses = 0;
   timeTotal = 0;
   for (float t: pulseTimes) {

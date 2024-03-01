@@ -118,11 +118,11 @@ int main(void)
   /* USER CODE BEGIN 2 */
   clock_init();
   led_init();
-//  tsenseInit();
-//  chargingInit();
+  tsenseInit();
+  chargingInit();
   fansInit();
-//  vcuInit();
-//  stateMachineInit();
+  vcuInit();
+  stateMachineInit();
   cellsInit();
 
   /* USER CODE END 2 */
@@ -150,10 +150,12 @@ int main(void)
 
     cellsPeriodic();
     tsensePeriodic();
-//    vcuPeriodic(!hvOk, !imdOk, state, deltaTime);
-//    chargingPeriodic(deltaTime);
+    vcuPeriodic(!hvOk, !imdOk, state, deltaTime);
+    chargingPeriodic(deltaTime);
     fansPeriodic(deltaTime);
 //    println(getAmbientTemp());
+
+    println(getUniqueFanRpm());
 
     // TODO output AMS fault
   }
