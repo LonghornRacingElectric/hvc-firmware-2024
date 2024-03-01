@@ -149,10 +149,12 @@ int main(void) {
     int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent, deltaTime);
 
     cellsPeriodic();
-//    tsensePeriodic();
+    tsensePeriodic();
 //    vcuPeriodic(!hvOk, !imdOk, state, deltaTime);
 //    chargingPeriodic(deltaTime);
 //    fansPeriodic(deltaTime);
+
+    println(getAmbientTemp());
 
     // TODO output AMS fault
   }
