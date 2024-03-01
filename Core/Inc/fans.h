@@ -6,7 +6,7 @@
 static float tachTimeout = 0.4f;
 
 // PWM Control
-static float reqPwm = 10.0f;
+static float reqPwm = 0.0f;
 static float pwmTimer = 0.0f;
 static float pwmDutyCycleMain = 0.0f;
 static float pwmDutyCycleUnique = 0.0f;
