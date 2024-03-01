@@ -34,5 +34,7 @@ void fansInit();
 void fansPeriodic(float deltaTime);
 void setFanPwm(float reqPwm, float deltaTime);
 void calculateTrueRpm(float deltaTime);
+float getMainFanRpm();
+float getUniqueFanRpm();
 
 #endif //HVC_FIRMWARE_2024_FANS_H
