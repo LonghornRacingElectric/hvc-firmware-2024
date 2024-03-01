@@ -40,6 +40,7 @@
 #include "fans.h"
 #include "led.h"
 #include "usb.h"
+#include "imu.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -125,6 +126,8 @@ int main(void)
   stateMachineInit();
   cellsInit();
 
+  imu_init(&hspi1);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -149,13 +152,19 @@ int main(void)
     int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent, deltaTime);
 
     cellsPeriodic();
-    tsensePeriodic();
+//    tsensePeriodic();
     vcuPeriodic(!hvOk, !imdOk, state, deltaTime);
     chargingPeriodic(deltaTime);
     fansPeriodic(deltaTime);
 //    println(getAmbientTemp());
 
-    println(getUniqueFanRpm());
+    xyz accel;
+    std::string s = "";
+    imu_getAccel(&accel);
+    println(accel.x);
+    println(accel.y);
+    println(accel.z);
+    println(s);
 
     // TODO output AMS fault
   }
