@@ -11,6 +11,7 @@
 
 #include <cstdint>
 #include "adbms.h"
+#include "ltc6813.h"
 #include "spi.h"
 
 
@@ -98,6 +99,26 @@ LTC6813_Error_t ltc6813_cmd_read(LTC6813_Command_t command, uint8_t *data_buf) {
 
 }
 
+LTC6813_Error_t ltc6813_start_adc_conv(uint8_t cells) {
+    ltc6813_adcv(MD_7KHZ_3KHZ, DCP_ENABLED, cells);
+
+    return LTC6813_OK;
+}
+
+// data_buf must be >= data size (6 bytes per ADC IC?)
+LTC6813_Error_t ltc6813_cmd_read(LTC6813_Command_t command, uint8_t *data_buf) {
+    LTC6813_Command_t cmd_buf = command; // PEC15 requires pointer to command
+    LTC6813_Error_t output_status = LTC6813_OK;
+    uint16_t received_data_crc;
+    uint16_t cmd_crc = pec15((char *) cmd_buf, 2);
+
+    // Send command
+    if(HAL_SPI_Transmit(&hspi1, (uint8_t *) &cmd_buf, 2, LTC_SPI_TIMEOUT) != HAL_OK) {
+        return LTC6813_SPI_ERROR;
+    }
+    if(HAL_SPI_Transmit(&hspi1, (uint8_t *) &cmd_crc, 2, LTC_SPI_TIMEOUT) != HAL_OK) {
+        return LTC6813_SPI_ERROR;
+    }
 
 LTC6813_Error_t ltc6813_cmd(LTC6813_Command_t command) {
   uint16_t command_int = command;

@@ -49,11 +49,11 @@ Copyright 2017 Linear Technology Corp. (LTC)
 #include "spi.h"
 
 void cs_low() {
-  HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_RESET);
+  HAL_GPIO_WritePin(CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_RESET);
 }
 
 void cs_high() {
-  HAL_GPIO_WritePin(SPI_CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_SET);
+  HAL_GPIO_WritePin(CS_GPIO_Port, SPI_CS_Pin, GPIO_PIN_SET);
 }
 
 void delay_u(uint16_t micro) {

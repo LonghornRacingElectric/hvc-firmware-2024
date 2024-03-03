@@ -227,6 +227,14 @@ const uint16_t pec15Table[256] {0x0,0xc599, 0xceab, 0xb32, 0xd8cf, 0x1d56, 0x166
 LTC6813_Error_t ltc6813_cmd_write(LTC6813_Command_t command, uint8_t *data, uint8_t len);
 
 /**
+ * @brief Start ADC conversion for voltages, etc
+ *
+ * @param cells
+ * @return LTC6813_Error_t
+ */
+LTC6813_Error_t ltc6813_start_adc_conv(uint8_t cells);
+
+/**
  * @brief Read command from LTC6813
  *
  * @param command
