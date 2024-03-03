@@ -29,14 +29,18 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "imd.h"
-#include "thermal.h"
 #include "state_machine.h"
 #include "vcu.h"
 #include "charging.h"
 #include "vsense.h"
 #include "isense.h"
+#include "tsense.h"
 #include "cells.h"
 #include "clock.h"
+#include "fans.h"
+#include "led.h"
+#include "usb.h"
+#include "imu.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -112,41 +116,58 @@ int main(void)
   MX_SPI2_Init();
   MX_TIM5_Init();
   MX_UART4_Init();
-
   /* USER CODE BEGIN 2 */
   clock_init();
-  stateMachineInit();
-  vcuInit();
-  cellsInit();
+  led_init();
+  tsenseInit();
   chargingInit();
+  fansInit();
+  vcuInit();
+  stateMachineInit();
+  cellsInit();
+
+  imu_init(&hspi1);
 
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
-    while (1) {
+  while (1) {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
 
-        float deltaTime = clock_getDeltaTime();
+    float deltaTime = clock_getDeltaTime();
+    led_rainbow(deltaTime);
 
-        bool hvOk = isTempWithinBounds();
-        hvOk = hvOk && isPackVoltageWithinBounds();
-        hvOk = hvOk && isPackCurrentWithinBounds();
-        hvOk = hvOk && areCellVoltagesWithinBounds();
-        // TODO see if more checks are needed
-        bool imdOk = isImdOk();
-        bool shutdownClosed = isShutdownClosed();
-        bool chargerPresent = isChargingConnected();
+    bool hvOk = isTempWithinBounds();
+    hvOk = hvOk && isPackVoltageWithinBounds();
+    hvOk = hvOk && isPackCurrentWithinBounds();
+    hvOk = hvOk && areCellVoltagesWithinBounds();
+//    // TODO see if more checks are needed
+    bool imdOk = isImdOk();
+    bool shutdownClosed = isShutdownClosed();
+    bool chargerPresent = isChargingConnected();
 
-        int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent, deltaTime);
+    int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent, deltaTime);
 
-        cellsPeriodic();
-        thermalPeriodic();
-        vcuPeriodic(!hvOk, !imdOk);
-        chargingPeriodic(deltaTime);
-    }
+    cellsPeriodic();
+//    tsensePeriodic();
+    vcuPeriodic(!hvOk, !imdOk, state, deltaTime);
+    chargingPeriodic(deltaTime);
+    fansPeriodic(deltaTime);
+//    println(getAmbientTemp());
+
+    xyz accel;
+    std::string s = "";
+    imu_getAccel(&accel);
+    println(accel.x);
+    println(accel.y);
+    println(accel.z);
+    println(s);
+
+    // TODO output AMS fault
+  }
   /* USER CODE END 3 */
 }
 
@@ -221,18 +242,16 @@ void PeriphCommonClock_Config(void)
 
   /** Initializes the peripherals clock
   */
-  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_ADC|RCC_PERIPHCLK_SPI2
-                              |RCC_PERIPHCLK_SPI1;
-  PeriphClkInitStruct.PLL2.PLL2M = 10;
-  PeriphClkInitStruct.PLL2.PLL2N = 288;
-  PeriphClkInitStruct.PLL2.PLL2P = 125;
-  PeriphClkInitStruct.PLL2.PLL2Q = 2;
-  PeriphClkInitStruct.PLL2.PLL2R = 2;
-  PeriphClkInitStruct.PLL2.PLL2RGE = RCC_PLL2VCIRANGE_0;
-  PeriphClkInitStruct.PLL2.PLL2VCOSEL = RCC_PLL2VCOMEDIUM;
-  PeriphClkInitStruct.PLL2.PLL2FRACN = 0;
-  PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL2;
-  PeriphClkInitStruct.AdcClockSelection = RCC_ADCCLKSOURCE_PLL2;
+  PeriphClkInitStruct.PeriphClockSelection = RCC_PERIPHCLK_SPI2|RCC_PERIPHCLK_SPI1;
+  PeriphClkInitStruct.PLL3.PLL3M = 1;
+  PeriphClkInitStruct.PLL3.PLL3N = 8;
+  PeriphClkInitStruct.PLL3.PLL3P = 2;
+  PeriphClkInitStruct.PLL3.PLL3Q = 2;
+  PeriphClkInitStruct.PLL3.PLL3R = 2;
+  PeriphClkInitStruct.PLL3.PLL3RGE = RCC_PLL3VCIRANGE_3;
+  PeriphClkInitStruct.PLL3.PLL3VCOSEL = RCC_PLL3VCOWIDE;
+  PeriphClkInitStruct.PLL3.PLL3FRACN = 0;
+  PeriphClkInitStruct.Spi123ClockSelection = RCC_SPI123CLKSOURCE_PLL3;
   if (HAL_RCCEx_PeriphCLKConfig(&PeriphClkInitStruct) != HAL_OK)
   {
     Error_Handler();
@@ -250,10 +269,10 @@ void PeriphCommonClock_Config(void)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
-    /* User can add his own implementation to report the HAL error return state */
-    __disable_irq();
-    while (1) {
-    }
+  /* User can add his own implementation to report the HAL error return state */
+  __disable_irq();
+  while (1) {
+  }
   /* USER CODE END Error_Handler_Debug */
 }
 

@@ -5,50 +5,69 @@
 #include "vsense.h"
 #include "cells.h"
 #include "imu.h"
-#include "thermal.h"
+#include "fans.h"
+#include "tsense.h"
+#include "soc_estimation.h"
 
 static CanInbox parameterInbox;
 static CanOutbox packStatus;
 static CanOutbox imuAccel;
 static CanOutbox imuGyro;
 static CanOutbox indicatorStatus;
+static CanOutbox fanRPMs;
+static CanOutbox ccsInfo;
+static CanOutbox contactorStatus;
 
 void vcuInit() {
     can_addInbox(VCU_HVC_PARAMS, &parameterInbox);
-    can_addOutbox(HVC_VCU_PACK_STATUS, 0.01f, &packStatus);
-    can_addOutbox(HVC_VCU_IMU_ACCEL, 0.01f, &imuAccel);
-    can_addOutbox(HVC_VCU_IMU_GYRO, 0.01f, &imuGyro);
-    can_addOutbox(HVC_VCU_AMS_IMD, 0.1f, &indicatorStatus);
+    can_addOutbox(HVC_VCU_PACK_STATUS, 0.003f, &packStatus);
+    can_addOutbox(HVC_VCU_IMU_ACCEL, 0.003f, &imuAccel);
+    can_addOutbox(HVC_VCU_IMU_GYRO, 0.003f, &imuGyro);
+    can_addOutbox(HVC_VCU_AMS_IMD, 0.003f, &indicatorStatus);
+    can_addOutbox(HVC_VCU_FAN_RPM, 0.1f, &fanRPMs);
+    can_addOutbox(HVC_VCU_CCS_INFO, 1.0f, &ccsInfo);
+    can_addOutbox(HVC_VCU_CONTACTOR_STATUS, .003f, &contactorStatus);
 }
 
 /**
  *  Get pack current, voltage, SoC, max temp -> store in data array (2 bytes each)
  *  Get imu accel and gyro data
  * */
-void vcuPeriodic(bool amsIndicator, bool imdIndicator) {
+void vcuPeriodic(bool amsIndicator, bool imdIndicator, int state, float deltaTime) {
 
     // Battery Pack and IMU Data
-    can_writeBytes(packStatus.data, 0, 1, (uint16_t) (getPackVoltageFromCells() / 0.01f));
-    can_writeBytes(packStatus.data, 2, 3, (uint16_t) (getPackCurrent() / 0.1f));
-    can_writeBytes(packStatus.data, 4, 4, (uint8_t) getSoC());
-    can_writeBytes(packStatus.data, 5, 5, (uint8_t) getMaxTemp());
+    can_writeFloat(uint16_t, &packStatus, 0, getPackVoltageFromCells(), 0.01f);
+    can_writeFloat(int16_t, &packStatus, 2, getPackCurrent(), 0.01f);
+    can_writeFloat(uint16_t, &packStatus, 4, getSoC(deltaTime), 0.01f);
+    can_writeFloat(uint8_t, &packStatus, 6, getMaxTemp(), 1.0f);
+    can_writeFloat(uint8_t, &packStatus, 7, getAmbientTemp(), 1.0f);
 
-    can_writeBytes(imuAccel.data, 0, 1, (int16_t) accelData.x);
-    can_writeBytes(imuAccel.data, 2, 3, (int16_t) accelData.y);
-    can_writeBytes(imuAccel.data, 4, 5, (int16_t) accelData.z);
+    can_writeFloat(int16_t, &imuAccel, 0, accelData.x, 0.01f);
+    can_writeFloat(int16_t, &imuAccel, 2, accelData.y, 0.01f);
+    can_writeFloat(int16_t, &imuAccel, 4, accelData.z, 0.01f);
 
-    can_writeBytes(imuGyro.data, 0, 1, (int16_t) gyroData.x);
-    can_writeBytes(imuGyro.data, 2, 3, (int16_t) gyroData.y);
-    can_writeBytes(imuGyro.data, 4, 5, (int16_t) gyroData.z);
+    can_writeFloat(int16_t, &imuGyro, 0, gyroData.x, 0.01f);
+    can_writeFloat(int16_t, &imuGyro, 2, gyroData.y, 0.01f);
+    can_writeFloat(int16_t, &imuGyro, 4, gyroData.z, 0.01f);
+
+    can_writeFloat(int16_t, &fanRPMs, 0, trueRpmMain, 1.0f);
+    can_writeFloat(int16_t, &fanRPMs, 2, trueRpmUnique, 1.0f);
 
     // Indicator Status
-    can_writeBytes(indicatorStatus.data, 0, 0, (uint8_t) amsIndicator);
-    can_writeBytes(indicatorStatus.data, 1, 1, (uint8_t) imdIndicator);
+    can_writeInt(uint8_t, &indicatorStatus, 0, amsIndicator);
+    can_writeInt(uint8_t, &indicatorStatus, 1, imdIndicator);
+
+    // CCS Info
+    // TODO implement
+
+    // Contactor Status
+    can_writeInt(uint8_t, &contactorStatus, 0, state);
 
     // Check VCU->HVC Params Inbox
     if(parameterInbox.isRecent) {
-        auto minTempParam = (float) can_readBytes(parameterInbox.data, 0, 0);
-        auto maxTempParam = (float) can_readBytes(parameterInbox.data, 1, 1);
-        updateParameters(minTempParam, maxTempParam);
+        parameterInbox.isRecent = false;
+        auto minTempParam = (float) can_readInt(uint8_t, &parameterInbox, 0);
+        auto maxTempParam = (float) can_readInt(uint8_t, &parameterInbox, 1);
+        updateTempParameters(minTempParam, maxTempParam);
     }
 }
