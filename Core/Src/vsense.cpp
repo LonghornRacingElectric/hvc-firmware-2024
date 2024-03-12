@@ -18,12 +18,7 @@ float getTractiveVoltage() {
      */
 
     // this code outputs 585.49V at 1.6318V
-    if (VSenseVoltage >= 1.6318f) {
-        return MAX_VOLTAGE; //return measured max voltage
-    } else if (VSenseVoltage <= 0.0f) {
-        return 0.0f;
-    } else {
-        return (float) (VSenseVoltage / 8.2f) * (2942.176473f) ; // 2942.176473 is voltage divider ratio
-    }
+    return (float) (VSenseVoltage / 8.2f) * (2942.176473f) ; // 2942.176473 is voltage divider ratio
+
 }
 
