@@ -130,6 +130,32 @@ float getPackVoltageFromCells() {
     return packVoltage;
 }
 
+float* getPackVoltages() {
+    return voltageData;
+}
+
+float getMaxVoltage() {
+    float out = 0;
+
+    for(float value : voltageData) {
+        if(value >= out)
+            out = value;
+    }
+
+    return out;
+}
+
+float getMinVoltage() {
+    float out = 100; // High number
+
+    for(float value : voltageData) {
+        if(value <= out)
+            out = value;
+    }
+
+    return out;
+}
+
 bool isTempWithinBounds() {
     return getMinTemp() >= minAllowedTemp && getMaxTemp() <= maxAllowedTemp;
 }

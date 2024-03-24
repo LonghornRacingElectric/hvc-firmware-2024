@@ -4,6 +4,7 @@
 #include "gpio.h"
 #include "angel_can_ids.h"
 #include "faults.h"
+#include "cells.h"
 
 static FDCAN_HandleTypeDef* ccs_can_handle;
 static float accum_time;
@@ -213,8 +214,23 @@ uint32_t charging_can_receive(float& voltage_given, float& current_given) {
     return 0;
 }
 
+/**
+ * Balancing:
+
+    1. Start charging
+    2. Wait for a cell to hit full charge
+    3. Turn off for n secs (30?) - wait for cells to go to resting
+    4. Measure each cell for lowest
+    5. Discharge every cell to that lowest value +/- some value
+    6. Repeat if total resting voltage is within some value of charged
+
+    STOP if LTC die temp exceeds are a value
+
+ *
+ */
 
 int chargingPeriodic(float delta) {
+    static uint32_t balancing_charge_wait_time_left = 0;
 
     float voltage_limit = 0.0f;
     float current_limit = 0.0f;
@@ -242,6 +258,21 @@ int chargingPeriodic(float delta) {
       current_limit = max_charger_current > MAX_CURRENT ? MAX_CURRENT : max_charger_current;
     }
 
+    if(balancing_charge_wait_time_left > 0) {
+        // Cut off charging
+        current_limit = 0;
+        voltage_limit = 0;
+        writePilotCtrl(0);
+    }
+
+    if(getMaxVoltage() >= FULL_CHARGE_THRESHOLD) {
+        // Cut off charging
+        voltage_limit = 0;
+        current_limit = 0;
+        writePilotCtrl(0);
+        balancing_charge_wait_time_left = 30000; //30 sec
+    }
+
     accum_time += delta;
     if(accum_time < 1.0f){
       return -1;
@@ -254,4 +285,9 @@ int chargingPeriodic(float delta) {
     uint32_t error_rx = charging_can_receive(voltage_given, current_given);
 
     return (error_tx + error_rx);
+}
+
+// TODO: State machine for balancing
+void balancing_state_machine() {
+
 }

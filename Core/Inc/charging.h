@@ -7,6 +7,8 @@
 #define MAX_VOLTAGE 595.0f // Max voltage that the battery can charge with
 #define PILOT_TOLERANCE 0.5f // Tolerance between the PWM high's and low's
 
+#define FULL_CHARGE_THRESHOLD 4.2f
+
 typedef enum ChargerCxnState {
     NOT_CONNECTED, // Bruv you ain't even connected
     SWITCH_PRESSED, // You're connected but the button is pressed, which releases S3, adding 330 ohms to the circuit
