@@ -140,14 +140,18 @@ int main(void)
     float deltaTime = clock_getDeltaTime();
     led_rainbow(deltaTime);
 
+    bool imdOk = isImdOk();
+    bool shutdownClosed = isShutdownClosed();
+    bool chargerPresent = isChargingConnected();
+
     bool hvOk = isTempWithinBounds();
     hvOk = hvOk && isPackVoltageWithinBounds();
     hvOk = hvOk && isPackCurrentWithinBounds();
     hvOk = hvOk && areCellVoltagesWithinBounds();
-//    // TODO see if more checks are needed
-    bool imdOk = isImdOk();
-    bool shutdownClosed = isShutdownClosed();
-    bool chargerPresent = isChargingConnected();
+
+    writeAmsError(!hvOk);
+
+    hvOk = hvOk && imdOk;
 
     int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent, deltaTime);
 

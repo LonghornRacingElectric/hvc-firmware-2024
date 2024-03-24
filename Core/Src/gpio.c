@@ -132,4 +132,8 @@ void writePilotCtrl(unsigned int state) {
   HAL_GPIO_WritePin(Ctrl_to_MCU_GPIO_Port, Ctrl_to_MCU_Pin, state);
 }
 
+void writeAmsError(unsigned int error) {
+  HAL_GPIO_WritePin(AMS_Error_GPIO_Port, AMS_Error_Pin, error);
+}
+
 /* USER CODE END 2 */
