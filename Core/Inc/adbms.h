@@ -11,7 +11,7 @@
 #define ADBMS_H
 
 #define LTC_SPI_TIMEOUT 1000 // Timeout
-#define NUM_BMS_ICS 1 // Number of BMS ICs in daisy chain
+#define NUM_BMS_ICS 2 // Number of BMS ICs in daisy chain
 // TODO change back to 10 ICs
 
 // Not used here - just for reference

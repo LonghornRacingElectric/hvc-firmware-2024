@@ -41,6 +41,7 @@
 #include "led.h"
 #include "usb.h"
 #include "imu.h"
+#include "contactors.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -136,6 +137,7 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+//    setDriveContactor(((int)clock_getTime())%2);
 
     float deltaTime = clock_getDeltaTime();
     led_rainbow(deltaTime);
@@ -153,11 +155,13 @@ int main(void)
 
     hvOk = hvOk && imdOk;
 
-    int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent, deltaTime);
+//    int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent, deltaTime);
+    volatile float tractive = getTractiveVoltage();
+      println(tractive);
 
     cellsPeriodic();
 //    tsensePeriodic();
-    vcuPeriodic(!hvOk, !imdOk, state, deltaTime);
+//    vcuPeriodic(!hvOk, !imdOk, state, deltaTime);
     chargingPeriodic(deltaTime);
     fansPeriodic(deltaTime);
 //    println(getAmbientTemp());
@@ -165,10 +169,10 @@ int main(void)
     xyz accel;
     std::string s = "";
     imu_getAccel(&accel);
-    println(accel.x);
-    println(accel.y);
-    println(accel.z);
-    println(s);
+//    println(accel.x);
+//    println(accel.y);
+//    println(accel.z);
+//    println(s);
 
     // TODO output AMS fault
   }
