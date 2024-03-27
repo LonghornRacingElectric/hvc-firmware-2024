@@ -156,23 +156,14 @@ int main(void)
     hvOk = hvOk && imdOk;
 
 //    int state = updateStateMachine(shutdownClosed, hvOk, chargerPresent, deltaTime);
-    volatile float tractive = getTractiveVoltage();
-      println(tractive);
 
     cellsPeriodic();
+    println(getPackVoltageFromCells());
 //    tsensePeriodic();
 //    vcuPeriodic(!hvOk, !imdOk, state, deltaTime);
     chargingPeriodic(deltaTime);
     fansPeriodic(deltaTime);
 //    println(getAmbientTemp());
-
-    xyz accel;
-    std::string s = "";
-    imu_getAccel(&accel);
-//    println(accel.x);
-//    println(accel.y);
-//    println(accel.z);
-//    println(s);
 
     // TODO output AMS fault
   }
