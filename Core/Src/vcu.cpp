@@ -7,6 +7,7 @@
 #include "imu.h"
 #include "fans.h"
 #include "tsense.h"
+#include "soc_estimation.h"
 
 static CanInbox parameterInbox;
 static CanOutbox packStatus;
@@ -32,12 +33,12 @@ void vcuInit() {
  *  Get pack current, voltage, SoC, max temp -> store in data array (2 bytes each)
  *  Get imu accel and gyro data
  * */
-void vcuPeriodic(bool amsIndicator, bool imdIndicator, int state) {
+void vcuPeriodic(bool amsIndicator, bool imdIndicator, int state, float deltaTime) {
 
     // Battery Pack and IMU Data
     can_writeFloat(uint16_t, &packStatus, 0, getPackVoltageFromCells(), 0.01f);
     can_writeFloat(int16_t, &packStatus, 2, getPackCurrent(), 0.01f);
-    can_writeFloat(uint16_t, &packStatus, 4, getSoC(), 0.01f);
+    can_writeFloat(uint16_t, &packStatus, 4, getSoC(deltaTime), 0.01f);
     can_writeFloat(uint8_t, &packStatus, 6, getMaxTemp(), 1.0f);
     can_writeFloat(uint8_t, &packStatus, 7, getAmbientTemp(), 1.0f);
 

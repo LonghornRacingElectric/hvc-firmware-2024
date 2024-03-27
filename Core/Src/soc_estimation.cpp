@@ -78,7 +78,7 @@ static float getSocWithVoltage(float outputVoltage) {
 }
 
 //this is the public function to call
-float socEstimation(float deltaTime) {
+float getSoC(float deltaTime) {
     bool isSocValid = (soc != -1.0f);
     float dt = deltaTime;
 

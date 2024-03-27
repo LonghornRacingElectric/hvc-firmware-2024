@@ -36,7 +36,7 @@ extern ADC_HandleTypeDef hadc1;
 
 /* USER CODE BEGIN Private defines */
 #define NUM_ADC_CHANNELS 6
-static uint16_t adcDataDMA[NUM_ADC_CHANNELS];
+static volatile uint16_t adcDataDMA[NUM_ADC_CHANNELS];
 //int adcConversionComplete= 0;
 /* USER CODE END Private defines */
 

@@ -13,12 +13,12 @@ float getTractiveVoltage() {
     /* theory of operation:
      * HV_inputV * (R2/R2+R1) = V_isoAmp
      * V_isoAmp * 8.2 = V_mcu = VSenseVoltage
+     * note derek updated because gain is really 4.11 and there's an offset apparently
      *
      * Note: at 588V, output should be 1.6318 V give or take a few mV
      */
 
-    // this code outputs 585.49V at 1.6318V
-    return (float) (VSenseVoltage / 8.2f) * (2942.176473f) ; // 2942.176473 is voltage divider ratio
+    return (float) ((VSenseVoltage-1.27f) / 4.11f) * (2942.176473f); // 2942.176473 is voltage divider ratio
 
 }
 

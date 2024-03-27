@@ -40,6 +40,7 @@ void MX_GPIO_Init(void);
 
 /* USER CODE BEGIN Prototypes */
 void writePilotCtrl(unsigned int state);
+void writeAmsError(unsigned int error);
 
 /* USER CODE END Prototypes */
 

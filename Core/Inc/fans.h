@@ -3,6 +3,8 @@
 #define HVC_FIRMWARE_2024_FANS_H
 
 /* Variables */
+static float tachTimeout = 0.4f;
+
 // PWM Control
 static float reqPwm = 0.0f;
 static float pwmTimer = 0.0f;
@@ -15,7 +17,7 @@ static float trueRpmMain = 0.0f; // 8300 RPM max
 static float pulseTimes[10];
 static float timeTotal = 0.0f;
 static float numPulses = 0.0f;
-static int index = 0;
+static int index1 = 0;
 static bool prevTach = false;
 static bool currTach = false;
 
@@ -34,5 +36,7 @@ void fansInit();
 void fansPeriodic(float deltaTime);
 void setFanPwm(float reqPwm, float deltaTime);
 void calculateTrueRpm(float deltaTime);
+float getMainFanRpm();
+float getUniqueFanRpm();
 
 #endif //HVC_FIRMWARE_2024_FANS_H

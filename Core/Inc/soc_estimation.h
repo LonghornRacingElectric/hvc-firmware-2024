@@ -10,7 +10,7 @@
 #define ARR_LEN 465
 
 
-float socEstimation(float deltaTime);
+float getSoC(float deltaTime);
 
 
 static float arrX[ARR_LEN]{ //voltage

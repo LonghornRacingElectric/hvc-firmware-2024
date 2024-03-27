@@ -9,9 +9,9 @@
 
 #include <cstdint>
 
-uint8_t thermistorData[2];
-uint16_t rawTempData = 0x0000;
-float ambientTemp = 0.0f;
+static uint8_t thermistorData[2];
+static uint16_t rawTempData = 0x0000;
+static float ambientTemp = 0.0f;
 
 void tsenseInit();
 
